@@ -1,0 +1,6 @@
+{
+  "name": "Brahmyaman Nursery",
+  "description": "Family plant nursery in Kalsuli village, Bankura, West Bengal. Quality saplings for local families, rooftop gardeners, and puja buyers with direct WhatsApp ordering and fair prices.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

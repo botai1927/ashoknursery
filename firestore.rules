@@ -1,0 +1,286 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global safety net catch-all rule
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Verified Admin Allowlist (can add, edit, update prices/stock, and soft-delete to Trash)
+    function isAuthorizedAdmin() {
+      return isSignedIn() &&
+        request.auth.token.email_verified == true &&
+        request.auth.token.email is string &&
+        request.auth.token.email.lower() in ['apurbax3@gmail.com', 'mahataapurba278@gmail.com', 'amahata169@gmail.com'];
+    }
+
+    // Verified Owner Allowlist (exclusive authority for permanent delete & factory reset)
+    function isOwner() {
+      return isSignedIn() &&
+        request.auth.token.email_verified == true &&
+        request.auth.token.email is string &&
+        request.auth.token.email.lower() in ['apurbax3@gmail.com', 'mahataapurba278@gmail.com'];
+    }
+
+    // Schema & payload boundary validator for nursery plants
+    function isValidPlant(data) {
+      return data.keys().hasAll(['id', 'nameBn', 'category', 'options']) &&
+        data.keys().hasOnly([
+          'id', 'nameBn', 'nameEn', 'botanicalName', 'category', 'audience',
+          'badgeBn', 'badgeEn', 'colorBn', 'colorEn',
+          'sunlightBn', 'sunlightEn', 'wateringBn', 'wateringEn',
+          'soilTipBn', 'soilTipEn', 'descriptionBn', 'descriptionEn',
+          'image', 'images', 'cloudinaryPublicIds', 'options', 'featured', 'inStock',
+          'createdAt', 'createdAtBn', 'updatedAt', 'updatedAtBn', 'status', 'deletedAt', 'deletedAtBn'
+        ]) &&
+        isValidId(data.id) &&
+        data.nameBn is string && data.nameBn.size() >= 1 && data.nameBn.size() <= 300 &&
+        data.category is string && data.category.size() >= 1 && data.category.size() <= 150 &&
+        data.options is list && data.options.size() >= 1 && data.options.size() <= 10 &&
+        (data.options[0] is map && data.options[0].price is number && data.options[0].price > 0) &&
+        (!('nameEn' in data) || (data.nameEn is string && data.nameEn.size() <= 300)) &&
+        (!('botanicalName' in data) || (data.botanicalName is string && data.botanicalName.size() <= 200)) &&
+        (!('audience' in data) || (
+          data.audience is list &&
+          data.audience.size() <= 10 &&
+          (data.audience.size() == 0 || (data.audience[0] is string && data.audience[0].size() <= 50))
+        )) &&
+        (!('badgeBn' in data) || (data.badgeBn is string && data.badgeBn.size() <= 120)) &&
+        (!('badgeEn' in data) || (data.badgeEn is string && data.badgeEn.size() <= 120)) &&
+        (!('colorBn' in data) || (data.colorBn is string && data.colorBn.size() <= 120)) &&
+        (!('colorEn' in data) || (data.colorEn is string && data.colorEn.size() <= 120)) &&
+        (!('sunlightBn' in data) || (data.sunlightBn is string && data.sunlightBn.size() <= 300)) &&
+        (!('sunlightEn' in data) || (data.sunlightEn is string && data.sunlightEn.size() <= 300)) &&
+        (!('wateringBn' in data) || (data.wateringBn is string && data.wateringBn.size() <= 300)) &&
+        (!('wateringEn' in data) || (data.wateringEn is string && data.wateringEn.size() <= 300)) &&
+        (!('soilTipBn' in data) || (data.soilTipBn is string && data.soilTipBn.size() <= 300)) &&
+        (!('soilTipEn' in data) || (data.soilTipEn is string && data.soilTipEn.size() <= 300)) &&
+        (!('descriptionBn' in data) || (data.descriptionBn is string && data.descriptionBn.size() <= 3000)) &&
+        (!('descriptionEn' in data) || (data.descriptionEn is string && data.descriptionEn.size() <= 3000)) &&
+        (!('image' in data) || (data.image is string && data.image.size() <= 850000)) &&
+        (!('images' in data) || (
+          data.images is list &&
+          data.images.size() <= 3 &&
+          (data.images.size() == 0 || (data.images[0] is string && data.images[0].size() <= 850000)) &&
+          (data.images.size() < 2 || (data.images[1] is string && data.images[1].size() <= 850000)) &&
+          (data.images.size() < 3 || (data.images[2] is string && data.images[2].size() <= 850000))
+        )) &&
+        (!('cloudinaryPublicIds' in data) || (
+          data.cloudinaryPublicIds is list &&
+          data.cloudinaryPublicIds.size() <= 3 &&
+          (data.cloudinaryPublicIds.size() == 0 || (data.cloudinaryPublicIds[0] is string && data.cloudinaryPublicIds[0].size() <= 300)) &&
+          (data.cloudinaryPublicIds.size() < 2 || (data.cloudinaryPublicIds[1] is string && data.cloudinaryPublicIds[1].size() <= 300)) &&
+          (data.cloudinaryPublicIds.size() < 3 || (data.cloudinaryPublicIds[2] is string && data.cloudinaryPublicIds[2].size() <= 300))
+        )) &&
+        (!('featured' in data) || (data.featured is bool)) &&
+        (!('inStock' in data) || (data.inStock is bool)) &&
+        (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 100)) &&
+        (!('createdAtBn' in data) || (data.createdAtBn is string && data.createdAtBn.size() <= 200)) &&
+        (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 100)) &&
+        (!('updatedAtBn' in data) || (data.updatedAtBn is string && data.updatedAtBn.size() <= 200)) &&
+        (!('status' in data) || (data.status in ['active', 'deleted'])) &&
+        (!('deletedAt' in data) || (data.deletedAt is string && data.deletedAt.size() <= 100)) &&
+        (!('deletedAtBn' in data) || (data.deletedAtBn is string && data.deletedAtBn.size() <= 200));
+    }
+
+    // Schema validator for admin activity logs
+    function isValidActivityLog(data) {
+      return data.keys().hasAll(['id', 'actionType', 'titleBn', 'descriptionBn']) &&
+        data.keys().hasOnly([
+          'id', 'timestamp', 'dateBn', 'timeBn', 'actionType',
+          'titleBn', 'descriptionBn', 'plantId', 'plantNameBn', 'thumbnail'
+        ]) &&
+        isValidId(data.id) &&
+        data.actionType is string && data.actionType.size() <= 60 &&
+        data.titleBn is string && data.titleBn.size() <= 300 &&
+        data.descriptionBn is string && data.descriptionBn.size() <= 1000 &&
+        (!('timestamp' in data) || (data.timestamp is string && data.timestamp.size() <= 100)) &&
+        (!('dateBn' in data) || (data.dateBn is string && data.dateBn.size() <= 120)) &&
+        (!('timeBn' in data) || (data.timeBn is string && data.timeBn.size() <= 120)) &&
+        (!('plantId' in data) || isValidId(data.plantId)) &&
+        (!('plantNameBn' in data) || (data.plantNameBn is string && data.plantNameBn.size() <= 300)) &&
+        (!('thumbnail' in data) || (data.thumbnail is string && data.thumbnail.size() <= 850000));
+    }
+
+    // Schema validator for cross-device deleted seed IDs metadata
+    function isValidDeletedSeeds(data) {
+      return data.keys().hasAll(['deletedIds', 'updatedAt']) &&
+        data.keys().hasOnly(['deletedIds', 'updatedAt']) &&
+        data.deletedIds is list &&
+        data.deletedIds.size() <= 500 &&
+        (data.deletedIds.size() == 0 || (data.deletedIds[0] is string && data.deletedIds[0].size() <= 128)) &&
+        data.updatedAt is string && data.updatedAt.size() <= 100;
+    }
+
+    // Schema validator for customer WhatsApp orders & share inquiries
+    function isValidWhatsAppInquiry(data) {
+      return data.keys().hasAll(['id', 'timestamp', 'eventType', 'items', 'totalAmount', 'totalQuantity', 'status']) &&
+        data.keys().hasOnly([
+          'id', 'timestamp', 'dateBn', 'timeBn', 'eventType',
+          'customerName', 'customerVillage', 'customerPhone', 'deliveryMode',
+          'voiceTranscript', 'items', 'totalAmount', 'totalQuantity', 'status'
+        ]) &&
+        isValidId(data.id) &&
+        data.timestamp is string && data.timestamp.size() >= 1 && data.timestamp.size() <= 100 &&
+        data.eventType in ['cart_order', 'direct_order', 'voice_order', 'photo_share'] &&
+        data.items is list && data.items.size() >= 1 && data.items.size() <= 50 &&
+        (data.items[0] is map && data.items[0].plantId is string && data.items[0].plantId.size() <= 128) &&
+        data.totalAmount is number && data.totalAmount >= 0 && data.totalAmount <= 1000000 &&
+        data.totalQuantity is number && data.totalQuantity >= 1 && data.totalQuantity <= 10000 &&
+        data.status in ['new', 'contacted', 'completed'] &&
+        (!('dateBn' in data) || (data.dateBn is string && data.dateBn.size() <= 120)) &&
+        (!('timeBn' in data) || (data.timeBn is string && data.timeBn.size() <= 120)) &&
+        (!('customerName' in data) || (data.customerName is string && data.customerName.size() <= 120)) &&
+        (!('customerVillage' in data) || (data.customerVillage is string && data.customerVillage.size() <= 200)) &&
+        (!('customerPhone' in data) || (data.customerPhone is string && data.customerPhone.size() <= 40)) &&
+        (!('deliveryMode' in data) || (data.deliveryMode in ['pickup', 'delivery'])) &&
+        (!('voiceTranscript' in data) || (data.voiceTranscript is string && data.voiceTranscript.size() <= 1000));
+    }
+
+    // Schema validator for customer reviews & garden photo gallery
+    function isValidCustomerReview(data) {
+      return data.keys().hasAll(['id', 'customerNameBn', 'locationBn', 'rating', 'commentBn', 'status', 'createdAt']) &&
+        data.keys().hasOnly([
+          'id', 'customerNameBn', 'customerNameEn', 'locationBn', 'locationEn',
+          'rating', 'commentBn', 'commentEn', 'plantId', 'plantNameBn', 'plantNameEn',
+          'gardenImage', 'status', 'createdAt', 'createdAtBn'
+        ]) &&
+        isValidId(data.id) &&
+        data.customerNameBn is string && data.customerNameBn.size() >= 1 && data.customerNameBn.size() <= 120 &&
+        data.locationBn is string && data.locationBn.size() >= 1 && data.locationBn.size() <= 160 &&
+        data.rating is number && data.rating >= 1 && data.rating <= 5 &&
+        data.commentBn is string && data.commentBn.size() >= 1 && data.commentBn.size() <= 1500 &&
+        data.status in ['approved', 'pending'] &&
+        data.createdAt is string && data.createdAt.size() >= 1 && data.createdAt.size() <= 100 &&
+        (!('customerNameEn' in data) || (data.customerNameEn is string && data.customerNameEn.size() <= 120)) &&
+        (!('locationEn' in data) || (data.locationEn is string && data.locationEn.size() <= 160)) &&
+        (!('commentEn' in data) || (data.commentEn is string && data.commentEn.size() <= 1500)) &&
+        (!('plantId' in data) || (data.plantId is string && data.plantId.size() <= 128)) &&
+        (!('plantNameBn' in data) || (data.plantNameBn is string && data.plantNameBn.size() <= 200)) &&
+        (!('plantNameEn' in data) || (data.plantNameEn is string && data.plantNameEn.size() <= 200)) &&
+        (!('gardenImage' in data) || (data.gardenImage is string && data.gardenImage.size() <= 450000)) &&
+        (!('createdAtBn' in data) || (data.createdAtBn is string && data.createdAtBn.size() <= 160));
+    }
+
+    // Read-only connection health probe
+    match /_test/connection {
+      allow get: if true;
+      allow list, create, update, delete: if false;
+    }
+
+    // Active Plants catalog: Public read, Admin create/update (active items only), atomic soft-delete move to /trash_plants, Owner-only permanent delete
+    match /plants/{plantId} {
+      allow list: if true;
+      allow get: if isValidId(plantId);
+      allow create: if isAuthorizedAdmin() &&
+        isValidId(plantId) &&
+        isValidPlant(incoming()) &&
+        incoming().id == plantId &&
+        (!('status' in incoming()) || incoming().status == 'active');
+      allow update: if isAuthorizedAdmin() &&
+        isValidId(plantId) &&
+        isValidPlant(incoming()) &&
+        incoming().id == existing().id &&
+        (!('status' in incoming()) || incoming().status == 'active');
+      allow delete: if (isOwner() && isValidId(plantId)) ||
+        (isAuthorizedAdmin() && isValidId(plantId) && existsAfter(/databases/$(database)/documents/trash_plants/$(plantId)));
+    }
+
+    // Admin-only Trash Bin: Publicly unreadable, Admin soft-delete/restore (atomic move back to /plants), Owner-only permanent purge
+    match /trash_plants/{plantId} {
+      allow list: if isAuthorizedAdmin();
+      allow get: if isAuthorizedAdmin() && isValidId(plantId);
+      allow create: if isAuthorizedAdmin() &&
+        isValidId(plantId) &&
+        isValidPlant(incoming()) &&
+        incoming().id == plantId &&
+        incoming().status == 'deleted';
+      allow update: if isAuthorizedAdmin() &&
+        isValidId(plantId) &&
+        isValidPlant(incoming()) &&
+        incoming().id == existing().id &&
+        incoming().status == 'deleted';
+      allow delete: if (isOwner() && isValidId(plantId)) ||
+        (isAuthorizedAdmin() && isValidId(plantId) && existsAfter(/databases/$(database)/documents/plants/$(plantId)));
+    }
+
+    // Cross-device deleted seed IDs: Public get so deleted defaults remain hidden everywhere; Owner-only delete
+    match /catalog_meta/deleted_seeds {
+      allow get: if true;
+      allow list: if false;
+      allow create, update: if isAuthorizedAdmin() && isValidDeletedSeeds(incoming());
+      allow delete: if isOwner();
+    }
+
+    // Server-side shared rate limit buckets: Admin SDK only, strictly closed to clients
+    match /_rate_limits/{bucketId} {
+      allow read, write: if false;
+    }
+
+    // Activity audit logs: Authorized Admin read/create (append-only); Owner-only delete
+    match /activity_logs/{logId} {
+      allow list: if isAuthorizedAdmin();
+      allow get: if isAuthorizedAdmin() && isValidId(logId);
+      allow create: if isAuthorizedAdmin() && isValidId(logId) && isValidActivityLog(incoming()) && incoming().id == logId;
+      allow update: if false;
+      allow delete: if isOwner() && isValidId(logId);
+    }
+
+    // Customer WhatsApp Orders & Share Inquiries: Public create (status == 'new'), Authorized Admin read/update, Owner delete
+    match /whatsapp_inquiries/{inquiryId} {
+      allow list: if isAuthorizedAdmin();
+      allow get: if isAuthorizedAdmin() && isValidId(inquiryId);
+      allow create: if isValidId(inquiryId) &&
+        isValidWhatsAppInquiry(incoming()) &&
+        incoming().id == inquiryId &&
+        (incoming().status == 'new' || isAuthorizedAdmin());
+      allow update: if isAuthorizedAdmin() &&
+        isValidId(inquiryId) &&
+        isValidWhatsAppInquiry(incoming()) &&
+        incoming().id == existing().id &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['status']);
+      allow delete: if isOwner() && isValidId(inquiryId);
+    }
+
+    // Customer Reviews & Garden Photo Gallery: Public read of approved reviews, Public create as pending (or Admin approved), Admin approve/update, Owner delete
+    match /customer_reviews/{reviewId} {
+      allow list: if isAuthorizedAdmin() || existing().status == 'approved';
+      allow get: if isValidId(reviewId) && (isAuthorizedAdmin() || existing().status == 'approved');
+      allow create: if isValidId(reviewId) &&
+        isValidCustomerReview(incoming()) &&
+        incoming().id == reviewId &&
+        (incoming().status == 'pending' || isAuthorizedAdmin());
+      allow update: if isAuthorizedAdmin() &&
+        isValidId(reviewId) &&
+        isValidCustomerReview(incoming()) &&
+        incoming().id == existing().id &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['status', 'commentBn', 'commentEn', 'rating', 'gardenImage']);
+      allow delete: if isAuthorizedAdmin() && isValidId(reviewId);
+    }
+
+    // Usage stats & telemetry: Authorized admin can read & write running quota
+    match /usage_stats/{statId} {
+      allow get: if isAuthorizedAdmin() && isValidId(statId);
+      allow list: if false;
+      allow create, update: if isAuthorizedAdmin() && isValidId(statId);
+      allow delete: if isOwner() && isValidId(statId);
+    }
+  }
+}

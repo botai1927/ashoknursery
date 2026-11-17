@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ভ্রম্যমাণ নার্সারি — Brahmyaman Nursery | কালশুলি, বাঁকুড়া</title>
+    <meta name="description" content="পারিবারিক নার্সারি, কালশুলি · বাঁকুড়া, ৭২২১৬০, WhatsApp-এ সরাসরি অর্ডার, ন্যায্য দাম। কালশুলি, পারসোলা, খাতড়া ও সিমলাপাল অঞ্চলে সতেজ চারাগাছ ও ফলের কলম সরবরাহ।" />
+    <meta property="og:title" content="ভ্রম্যমাণ নার্সারি — Brahmyaman Nursery | Kalsuli, Bankura" />
+    <meta property="og:description" content="পারিবারিক নার্সারি, কালশুলি · বাঁকুড়া, ৭২২১৬০, WhatsApp-এ সরাসরি অর্ডার, ন্যায্য দাম।" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <script>
+      (function () {
+        var ASSERTION_FRAGMENT = 'INTERNAL ASSERTION FAILED: Pending promise was never set';
+        function getErrorText(val) {
+          if (!val) return '';
+          if (typeof val === 'string') return val;
+          return val.message || val.stack || String(val) || '';
+        }
+        function isFirebasePopupAssertion(val) {
+          var text = getErrorText(val);
+          return text.indexOf(ASSERTION_FRAGMENT) !== -1;
+        }
+        function isViteWebSocketNoise(val) {
+          var text = getErrorText(val);
+          return (
+            text.indexOf('WebSocket closed without opened') !== -1 ||
+            text.indexOf('failed to connect to websocket') !== -1 ||
+            (text.indexOf('@vite/client') !== -1 && text.indexOf('WebSocket') !== -1)
+          );
+        }
+        window.addEventListener(
+          'error',
+          function (event) {
+            if (
+              isFirebasePopupAssertion(event.error) ||
+              isFirebasePopupAssertion(event.message) ||
+              isViteWebSocketNoise(event.error) ||
+              isViteWebSocketNoise(event.message)
+            ) {
+              event.preventDefault();
+              event.stopImmediatePropagation();
+            }
+          },
+          true
+        );
+        window.addEventListener(
+          'unhandledrejection',
+          function (event) {
+            if (
+              isFirebasePopupAssertion(event.reason) ||
+              isViteWebSocketNoise(event.reason)
+            ) {
+              event.preventDefault();
+              event.stopImmediatePropagation();
+            }
+          },
+          true
+        );
+        var origConsoleError = console.error;
+        if (typeof origConsoleError === 'function') {
+          console.error = function () {
+            for (var i = 0; i < arguments.length; i++) {
+              if (
+                isFirebasePopupAssertion(arguments[i]) ||
+                isViteWebSocketNoise(arguments[i])
+              ) {
+                return;
+              }
+            }
+            return origConsoleError.apply(console, arguments);
+          };
+        }
+        var origConsoleWarn = console.warn;
+        if (typeof origConsoleWarn === 'function') {
+          console.warn = function () {
+            for (var i = 0; i < arguments.length; i++) {
+              if (isViteWebSocketNoise(arguments[i])) {
+                return;
+              }
+            }
+            return origConsoleWarn.apply(console, arguments);
+          };
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

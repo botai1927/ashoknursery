@@ -1,0 +1,164 @@
+{
+  "entities": {
+    "Plant": {
+      "title": "Plant",
+      "description": "Nursery plant catalog item with stock status, pricing, and category",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "nameBn": { "type": "string" },
+        "nameEn": { "type": "string" },
+        "botanicalName": { "type": "string" },
+        "category": { "type": "string" },
+        "audience": { "type": "array" },
+        "inStock": { "type": "boolean" },
+        "badgeBn": { "type": "string" },
+        "badgeEn": { "type": "string" },
+        "colorBn": { "type": "string" },
+        "colorEn": { "type": "string" },
+        "sunlightBn": { "type": "string" },
+        "sunlightEn": { "type": "string" },
+        "wateringBn": { "type": "string" },
+        "wateringEn": { "type": "string" },
+        "soilTipBn": { "type": "string" },
+        "soilTipEn": { "type": "string" },
+        "descriptionBn": { "type": "string" },
+        "descriptionEn": { "type": "string" },
+        "image": { "type": "string" },
+        "images": { "type": "array" },
+        "cloudinaryPublicIds": { "type": "array" },
+        "featured": { "type": "boolean" },
+        "options": { "type": "array" },
+        "status": { "type": "string" },
+        "deletedAt": { "type": "string" },
+        "deletedAtBn": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "createdAtBn": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "updatedAtBn": { "type": "string" }
+      },
+      "required": ["id", "nameBn", "category", "options"]
+    },
+    "ActivityLog": {
+      "title": "ActivityLog",
+      "description": "Admin activity log tracking updates and changes",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "dateBn": { "type": "string" },
+        "timeBn": { "type": "string" },
+        "actionType": { "type": "string" },
+        "titleBn": { "type": "string" },
+        "descriptionBn": { "type": "string" },
+        "plantId": { "type": "string" },
+        "plantNameBn": { "type": "string" },
+        "thumbnail": { "type": "string" }
+      },
+      "required": ["id", "actionType", "titleBn", "descriptionBn"]
+    },
+    "DeletedSeeds": {
+      "title": "DeletedSeeds",
+      "description": "Cross-device tombstone list of permanently deleted default catalog plant IDs",
+      "type": "object",
+      "properties": {
+        "deletedIds": { "type": "array" },
+        "updatedAt": { "type": "string", "maxLength": 100 }
+      },
+      "required": ["deletedIds", "updatedAt"]
+    },
+    "WhatsAppInquiry": {
+      "title": "WhatsAppInquiry",
+      "description": "Customer WhatsApp order, direct inquiry, voice order, or plant photo share event log",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "timestamp": { "type": "string", "maxLength": 100 },
+        "dateBn": { "type": "string", "maxLength": 120 },
+        "timeBn": { "type": "string", "maxLength": 120 },
+        "eventType": {
+          "type": "string",
+          "enum": ["cart_order", "direct_order", "voice_order", "photo_share"]
+        },
+        "customerName": { "type": "string", "maxLength": 120 },
+        "customerVillage": { "type": "string", "maxLength": 200 },
+        "customerPhone": { "type": "string", "maxLength": 40 },
+        "deliveryMode": { "type": "string", "enum": ["pickup", "delivery"] },
+        "voiceTranscript": { "type": "string", "maxLength": 1000 },
+        "items": { "type": "array" },
+        "totalAmount": { "type": "number" },
+        "totalQuantity": { "type": "number" },
+        "status": { "type": "string", "enum": ["new", "contacted", "completed"] }
+      },
+      "required": ["id", "timestamp", "eventType", "items", "totalAmount", "totalQuantity", "status"]
+    },
+    "CustomerReview": {
+      "title": "CustomerReview",
+      "description": "Customer review and garden plant photo submission",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "customerNameBn": { "type": "string", "maxLength": 120 },
+        "customerNameEn": { "type": "string", "maxLength": 120 },
+        "locationBn": { "type": "string", "maxLength": 160 },
+        "locationEn": { "type": "string", "maxLength": 160 },
+        "rating": { "type": "number" },
+        "commentBn": { "type": "string", "maxLength": 1500 },
+        "commentEn": { "type": "string", "maxLength": 1500 },
+        "plantId": { "type": "string", "maxLength": 128 },
+        "plantNameBn": { "type": "string", "maxLength": 200 },
+        "plantNameEn": { "type": "string", "maxLength": 200 },
+        "gardenImage": { "type": "string", "maxLength": 450000 },
+        "status": { "type": "string", "enum": ["approved", "pending"] },
+        "createdAt": { "type": "string", "maxLength": 100 },
+        "createdAtBn": { "type": "string", "maxLength": 160 }
+      },
+      "required": ["id", "customerNameBn", "locationBn", "rating", "commentBn", "status", "createdAt"]
+    },
+    "UsageStats": {
+      "title": "UsageStats",
+      "description": "Firestore running 24-hour quota and operation telemetry",
+      "type": "object",
+      "properties": {
+        "requestsTotal": { "type": "number" },
+        "requestsThisMinute": { "type": "number" },
+        "recentHitTimestamps": { "type": "array" },
+        "lastUsedAt": { "type": "string" },
+        "lastUsedModel": { "type": "string" },
+        "lastStatus": { "type": "string" },
+        "lastErrorBn": { "type": "string" },
+        "updatedAtIso": { "type": "string" }
+      }
+    }
+  },
+  "firestore": {
+    "/plants/{plantId}": {
+      "schema": "Plant",
+      "description": "Public active nursery plant catalog items"
+    },
+    "/trash_plants/{plantId}": {
+      "schema": "Plant",
+      "description": "Admin-only soft-deleted plants awaiting restore or permanent purge after 30 days"
+    },
+    "/activity_logs/{logId}": {
+      "schema": "ActivityLog",
+      "description": "Admin audit trail logs"
+    },
+    "/catalog_meta/deleted_seeds": {
+      "schema": "DeletedSeeds",
+      "description": "Permanently deleted default seed plant IDs synchronized across devices"
+    },
+    "/whatsapp_inquiries/{inquiryId}": {
+      "schema": "WhatsAppInquiry",
+      "description": "Customer WhatsApp order and plant inquiry tracker log"
+    },
+    "/customer_reviews/{reviewId}": {
+      "schema": "CustomerReview",
+      "description": "Customer reviews and garden plant photo gallery"
+    },
+    "/usage_stats/{statId}": {
+      "schema": "UsageStats",
+      "description": "Firestore running 24-hour quota and operation telemetry"
+    }
+  }
+}

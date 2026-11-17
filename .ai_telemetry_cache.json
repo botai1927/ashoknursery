@@ -1,0 +1,42 @@
+{
+  "slot-1": {
+    "requestsTotal": 16,
+    "recentHitTimestamps": [
+      1794857007389,
+      1794858231259,
+      1794858243337
+    ],
+    "cooldownUntil": null,
+    "lastUsedAt": "2026-11-16T19:43:54.905Z",
+    "lastUsedModel": "gemini-3.1-flash-lite",
+    "lastStatus": "ready",
+    "lastErrorBn": null
+  },
+  "slot-2": {
+    "requestsTotal": 0,
+    "recentHitTimestamps": [],
+    "cooldownUntil": null,
+    "lastUsedAt": null,
+    "lastUsedModel": null,
+    "lastStatus": "ready",
+    "lastErrorBn": null
+  },
+  "slot-3": {
+    "requestsTotal": 0,
+    "recentHitTimestamps": [],
+    "cooldownUntil": null,
+    "lastUsedAt": null,
+    "lastUsedModel": null,
+    "lastStatus": "ready",
+    "lastErrorBn": null
+  },
+  "slot-4": {
+    "requestsTotal": 0,
+    "recentHitTimestamps": [],
+    "cooldownUntil": null,
+    "lastUsedAt": null,
+    "lastUsedModel": null,
+    "lastStatus": "ready",
+    "lastErrorBn": null
+  }
+}

@@ -1,0 +1,138 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif-bn: "Noto Serif Bengali", serif;
+  --font-sans-bn: "Hind Siliguri", "Plus Jakarta Sans", sans-serif;
+  --font-display: "Noto Serif Bengali", serif;
+  --font-sans: "Hind Siliguri", "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+@layer base {
+  html {
+    scroll-behavior: auto;
+    font-family: var(--font-sans);
+    background-color: #f4f7f1;
+    color: #122619;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+.font-serif-bn {
+  font-family: var(--font-serif-bn);
+}
+
+.font-sans-bn {
+  font-family: var(--font-sans-bn);
+}
+
+.font-mono-num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Ken Burns slow animation */
+@keyframes kenburns {
+  0% {
+    transform: scale(1) translate(0, 0);
+  }
+  50% {
+    transform: scale(1.09) translate(-1%, -0.5%);
+  }
+  100% {
+    transform: scale(1) translate(0, 0);
+  }
+}
+
+.animate-kenburns {
+  animation: kenburns 32s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+/* Tactile botanical card elevation & subtle spring micro-interactions */
+.botanical-card {
+  transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 220ms ease;
+}
+
+.botanical-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 30px -12px rgba(18, 38, 25, 0.16),
+    0 4px 10px -4px rgba(21, 128, 61, 0.08);
+}
+
+.botanical-card:active {
+  transform: translateY(-1px) scale(0.992);
+}
+
+@keyframes bagPop {
+  0% {
+    transform: scale(0.92);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-bag-pop {
+  animation: bagPop 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Hide scrollbars completely while keeping scrollability */
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar,
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Subtle horizontal scrollbar for desktop catalog rails */
+.thin-horizontal-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.thin-horizontal-scroll::-webkit-scrollbar-track {
+  background: #e4ece0;
+  border-radius: 9999px;
+}
+
+.thin-horizontal-scroll::-webkit-scrollbar-thumb {
+  background: #8cad97;
+  border-radius: 9999px;
+}
+
+.thin-horizontal-scroll::-webkit-scrollbar-thumb:hover {
+  background: #15803d;
+}
+
+.thin-horizontal-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #8cad97 #e4ece0;
+}
+
