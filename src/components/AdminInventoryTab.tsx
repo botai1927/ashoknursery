@@ -280,7 +280,7 @@ export function AdminInventoryTab({
               value={adminSearchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="গাছের নাম লিখে খুঁজুন... (যেমন: টিউলিপ, জাম, জবা)"
-              className="w-full h-14 pl-12 pr-12 bg-white border border-[#D5C9B8] focus:border-[#1B8354] rounded-xl text-base sm:text-lg font-semibold text-[#142318] focus:outline-none"
+              className="w-full h-14 pl-12 pr-12 bg-white border border-[#D5C9B8] focus:border-[#1B8354] rounded-xl text-base sm:text-lg font-semibold text-[#142318] focus:outline-2 focus:outline-[#1B8354] focus:outline-offset-1"
             />
             {adminSearchQuery && (
               <button
@@ -342,8 +342,10 @@ export function AdminInventoryTab({
                         src={resolvePlantImageUrl(plant.image, PUJA_IMAGE)}
                         alt={plant.nameBn}
                         className="w-full h-full object-cover"
+                        loading="lazy"
+                        decoding="async"
                       />
-                      <span className="absolute top-1 left-1 bg-[#142318]/85 text-white font-mono text-[10px] font-bold px-1.5 py-0.5 rounded">
+                      <span className="absolute top-1 left-1 bg-[#142318]/85 text-white font-mono text-xs font-bold px-1.5 py-0.5 rounded">
                         #{idx + 1}
                       </span>
                     </div>
@@ -471,7 +473,7 @@ export function AdminInventoryTab({
               title="সব সক্রিয় চারা দেখুন"
             >
               <p
-                className={`text-[11px] font-bold ${
+                className={`text-xs font-bold ${
                   stockFilter === 'all' ? 'text-[#A3E635]' : 'text-[#785942]'
                 }`}
               >
@@ -491,7 +493,7 @@ export function AdminInventoryTab({
               title="শুধু আপনার আপলোড করা চারাগুলো দেখুন"
             >
               <p
-                className={`text-[11px] font-bold ${
+                className={`text-xs font-bold ${
                   stockFilter === 'uploaded_only' ? 'text-white' : 'text-[#1B8354]'
                 }`}
               >
@@ -517,7 +519,7 @@ export function AdminInventoryTab({
               title="স্টকে থাকা চারাগুলো দেখুন"
             >
               <p
-                className={`text-[11px] font-bold ${
+                className={`text-xs font-bold ${
                   stockFilter === 'in_stock' ? 'text-[#A3E635]' : 'text-[#785942]'
                 }`}
               >
@@ -537,7 +539,7 @@ export function AdminInventoryTab({
               title="স্টক শেষ হওয়া চারাগুলো দেখুন"
             >
               <p
-                className={`text-[11px] font-bold ${
+                className={`text-xs font-bold ${
                   stockFilter === 'out_of_stock' ? 'text-white' : 'text-[#785942]'
                 }`}
               >
@@ -567,7 +569,7 @@ export function AdminInventoryTab({
               title="Cloudinary লিংকে যুক্ত ছবির চারাগুলো দেখুন"
             >
               <p
-                className={`text-[11px] font-bold ${
+                className={`text-xs font-bold ${
                   stockFilter === 'cloudinary' ? 'text-[#A3E635]' : 'text-[#785942]'
                 }`}
               >
@@ -593,7 +595,7 @@ export function AdminInventoryTab({
               title="সরাসরি মেমরিতে থাকা Base64 ছবির চারা ফিল্টার করুন"
             >
               <p
-                className={`text-[11px] font-bold ${
+                className={`text-xs font-bold ${
                   stockFilter === 'base64' ? 'text-white' : 'text-[#785942]'
                 }`}
               >
@@ -613,7 +615,7 @@ export function AdminInventoryTab({
                 </span>
                 {metrics.trashedBase64Count > 0 && (
                   <span
-                    className={`text-[10px] font-mono ${
+                    className={`text-xs font-mono ${
                       stockFilter === 'base64' ? 'text-white/90' : 'text-[#785942]'
                     }`}
                   >
@@ -638,14 +640,14 @@ export function AdminInventoryTab({
 
         {/* Crisp Inline Catalog Audit & Bug-Fix Toolbar */}
         <div className="pt-3 border-t border-[#F0EAE1] flex flex-wrap items-center justify-between gap-2">
-          <p className="text-[11px] text-[#526356] font-medium">
+          <p className="text-xs text-[#526356] font-medium">
             ক্যাটালগ অডিট ও মেরামত সরঞ্জাম:
           </p>
           <div className="flex flex-wrap items-center gap-1.5">
             <button
               type="button"
               onClick={() => onOpenDiagnostics('rootcause')}
-              className="px-2.5 py-1.5 bg-[#FAF8F5] hover:bg-[#F3ECE2] border border-[#E8E1D5] text-[#142318] rounded-lg text-[11px] font-bold inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+              className="px-2.5 py-1.5 bg-[#FAF8F5] hover:bg-[#F3ECE2] border border-[#E8E1D5] text-[#142318] rounded-lg text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
             >
               <AlertTriangle
                 className={`w-3.5 h-3.5 ${rootCauseCount > 0 ? 'text-[#B34728]' : 'text-[#1B8354]'}`}
@@ -656,7 +658,7 @@ export function AdminInventoryTab({
             <button
               type="button"
               onClick={() => onOpenDiagnostics('duplicates')}
-              className="px-2.5 py-1.5 bg-[#FAF8F5] hover:bg-[#F3ECE2] border border-[#E8E1D5] text-[#142318] rounded-lg text-[11px] font-bold inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+              className="px-2.5 py-1.5 bg-[#FAF8F5] hover:bg-[#F3ECE2] border border-[#E8E1D5] text-[#142318] rounded-lg text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
             >
               <Search className="w-3.5 h-3.5 text-[#1B8354]" />
               <span className="tabular-nums">ডুপ্লিকেট ({duplicateCount})</span>
@@ -666,7 +668,7 @@ export function AdminInventoryTab({
               type="button"
               disabled={isRunningBugFix}
               onClick={onRunBugFix}
-              className="px-2.5 py-1.5 bg-[#EBF5EF] hover:bg-[#D5EBDC] disabled:opacity-60 border border-[#BFE2CC] text-[#14532D] rounded-lg text-[11px] font-bold inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+              className="px-2.5 py-1.5 bg-[#EBF5EF] hover:bg-[#D5EBDC] disabled:opacity-60 border border-[#BFE2CC] text-[#14532D] rounded-lg text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isRunningBugFix ? 'animate-spin' : ''}`} />
               <span>{isRunningBugFix ? 'মেরামত চলছে...' : 'অটো বাগ ফিক্স'}</span>
@@ -675,7 +677,7 @@ export function AdminInventoryTab({
             <button
               type="button"
               onClick={() => onOpenDiagnostics('health')}
-              className="px-2.5 py-1.5 bg-[#FAF8F5] hover:bg-[#F3ECE2] border border-[#E8E1D5] text-[#142318] rounded-lg text-[11px] font-bold inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+              className="px-2.5 py-1.5 bg-[#FAF8F5] hover:bg-[#F3ECE2] border border-[#E8E1D5] text-[#142318] rounded-lg text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
             >
               <Globe className="w-3.5 h-3.5 text-[#1B8354]" />
               <span>হেলথ রিপোর্ট</span>
@@ -694,7 +696,7 @@ export function AdminInventoryTab({
               value={adminSearchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="নাম (যেমন: টিউলিপ, জাম), রং বা তারিখ দিয়ে খুঁজুন..."
-              className="w-full h-10 pl-9 pr-9 bg-[#FAF8F5] border border-[#E8E1D5] focus:border-[#1B8354] rounded-xl text-xs text-[#142318] focus:outline-none"
+              className="w-full h-10 pl-9 pr-9 bg-[#FAF8F5] border border-[#E8E1D5] focus:border-[#1B8354] rounded-xl text-xs text-[#142318] focus:outline-2 focus:outline-[#1B8354] focus:outline-offset-1"
             />
             {adminSearchQuery && (
               <button
@@ -713,7 +715,7 @@ export function AdminInventoryTab({
               aria-label="বিভাগ ফিল্টার"
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value as 'all' | PlantCategory)}
-              className="w-full h-10 px-2.5 bg-[#FAF8F5] border border-[#E8E1D5] focus:border-[#1B8354] rounded-xl text-xs font-semibold text-[#142318] focus:outline-none"
+              className="w-full h-10 px-2.5 bg-[#FAF8F5] border border-[#E8E1D5] focus:border-[#1B8354] rounded-xl text-xs font-semibold text-[#142318] focus:outline-2 focus:outline-[#1B8354] focus:outline-offset-1"
             >
               <option value="all">সকল বিভাগ ({metrics.total})</option>
               {ADMIN_CATEGORIES.map((cat) => (
@@ -730,7 +732,7 @@ export function AdminInventoryTab({
               aria-label="সাজানোর ক্রম"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as SortOption)}
-              className="w-full h-10 pl-8 pr-2 bg-[#FAF8F5] border border-[#E8E1D5] focus:border-[#1B8354] rounded-xl text-xs font-semibold text-[#142318] focus:outline-none"
+              className="w-full h-10 pl-8 pr-2 bg-[#FAF8F5] border border-[#E8E1D5] focus:border-[#1B8354] rounded-xl text-xs font-semibold text-[#142318] focus:outline-2 focus:outline-[#1B8354] focus:outline-offset-1"
             >
               <option value="recent">নতুন আপলোড উপরে (ডেট-টাইম)</option>
               <option value="price_asc">দাম: কম থেকে বেশি</option>
@@ -744,7 +746,7 @@ export function AdminInventoryTab({
             <button
               type="button"
               onClick={() => setViewLayout('row')}
-              className={`flex-1 h-full rounded-lg text-[11px] font-bold inline-flex items-center justify-center gap-1 cursor-pointer transition-colors ${
+              className={`flex-1 h-full rounded-lg text-xs font-bold inline-flex items-center justify-center gap-1 cursor-pointer transition-colors ${
                 viewLayout === 'row'
                   ? 'bg-[#142318] text-white shadow-2xs'
                   : 'text-[#526356] hover:text-[#142318]'
@@ -757,7 +759,7 @@ export function AdminInventoryTab({
             <button
               type="button"
               onClick={() => setViewLayout('grid')}
-              className={`flex-1 h-full rounded-lg text-[11px] font-bold inline-flex items-center justify-center gap-1 cursor-pointer transition-colors ${
+              className={`flex-1 h-full rounded-lg text-xs font-bold inline-flex items-center justify-center gap-1 cursor-pointer transition-colors ${
                 viewLayout === 'grid'
                   ? 'bg-[#142318] text-white shadow-2xs'
                   : 'text-[#526356] hover:text-[#142318]'
@@ -787,7 +789,7 @@ export function AdminInventoryTab({
                 key={tab.id}
                 type="button"
                 onClick={() => setStockFilter(tab.id)}
-                className={`px-3 py-1 rounded-lg text-[11px] font-bold transition-colors whitespace-nowrap shrink-0 cursor-pointer tabular-nums ${
+                className={`px-3 py-1 rounded-lg text-xs font-bold transition-colors whitespace-nowrap shrink-0 cursor-pointer tabular-nums ${
                   stockFilter === tab.id
                     ? 'bg-white text-[#142318] shadow-2xs'
                     : 'text-[#526356] hover:text-[#142318]'
@@ -798,7 +800,7 @@ export function AdminInventoryTab({
             ))}
           </div>
 
-          <div className="flex items-center gap-2 text-[11px] text-[#526356] tabular-nums">
+          <div className="flex items-center gap-2 text-xs text-[#526356] tabular-nums">
             <span>
               দেখানো হচ্ছে <strong className="text-[#142318]">{visiblePlants.length}</strong> /{' '}
               {filteredPlants.length} টি
@@ -883,7 +885,7 @@ export function AdminInventoryTab({
       ) : viewLayout === 'row' ? (
         <div className="bg-white border border-[#E8E1D5] rounded-2xl overflow-hidden divide-y divide-[#EFEAE0]">
           {/* Table Header Row on Desktop */}
-          <div className="hidden lg:grid lg:grid-cols-12 gap-3 px-4 py-2.5 bg-[#FAF8F5] text-[11px] font-bold text-[#526356]">
+          <div className="hidden lg:grid lg:grid-cols-12 gap-3 px-4 py-2.5 bg-[#FAF8F5] text-xs font-bold text-[#526356]">
             <div className="col-span-5">ক্রম · চারার নাম, বিভাগ ও রং</div>
             <div className="col-span-3">আপলোড তারিখ ও সময় (Date &amp; Time)</div>
             <div className="col-span-1 text-right">দাম (₹)</div>
@@ -920,9 +922,10 @@ export function AdminInventoryTab({
                       alt={plant.nameBn}
                       className="w-full h-full object-cover"
                       loading="lazy"
+                      decoding="async"
                     />
                     {isBase64 && (
-                      <span className="absolute bottom-0 inset-x-0 bg-black/75 text-white text-[8px] text-center py-0.5 font-bold">
+                      <span className="absolute bottom-0 inset-x-0 bg-black/75 text-white text-xs text-center py-0.5 font-bold">
                         Base64
                       </span>
                     )}
@@ -934,12 +937,12 @@ export function AdminInventoryTab({
                         {plant.nameBn}
                       </h3>
                       {isUploaded && (
-                        <span className="px-1.5 py-0.5 rounded bg-[#EBF5EF] border border-[#BFE2CC] text-[10px] font-bold text-[#14532D] shrink-0">
+                        <span className="px-1.5 py-0.5 rounded bg-[#EBF5EF] border border-[#BFE2CC] text-xs font-bold text-[#14532D] shrink-0">
                           ✓ {info?.uploadBadgeBn}
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center flex-wrap gap-x-1.5 gap-y-0.5 text-[11px] text-[#526356] mt-0.5">
+                    <div className="flex items-center flex-wrap gap-x-1.5 gap-y-0.5 text-xs text-[#526356] mt-0.5">
                       <span className="truncate max-w-[150px]">{plant.nameEn}</span>
                       <span aria-hidden="true">·</span>
                       <span className="font-medium text-[#142318]">{plant.category}</span>
@@ -955,7 +958,7 @@ export function AdminInventoryTab({
 
                 {/* Col 6-8: Upload Date & Time */}
                 <div className="lg:col-span-3 flex items-center justify-between lg:justify-start gap-2 text-xs">
-                  <div className="inline-flex items-center gap-1.5 font-mono tabular-nums text-[11px]">
+                  <div className="inline-flex items-center gap-1.5 font-mono tabular-nums text-xs">
                     <Clock
                       className={`w-3.5 h-3.5 shrink-0 ${
                         isUploaded ? 'text-[#1B8354]' : 'text-[#785942]'
@@ -983,7 +986,7 @@ export function AdminInventoryTab({
                   <button
                     type="button"
                     onClick={() => onQuickPrice(plant)}
-                    className="py-1.5 px-2.5 bg-[#F5EFE6] hover:bg-[#EBDDCB] text-[#142318] rounded-lg text-[11px] font-bold transition-colors cursor-pointer whitespace-nowrap"
+                    className="py-1.5 px-2.5 bg-[#F5EFE6] hover:bg-[#EBDDCB] text-[#142318] rounded-lg text-xs font-bold transition-colors cursor-pointer whitespace-nowrap"
                   >
                     দাম (₹)
                   </button>
@@ -991,7 +994,7 @@ export function AdminInventoryTab({
                   <button
                     type="button"
                     onClick={() => onToggleStock(plant)}
-                    className={`py-1.5 px-2.5 rounded-lg text-[11px] font-bold transition-colors cursor-pointer whitespace-nowrap ${
+                    className={`py-1.5 px-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer whitespace-nowrap ${
                       plant.inStock !== false
                         ? 'bg-[#EBF5EF] hover:bg-[#D5EBDC] text-[#166534]'
                         : 'bg-[#FEE2E2] hover:bg-[#FECACA] text-[#991B1B]'
@@ -1014,7 +1017,7 @@ export function AdminInventoryTab({
                   <button
                     type="button"
                     onClick={() => onStartEditPlant(plant)}
-                    className="py-1.5 px-2.5 bg-[#EBF5EF] hover:bg-[#D5EBDC] text-[#14532D] rounded-lg text-[11px] font-bold inline-flex items-center gap-1 transition-colors cursor-pointer"
+                    className="py-1.5 px-2.5 bg-[#EBF5EF] hover:bg-[#D5EBDC] text-[#14532D] rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-colors cursor-pointer"
                     title="ছবি ও বিবরণ সম্পাদনা"
                   >
                     <Edit2 className="w-3.5 h-3.5" />
@@ -1053,12 +1056,13 @@ export function AdminInventoryTab({
                     alt={plant.nameBn}
                     className="w-full h-full object-cover"
                     loading="lazy"
+                    decoding="async"
                   />
-                  <span className="absolute top-1 left-1 bg-[#142318]/80 text-white font-mono text-[9px] font-bold px-1.5 py-0.5 rounded">
+                  <span className="absolute top-1 left-1 bg-[#142318]/80 text-white font-mono text-xs font-bold px-1.5 py-0.5 rounded">
                     #{index + 1}
                   </span>
                   {isBase64 && (
-                    <span className="absolute bottom-0 inset-x-0 bg-black/75 text-white text-[9px] text-center py-0.5 font-bold">
+                    <span className="absolute bottom-0 inset-x-0 bg-black/75 text-white text-xs text-center py-0.5 font-bold">
                       Base64
                     </span>
                   )}
@@ -1071,7 +1075,7 @@ export function AdminInventoryTab({
                         {plant.nameBn}
                       </h3>
                       {isUploaded && (
-                        <span className="px-1.5 py-0.5 rounded bg-[#EBF5EF] text-[9px] font-bold text-[#14532D] shrink-0">
+                        <span className="px-1.5 py-0.5 rounded bg-[#EBF5EF] text-xs font-bold text-[#14532D] shrink-0">
                           {info?.uploadBadgeBn}
                         </span>
                       )}
@@ -1081,7 +1085,7 @@ export function AdminInventoryTab({
                     </span>
                   </div>
 
-                  <div className="flex items-center flex-wrap gap-x-1.5 gap-y-0.5 text-[11px] text-[#526356] mt-0.5">
+                  <div className="flex items-center flex-wrap gap-x-1.5 gap-y-0.5 text-xs text-[#526356] mt-0.5">
                     <span className="truncate max-w-[160px]">{plant.nameEn}</span>
                     <span aria-hidden="true">·</span>
                     <span className="truncate">{plant.category}</span>
@@ -1093,7 +1097,7 @@ export function AdminInventoryTab({
                     )}
                   </div>
 
-                  <p className="text-[10px] text-[#142318] font-mono flex items-center gap-1 mt-1 truncate tabular-nums">
+                  <p className="text-xs text-[#142318] font-mono flex items-center gap-1 mt-1 truncate tabular-nums">
                     <Clock className="w-3 h-3 text-[#1B8354] shrink-0" />
                     <span>{info?.uploadDateTimeBn || 'মূল ক্যাটালগ'}</span>
                   </p>
@@ -1110,7 +1114,7 @@ export function AdminInventoryTab({
                     <button
                       type="button"
                       onClick={() => onToggleStock(plant)}
-                      className={`py-1.5 px-2.5 rounded-lg text-[11px] font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+                      className={`py-1.5 px-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                         plant.inStock !== false
                           ? 'bg-[#EBF5EF] hover:bg-[#D5EBDC] text-[#166534]'
                           : 'bg-[#FEE2E2] hover:bg-[#FECACA] text-[#991B1B]'

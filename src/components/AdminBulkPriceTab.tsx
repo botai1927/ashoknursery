@@ -178,7 +178,7 @@ export function AdminBulkPriceTab({
             >
               বাল্ক প্রাইস ও সিজনাল ডিসকাউন্ট আপডেটার
             </h2>
-            <p className="text-[11px] text-[#526356]">
+            <p className="text-xs text-[#526356]">
               বর্ষা বা শীতের মৌসুমে ১-ক্লিকে নির্দিষ্ট ক্যাটাগরির (যেমন সব ফুলের বা ফলের চারার) দাম শতকরা (%) বা টাকায় (₹) কমান বা বাড়ান
             </p>
           </div>
@@ -207,7 +207,7 @@ export function AdminBulkPriceTab({
                 <CloudRain className="w-3.5 h-3.5 text-[#1B8354]" />
                 <span>বর্ষার ফলের চারা ১৫% ছাড়</span>
               </p>
-              <p className="text-[10px] text-[#526356] mt-0.5">
+              <p className="text-xs text-[#526356] mt-0.5">
                 সব ‘ছাদবাগানের ফল ও কলম’-এ ১৫% দাম কমানো ও বর্ষা অফার ব্যাজ
               </p>
             </button>
@@ -228,7 +228,7 @@ export function AdminBulkPriceTab({
                 <Sun className="w-3.5 h-3.5 text-[#B34728]" />
                 <span>শীতের ফুল ও জবা ১০% ছাড়</span>
               </p>
-              <p className="text-[10px] text-[#526356] mt-0.5">
+              <p className="text-xs text-[#526356] mt-0.5">
                 সব ‘ছাদ ও বারান্দার ফুল’ চারায় ১০% ছাড় ও শীতের ব্যাজ
               </p>
             </button>
@@ -249,7 +249,7 @@ export function AdminBulkPriceTab({
                 <Tag className="w-3.5 h-3.5 text-[#1B8354]" />
                 <span>সব চারায় ₹১০ ফ্ল্যাট ছাড়</span>
               </p>
-              <p className="text-[10px] text-[#526356] mt-0.5">
+              <p className="text-xs text-[#526356] mt-0.5">
                 পুরো ক্যাটালগের প্রতিটি চারায় ₹১০ ছাড় প্রয়োগ
               </p>
             </button>
@@ -416,7 +416,7 @@ export function AdminBulkPriceTab({
           <h3 className="font-serif-bn text-sm font-bold text-[#142318]">
             লাইভ প্রিভিউ তালিকা (আগের দাম বনাম নতুন দাম)
           </h3>
-          <span className="text-[11px] font-mono text-[#526356]">
+          <span className="text-xs font-mono text-[#526356]">
             প্রথম ৫০টি চারার প্রিভিউ
           </span>
         </div>
@@ -428,17 +428,19 @@ export function AdminBulkPriceTab({
               className="px-4 py-2.5 flex items-center justify-between gap-3 text-xs hover:bg-[#FAF8F5]"
             >
               <div className="flex items-center gap-2.5 min-w-0">
-                <span className="font-mono text-[11px] text-[#785942] w-6">#{idx + 1}</span>
+                <span className="font-mono text-xs text-[#785942] w-6">#{idx + 1}</span>
                 <img
                   src={resolvePlantImageUrl(item.plant.image, PUJA_IMAGE)}
                   alt={item.plant.nameBn}
                   className="w-9 h-9 rounded-lg object-cover border border-[#DDD5C7] shrink-0"
+                  loading="lazy"
+                  decoding="async"
                 />
                 <div className="min-w-0">
                   <p className="font-serif-bn font-bold text-[#142318] truncate">
                     {item.plant.nameBn}
                   </p>
-                  <p className="text-[10px] text-[#526356]">
+                  <p className="text-xs text-[#526356]">
                     {item.plant.category}
                     {item.nextBadge ? ` · ব্যাজ: ${item.nextBadge}` : ''}
                   </p>
@@ -451,7 +453,7 @@ export function AdminBulkPriceTab({
                 <span className="text-sm font-extrabold text-[#1B8354]">₹{item.newPrimary}</span>
                 {item.diff !== 0 && (
                   <span
-                    className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                    className={`px-1.5 py-0.5 rounded text-xs font-bold ${
                       item.diff < 0
                         ? 'bg-[#EBF5EF] text-[#14532D]'
                         : 'bg-[#FEF2F2] text-[#991B1B]'

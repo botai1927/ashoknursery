@@ -2,13 +2,8 @@ import { useMemo, useState } from 'react';
 import {
   History,
   Clock,
-  Camera,
-  DollarSign,
   Plus,
   Edit2,
-  Trash2,
-  RefreshCw,
-  Lock,
   Search,
   Cloud,
   Database,
@@ -79,38 +74,6 @@ export function AdminUploadHistoryTab({
     [plants, activityLogs]
   );
 
-  const plantByIdMap = useMemo(() => {
-    const map = new Map<string, BrahmyamanPlant>();
-    for (const p of plants) {
-      map.set(p.id, p);
-    }
-    return map;
-  }, [plants]);
-
-  const plantByNameMap = useMemo(() => {
-    const map = new Map<string, BrahmyamanPlant>();
-    for (const p of plants) {
-      const key = p.nameBn.trim().toLowerCase();
-      if (!map.has(key) || p.status !== 'deleted') {
-        map.set(key, p);
-      }
-    }
-    return map;
-  }, [plants]);
-
-  const resolvePlantForLog = (log: AdminActivityLogItem): BrahmyamanPlant | undefined => {
-    if (log.plantId && plantByIdMap.has(log.plantId)) {
-      return plantByIdMap.get(log.plantId);
-    }
-    if (log.plantNameBn) {
-      const normalized = log.plantNameBn.trim().toLowerCase();
-      if (plantByNameMap.has(normalized)) {
-        return plantByNameMap.get(normalized);
-      }
-    }
-    return undefined;
-  };
-
   const uploadCounts = useMemo(() => {
     let uploadedOnly = 0;
     let cloudinary = 0;
@@ -161,33 +124,6 @@ export function AdminUploadHistoryTab({
       });
   }, [plants, historySearch, scopeFilter, uploadInfoMap]);
 
-  const filteredLogs = useMemo(() => {
-    const q = historySearch.trim().toLowerCase();
-    return activityLogs.filter((log) => {
-      if (logFilter === 'photo' && log.actionType !== 'photo_upload') return false;
-      if (logFilter === 'price' && log.actionType !== 'price_update') return false;
-      if (logFilter === 'plant' && log.actionType !== 'plant_add' && log.actionType !== 'plant_edit') {
-        return false;
-      }
-      if (
-        logFilter === 'trash' &&
-        log.actionType !== 'plant_delete' &&
-        log.actionType !== 'plant_restore' &&
-        log.actionType !== 'permanent_delete' &&
-        log.actionType !== 'trash_empty'
-      ) {
-        return false;
-      }
-      if (!q) return true;
-      return (
-        log.titleBn.toLowerCase().includes(q) ||
-        log.descriptionBn.toLowerCase().includes(q) ||
-        (log.plantNameBn || '').toLowerCase().includes(q) ||
-        log.dateBn.toLowerCase().includes(q)
-      );
-    });
-  }, [activityLogs, logFilter, historySearch]);
-
   return (
     <div className="space-y-3">
       {/* Header & Sub-View Switcher */}
@@ -205,7 +141,7 @@ export function AdminUploadHistoryTab({
               >
                 আপলোড করা চারার সারি ওয়াইজ (Row-by-Row) তালিকা ও লগ
               </h2>
-              <p className="text-[11px] text-[#526356]">
+              <p className="text-xs text-[#526356]">
                 নতুন আপলোড করা চারা (যেমন টিউলিপ, জাম ইত্যাদি) ডেট ও টাইম অনুযায়ী সবার উপরে দেখুন এবং ১-ক্লিকে এডিট করুন
               </p>
             </div>
@@ -262,7 +198,7 @@ export function AdminUploadHistoryTab({
                 ? 'চারার নাম (টিউলিপ, জাম...), রং বা তারিখ দিয়ে খুঁজুন...'
                 : 'লগের শিরোনাম, গাছের নাম বা তারিখ দিয়ে খুঁজুন...'
             }
-            className="w-full h-10 pl-9 pr-9 bg-[#FAF8F5] border border-[#E8E1D5] focus:border-[#1B8354] rounded-xl text-xs text-[#142318] focus:outline-none"
+            className="w-full h-10 pl-9 pr-9 bg-[#FAF8F5] border border-[#E8E1D5] focus:border-[#1B8354] rounded-xl text-xs text-[#142318] focus:outline-2 focus:outline-[#1B8354] focus:outline-offset-1"
           />
           {historySearch && (
             <button
@@ -338,7 +274,7 @@ export function AdminUploadHistoryTab({
                 type="button"
                 disabled={isCleaningLogs}
                 onClick={() => onCleanupOldLogs(100, false)}
-                className="px-2.5 py-1 bg-[#FAF8F5] hover:bg-[#F0EAE1] border border-[#D5C9B8] rounded-lg text-[10px] font-bold text-[#142318] cursor-pointer disabled:opacity-50"
+                className="px-2.5 py-1 bg-[#FAF8F5] hover:bg-[#F0EAE1] border border-[#D5C9B8] rounded-lg text-xs font-bold text-[#142318] cursor-pointer disabled:opacity-50"
               >
                 {isCleaningLogs ? 'ক্লিন হচ্ছে...' : 'পুরনো ক্লিন'}
               </button>
@@ -369,7 +305,7 @@ export function AdminUploadHistoryTab({
             </div>
           ) : (
             <div className="divide-y divide-[#EFEAE0]">
-              <div className="hidden md:grid md:grid-cols-12 gap-3 px-4 py-2.5 bg-[#FAF8F5] text-[11px] font-bold text-[#526356]">
+              <div className="hidden md:grid md:grid-cols-12 gap-3 px-4 py-2.5 bg-[#FAF8F5] text-xs font-bold text-[#526356]">
                 <div className="col-span-5">ক্রম · চারার নাম ও বিভাগ</div>
                 <div className="col-span-4">আপলোড তারিখ ও সময় (Date &amp; Time)</div>
                 <div className="col-span-1 text-right">দাম (₹)</div>
@@ -411,6 +347,8 @@ export function AdminUploadHistoryTab({
                           src={resolvePlantImageUrl(plant.image, PUJA_IMAGE)}
                           alt={plant.nameBn}
                           className="w-full h-full object-cover"
+                          loading="lazy"
+                          decoding="async"
                         />
                       </div>
 
@@ -424,17 +362,17 @@ export function AdminUploadHistoryTab({
                             {plant.nameBn}
                           </h3>
                           {isUploaded && (
-                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#EBF5EF] border border-[#BFE2CC] text-[10px] font-bold text-[#14532D]">
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#EBF5EF] border border-[#BFE2CC] text-xs font-bold text-[#14532D]">
                               <CheckCircle2 className="w-2.5 h-2.5" />
                               <span>{info?.uploadBadgeBn}</span>
                             </span>
                           )}
                           {isTrashed && (
-                            <span className="text-[11px] font-bold text-[#991B1B]">· ট্র্যাশে</span>
+                            <span className="text-xs font-bold text-[#991B1B]">· ট্র্যাশে</span>
                           )}
                         </div>
 
-                        <div className="flex items-center flex-wrap gap-1.5 text-[11px] text-[#526356] mt-0.5">
+                        <div className="flex items-center flex-wrap gap-1.5 text-xs text-[#526356] mt-0.5">
                           <span>{plant.category}</span>
                           {plant.colorBn && (
                             <>

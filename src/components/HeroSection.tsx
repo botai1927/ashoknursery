@@ -17,7 +17,7 @@ export function HeroSection({
   onOpenLocation,
 }: HeroSectionProps) {
   const whatsappMessage = encodeURIComponent(
-    'নমস্কার, আমি কালশুলির ব্রাহ্ম্যমাণ নার্সারি থেকে সতেজ চারাগাছ ও ফলের কলম সম্পর্কে জানতে ও অর্ডার করতে চাই।'
+    'নমস্কার, আমি কালশুলির ভ্রাম্যমাণ নার্সারি থেকে সতেজ চারাগাছ ও ফলের কলম সম্পর্কে জানতে ও অর্ডার করতে চাই।'
   );
   const whatsappUrl = `https://wa.me/${NURSERY_CONTACT.phoneRaw}?text=${whatsappMessage}`;
 
@@ -51,7 +51,7 @@ export function HeroSection({
       {/* Immediate, High-Contrast Focal Content */}
       <div className="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-9 text-center flex flex-col items-center w-full">
         {/* Clean Eyebrow */}
-        <p className="text-[11px] sm:text-xs font-sans-bn font-semibold uppercase tracking-[0.16em] text-[#FFD8C2] mb-2">
+        <p className="text-xs sm:text-xs font-sans-bn font-semibold uppercase tracking-[0.16em] text-[#FFD8C2] mb-2">
           {lang === 'bn'
             ? 'কালশুলি গ্রাম · বাঁকুড়া, ৭২২১৬০ · পারিবারিক নার্সারি'
             : 'Kalsuli Village · Bankura, 722160 · Family Nursery'}
@@ -118,40 +118,40 @@ export function HeroSection({
           </a>
         </div>
 
-        {/* Ethical Trust Reassurance Strip (Horizontal on Mobile, 3-col on Tablet+) */}
-        <div className="mt-5 pt-3.5 border-t border-white/15 w-full max-w-3xl flex sm:grid sm:grid-cols-3 gap-3 text-left font-sans-bn overflow-x-auto no-scrollbar pb-1">
-          <div className="flex items-start gap-2 min-w-[205px] sm:min-w-0 shrink-0 bg-white/5 sm:bg-transparent rounded-xl px-2.5 py-2 sm:p-0">
+        {/* Ethical Trust Reassurance Strip (Clean stacked grid on mobile, 3-col on Tablet+) */}
+        <div className="mt-5 pt-4 border-t border-white/15 w-full max-w-3xl grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 text-left font-sans-bn">
+          <div className="flex items-start gap-2.5 bg-white/8 sm:bg-transparent rounded-xl px-3 py-2.5 sm:p-0">
             <Sprout className="w-4 h-4 text-[#A3E635] shrink-0 mt-0.5" />
             <div>
-              <p className="text-xs font-semibold text-[#FDFBF7] whitespace-nowrap">
+              <p className="text-xs font-semibold text-[#FDFBF7]">
                 {lang === 'bn' ? 'বাঁকুড়ার মাটিতে তৈরি চারা' : 'Acclimatized in Bankura Soil'}
               </p>
-              <p className="text-[11px] text-[#CBD5E1] leading-snug">
-                {lang === 'bn' ? 'কড়া রোদে সহনশীল কলম' : 'Sun-hardy & early grafts'}
+              <p className="text-xs text-[#CBD5E1] leading-snug">
+                {lang === 'bn' ? 'কড়া রোদে সহনশীল কলম ও চারা' : 'Sun-hardy & early grafts'}
               </p>
             </div>
           </div>
 
-          <div className="flex items-start gap-2 min-w-[205px] sm:min-w-0 shrink-0 bg-white/5 sm:bg-transparent rounded-xl px-2.5 py-2 sm:p-0">
+          <div className="flex items-start gap-2.5 bg-white/8 sm:bg-transparent rounded-xl px-3 py-2.5 sm:p-0">
             <Camera className="w-4 h-4 text-[#FFD8C2] shrink-0 mt-0.5" />
             <div>
-              <p className="text-xs font-semibold text-[#FDFBF7] whitespace-nowrap">
+              <p className="text-xs font-semibold text-[#FDFBF7]">
                 {lang === 'bn' ? 'পাঠানোর আগে আসল ছবি' : 'Live Photo Before Dispatch'}
               </p>
-              <p className="text-[11px] text-[#CBD5E1] leading-snug">
-                {lang === 'bn' ? 'চারা দেখে অর্ডার নিশ্চিত' : 'Inspect sapling on WhatsApp'}
+              <p className="text-xs text-[#CBD5E1] leading-snug">
+                {lang === 'bn' ? 'চারা দেখে অর্ডার নিশ্চিত করুন' : 'Inspect sapling on WhatsApp'}
               </p>
             </div>
           </div>
 
-          <div className="flex items-start gap-2 min-w-[205px] sm:min-w-0 shrink-0 bg-white/5 sm:bg-transparent rounded-xl px-2.5 py-2 sm:p-0">
+          <div className="flex items-start gap-2.5 bg-white/8 sm:bg-transparent rounded-xl px-3 py-2.5 sm:p-0">
             <ShieldCheck className="w-4 h-4 text-[#A3E635] shrink-0 mt-0.5" />
             <div>
-              <p className="text-xs font-semibold text-[#FDFBF7] whitespace-nowrap">
+              <p className="text-xs font-semibold text-[#FDFBF7]">
                 {lang === 'bn' ? 'অক্ষত শিকড় ডেলিভারি' : 'Intact Root-Ball Delivery'}
               </p>
-              <p className="text-[11px] text-[#CBD5E1] leading-snug">
-                {lang === 'bn' ? 'কালশুলি, পারসোলা, খাতড়া' : 'Kalsuli, Parsola, Khatra'}
+              <p className="text-xs text-[#CBD5E1] leading-snug">
+                {lang === 'bn' ? 'কালশুলি, পারসোলা, খাতড়া ও সিমলাপাল' : 'Kalsuli, Parsola, Khatra'}
               </p>
             </div>
           </div>

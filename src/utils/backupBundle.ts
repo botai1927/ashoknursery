@@ -433,7 +433,7 @@ export function buildUnifiedBackupBundle(params: {
       activityLogsCount: activityLogs.length,
     },
     siteProfile: {
-      nurseryNameBn: 'ব্রাহ্ম্যমাণ নার্সারি',
+      nurseryNameBn: 'ভ্রাম্যমাণ নার্সারি',
       nurseryNameEn: 'Brahmyaman Nursery',
       locationBn: 'কালশুলি, বাঁকুড়া, পশ্চিমবঙ্গ - ৭২২১৬০',
       locationEn: 'Kalsuli, Bankura, West Bengal - 722160',

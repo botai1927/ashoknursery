@@ -192,9 +192,9 @@ export function AdminPlantFormTab({
   verifiedImageSource,
   onSearchPlantImages,
   onSelectSearchedImage,
-  aiStatus,
-  aiProviderChoice,
-  setAiProviderChoice,
+  aiStatus: _aiStatus,
+  aiProviderChoice: _aiProviderChoice,
+  setAiProviderChoice: _setAiProviderChoice,
   modelType,
   setModelType,
   aiCustomInstruction,
@@ -242,7 +242,7 @@ export function AdminPlantFormTab({
           <h2 className={`font-serif-bn font-bold text-[#142318] ${isAdminSimpleView ? 'text-xl' : 'text-base sm:text-lg'}`}>
             {editingPlantId ? 'চারার তথ্য, ছবি ও দাম আপডেট' : 'নতুন চারার ছবি ও দাম যোগ করুন'}
           </h2>
-          <p className={isAdminSimpleView ? 'text-sm text-[#526356]' : 'text-[11px] text-[#785942]'}>
+          <p className={isAdminSimpleView ? 'text-sm text-[#526356]' : 'text-xs text-[#785942]'}>
             ক্যামেরা দিয়ে ছবি তুলুন, AI দিয়ে বিবরণ তৈরি করুন ও বিক্রয়মূল্য সেট করুন
           </p>
         </div>
@@ -280,7 +280,7 @@ export function AdminPlantFormTab({
             <Undo2 className="w-3.5 h-3.5 text-[#1B8354] shrink-0" />
             <span>চারা যোগ ও ছবি আপলোড আনডু / রিডু (Form & Upload Undo/Redo)</span>
           </p>
-          <p className="text-[11px] text-[#526356] truncate mt-0.5">
+          <p className="text-xs text-[#526356] truncate mt-0.5">
             {lastFormUndoLabelBn
               ? `সর্বশেষ ফর্ম পরিবর্তন: ${lastFormUndoLabelBn}`
               : lastGlobalUndoLabelBn
@@ -303,7 +303,7 @@ export function AdminPlantFormTab({
           >
             <Undo2 className="w-3.5 h-3.5 text-[#1B8354]" />
             <span>ফর্ম আনডু</span>
-            <span className="font-mono text-[10px] text-[#1B8354]">({formUndoCount})</span>
+            <span className="font-mono text-xs text-[#1B8354]">({formUndoCount})</span>
           </button>
 
           <button
@@ -319,7 +319,7 @@ export function AdminPlantFormTab({
           >
             <Redo2 className="w-3.5 h-3.5 text-[#1B8354]" />
             <span>ফর্ম রিডু</span>
-            <span className="font-mono text-[10px] text-[#1B8354]">({formRedoCount})</span>
+            <span className="font-mono text-xs text-[#1B8354]">({formRedoCount})</span>
           </button>
 
           {(globalUndoCount > 0 || globalRedoCount > 0) && (
@@ -333,7 +333,7 @@ export function AdminPlantFormTab({
                     ? `ক্যাটালগ আনডু: ${lastGlobalUndoLabelBn}`
                     : 'ক্যাটালগ পরিবর্তন আনডু করুন'
                 }
-                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#142318] hover:bg-[#203425] disabled:opacity-40 disabled:pointer-events-none text-white text-[11px] font-bold cursor-pointer"
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#142318] hover:bg-[#203425] disabled:opacity-40 disabled:pointer-events-none text-white text-xs font-bold cursor-pointer"
               >
                 <Undo2 className="w-3 h-3 text-[#A3E635]" />
                 <span>ক্যাটালগ আনডু ({globalUndoCount})</span>
@@ -347,7 +347,7 @@ export function AdminPlantFormTab({
                     ? `ক্যাটালগ রিডু: ${lastGlobalRedoLabelBn}`
                     : 'ক্যাটালগ পরিবর্তন রিডু করুন'
                 }
-                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#142318] hover:bg-[#203425] disabled:opacity-40 disabled:pointer-events-none text-white text-[11px] font-bold cursor-pointer"
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#142318] hover:bg-[#203425] disabled:opacity-40 disabled:pointer-events-none text-white text-xs font-bold cursor-pointer"
               >
                 <Redo2 className="w-3 h-3 text-[#A3E635]" />
                 <span>ক্যাটালগ রিডু ({globalRedoCount})</span>
@@ -379,11 +379,11 @@ export function AdminPlantFormTab({
                   <button
                     type="button"
                     onClick={() => onEditExistingDuplicate(duplicateCheck.plant)}
-                    className="px-3 py-1.5 bg-[#991B1B] text-white font-bold rounded-lg text-[11px] cursor-pointer"
+                    className="px-3 py-1.5 bg-[#991B1B] text-white font-bold rounded-lg text-xs cursor-pointer"
                   >
                     বর্তমান চারাটিতে যান ও দাম আপডেট করুন
                   </button>
-                  <span className="text-[10px] text-[#B91C1C] flex items-center">
+                  <span className="text-xs text-[#B91C1C] flex items-center">
                     অথবা নিচে চারার নির্দিষ্ট রং/ভ্যারাইটি বেছে নিন।
                   </span>
                 </div>
@@ -401,14 +401,14 @@ export function AdminPlantFormTab({
               <Camera className="w-4 h-4 text-[#1B8354]" />
               <span>১. চারার ছবি ও ৩টি গ্যালারি স্লট</span>
             </label>
-            <div className="flex items-center gap-2 flex-wrap text-[11px]">
+            <div className="flex items-center gap-2 flex-wrap text-xs">
               {(formUndoCount > 0 || formRedoCount > 0) && (
                 <div className="inline-flex items-center gap-1">
                   <button
                     type="button"
                     disabled={formUndoCount === 0}
                     onClick={onFormUndo}
-                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-white hover:bg-[#EBF5EF] disabled:opacity-40 border border-[#D5C9B8] text-[#142318] text-[10px] font-bold cursor-pointer"
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-white hover:bg-[#EBF5EF] disabled:opacity-40 border border-[#D5C9B8] text-[#142318] text-xs font-bold cursor-pointer"
                     title="ছবি বা ফর্ম পরিবর্তন আনডু করুন"
                   >
                     <Undo2 className="w-3 h-3 text-[#1B8354]" />
@@ -418,7 +418,7 @@ export function AdminPlantFormTab({
                     type="button"
                     disabled={formRedoCount === 0}
                     onClick={onFormRedo}
-                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-white hover:bg-[#EBF5EF] disabled:opacity-40 border border-[#D5C9B8] text-[#142318] text-[10px] font-bold cursor-pointer"
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-white hover:bg-[#EBF5EF] disabled:opacity-40 border border-[#D5C9B8] text-[#142318] text-xs font-bold cursor-pointer"
                     title="ছবি বা ফর্ম পরিবর্তন রিডু করুন"
                   >
                     <Redo2 className="w-3 h-3 text-[#1B8354]" />
@@ -490,15 +490,17 @@ export function AdminPlantFormTab({
                           src={resolvePlantImageUrl(slotImg, PUJA_IMAGE)}
                           alt={slot.label}
                           className="w-full h-full object-cover"
+                          loading="lazy"
+                          decoding="async"
                         />
                       ) : (
-                        <span className="text-[10px] text-[#785942] font-medium">+ ছবি দিন</span>
+                        <span className="text-xs text-[#785942] font-medium">+ ছবি দিন</span>
                       )}
                     </div>
-                    <p className="text-[10px] font-bold text-[#142318] truncate leading-tight">
+                    <p className="text-xs font-bold text-[#142318] truncate leading-tight">
                       {slot.label}
                     </p>
-                    <p className="text-[9px] text-[#785942] truncate">
+                    <p className="text-xs text-[#785942] truncate">
                       {slotImg ? (slotImg.includes('cloudinary') ? 'Cloudinary ✓' : 'সংরক্ষিত') : slot.desc}
                     </p>
                   </button>
@@ -526,17 +528,19 @@ export function AdminPlantFormTab({
                 src={resolvePlantImageUrl(formImages[activeImageSlot] || formImage, PUJA_IMAGE)}
                 alt="Preview"
                 className="w-full h-full object-cover"
+                loading="lazy"
+                decoding="async"
               />
               {(isCompressingPhoto || isUploadingToCloudinary) && (
                 <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white p-1 text-center">
                   <Loader2 className="w-5 h-5 animate-spin text-[#A3E635]" />
-                  <span className="text-[9px] mt-1 font-bold">
+                  <span className="text-xs mt-1 font-bold">
                     {isUploadingToCloudinary ? 'ক্লাউডিনারি...' : 'কমপ্রেস...'}
                   </span>
                 </div>
               )}
               {verifiedImageSource && (
-                <div className="absolute bottom-0 inset-x-0 bg-[#1B8354]/95 text-white text-[9px] font-bold text-center py-0.5">
+                <div className="absolute bottom-0 inset-x-0 bg-[#1B8354]/95 text-white text-xs font-bold text-center py-0.5">
                   যাচাইকৃত
                 </div>
               )}
@@ -567,7 +571,7 @@ export function AdminPlantFormTab({
                 <span>স্লট {activeImageSlot + 1}-এ গ্যালারি থেকে আপলোড</span>
               </button>
 
-              <p className="text-[10px] font-medium text-[#526356] leading-snug">
+              <p className="text-xs font-medium text-[#526356] leading-snug">
                 {editingPlantId
                   ? 'ছবি বদলালেই সাথে সাথে লাইভ দোকানে আপডেট হয়ে যাবে।'
                   : 'ছবি যুক্ত করে নিচের সংরক্ষণ বোতামে চাপলে দোকানে লাইভ হবে।'}
@@ -598,7 +602,7 @@ export function AdminPlantFormTab({
               </button>
 
               {verifiedImageSource && (
-                <span className="text-[10px] text-[#1B8354] font-bold flex items-center gap-1">
+                <span className="text-xs text-[#1B8354] font-bold flex items-center gap-1">
                   <CheckCircle className="w-3 h-3" />
                   <span>{verifiedImageSource}</span>
                 </span>
@@ -621,7 +625,7 @@ export function AdminPlantFormTab({
                         }
                       }}
                       placeholder="যেমন: রক্তজবা, কাগজি লেবু, Rose, Bougainvillea..."
-                      className="w-full h-9 pl-9 pr-3 bg-[#FAF8F5] border border-[#D5C9B8] rounded-xl text-xs text-[#142318] focus:outline-none focus:border-[#1B8354]"
+                      className="w-full h-9 pl-9 pr-3 bg-[#FAF8F5] border border-[#D5C9B8] rounded-xl text-xs text-[#142318] focus:outline-2 focus:outline-[#1B8354] focus:outline-offset-1 focus:border-[#1B8354]"
                     />
                   </div>
                   <button
@@ -640,7 +644,7 @@ export function AdminPlantFormTab({
                 </div>
 
                 <div className="flex flex-wrap gap-1 items-center">
-                  <span className="text-[10px] text-[#785942] font-semibold">জনপ্রিয়:</span>
+                  <span className="text-xs text-[#785942] font-semibold">জনপ্রিয়:</span>
                   {['টমেটোর চারা', 'বেগুনের চারা', 'রক্তজবা', 'কাগজি লেবু', 'গোলাপ', 'আম্রপালী', 'থাই পেয়ারা', 'টিউলিপ', 'কৃষ্ণ তুলসী'].map(
                     (tag) => (
                       <button
@@ -650,7 +654,7 @@ export function AdminPlantFormTab({
                           setImageSearchQuery(tag);
                           onSearchPlantImages(tag);
                         }}
-                        className="px-2 py-0.5 rounded-md bg-[#FAF8F5] hover:bg-[#F3ECE2] border border-[#E8E1D5] text-[10px] text-[#526356] font-medium cursor-pointer"
+                        className="px-2 py-0.5 rounded-md bg-[#FAF8F5] hover:bg-[#F3ECE2] border border-[#E8E1D5] text-xs text-[#526356] font-medium cursor-pointer"
                       >
                         {tag}
                       </button>
@@ -692,11 +696,12 @@ export function AdminPlantFormTab({
                               alt={img.title}
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                               loading="lazy"
+                              decoding="async"
                             />
                           </div>
                           <div className="p-1.5 w-full">
-                            <p className="text-[10px] font-bold text-[#142318] truncate">{img.title}</p>
-                            <div className="flex items-center justify-between mt-0.5 text-[9px]">
+                            <p className="text-xs font-bold text-[#142318] truncate">{img.title}</p>
+                            <div className="flex items-center justify-between mt-0.5 text-xs">
                               <span className="text-[#1B8354] font-semibold">যাচাইকৃত</span>
                               {isSlotMatch && <span className="text-[#1B8354] font-bold">যুক্ত ✓</span>}
                             </div>
@@ -712,7 +717,7 @@ export function AdminPlantFormTab({
 
           {/* Preset Species Thumbnails */}
           <div>
-            <span className="block text-[10px] font-semibold text-[#526356] mb-1.5">
+            <span className="block text-xs font-semibold text-[#526356] mb-1.5">
               অথবা নার্সারির প্রস্তুত চারা থেকে ছবি বাছুন:
             </span>
             <div className="grid grid-cols-6 sm:grid-cols-7 gap-1.5 max-h-24 overflow-y-auto p-1.5 bg-white border border-[#E8E1D5] rounded-xl">
@@ -732,7 +737,13 @@ export function AdminPlantFormTab({
                         : 'border-transparent opacity-85 hover:opacity-100'
                     }`}
                   >
-                    <img src={preset.url} alt={preset.label} className="w-full h-full object-cover" />
+                    <img
+                      src={preset.url}
+                      alt={preset.label}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                      decoding="async"
+                    />
                   </button>
                 );
               })}
@@ -768,7 +779,7 @@ export function AdminPlantFormTab({
                 value={formNameBn}
                 onChange={(e) => setFormNameBn(e.target.value)}
                 placeholder="যেমন: রক্তজবা, কাগজি লেবু, আম্রপালী"
-                className={`w-full px-3 border border-[#D5C9B8] rounded-xl focus:outline-none focus:border-[#1B8354] ${
+                className={`w-full px-3 border border-[#D5C9B8] rounded-xl focus:outline-2 focus:outline-[#1B8354] focus:outline-offset-1 focus:border-[#1B8354] ${
                   isAdminSimpleView ? 'h-13 text-lg font-semibold' : 'h-10 text-sm'
                 }`}
               />
@@ -784,7 +795,7 @@ export function AdminPlantFormTab({
                   value={formNameEn}
                   onChange={(e) => setFormNameEn(e.target.value)}
                   placeholder="e.g. Red Hibiscus, Lemon"
-                  className="w-full h-10 px-3 border border-[#D5C9B8] rounded-xl text-sm focus:outline-none focus:border-[#1B8354]"
+                  className="w-full h-10 px-3 border border-[#D5C9B8] rounded-xl text-sm focus:outline-2 focus:outline-[#1B8354] focus:outline-offset-1 focus:border-[#1B8354]"
                 />
               </div>
             )}
@@ -797,7 +808,7 @@ export function AdminPlantFormTab({
                 <span>রং বা বিশেষ জাত (ঐচ্ছিক)</span>
               </label>
               {!isAdminSimpleView && (
-                <span className="text-[10px] text-[#785942]">একই গাছের ভিন্ন কালার আলাদা করবে</span>
+                <span className="text-xs text-[#785942]">একই গাছের ভিন্ন কালার আলাদা করবে</span>
               )}
             </div>
 
@@ -825,7 +836,7 @@ export function AdminPlantFormTab({
               value={formColorBn}
               onChange={(e) => setFormColorBn(e.target.value)}
               placeholder="অথবা নিজের মতো লিখুন: যেমন: হলুদ, গোলাপি, কাটিমন বারোমাসি"
-              className={`w-full px-3 border border-[#D5C9B8] rounded-xl bg-white focus:outline-none focus:border-[#1B8354] ${
+              className={`w-full px-3 border border-[#D5C9B8] rounded-xl bg-white focus:outline-2 focus:outline-[#1B8354] focus:outline-offset-1 focus:border-[#1B8354] ${
                 isAdminSimpleView ? 'h-12 text-base' : 'h-9 text-xs'
               }`}
             />
@@ -839,7 +850,7 @@ export function AdminPlantFormTab({
               <select
                 value={formCategory}
                 onChange={(e) => setFormCategory(e.target.value as PlantCategory)}
-                className={`w-full px-3 border border-[#D5C9B8] rounded-xl bg-white focus:outline-none focus:border-[#1B8354] ${
+                className={`w-full px-3 border border-[#D5C9B8] rounded-xl bg-white focus:outline-2 focus:outline-[#1B8354] focus:outline-offset-1 focus:border-[#1B8354] ${
                   isAdminSimpleView ? 'h-13 text-base font-semibold' : 'h-10 text-xs'
                 }`}
               >
@@ -861,7 +872,7 @@ export function AdminPlantFormTab({
                   value={formBotanical}
                   onChange={(e) => setFormBotanical(e.target.value)}
                   placeholder="যেমন: Hibiscus rosa-sinensis"
-                  className="w-full h-10 px-3 border border-[#D5C9B8] rounded-xl text-sm focus:outline-none focus:border-[#1B8354]"
+                  className="w-full h-10 px-3 border border-[#D5C9B8] rounded-xl text-sm focus:outline-2 focus:outline-[#1B8354] focus:outline-offset-1 focus:border-[#1B8354]"
                 />
               </div>
             )}
@@ -875,7 +886,7 @@ export function AdminPlantFormTab({
               <DollarSign className="w-4 h-4 text-[#B34728]" />
               <span>৩. বিক্রয়মূল্য ও পাত্রের ধরন (₹)</span>
             </label>
-            <span className={isAdminSimpleView ? 'text-xs text-[#785942]' : 'text-[10px] text-[#785942]'}>
+            <span className={isAdminSimpleView ? 'text-xs text-[#785942]' : 'text-xs text-[#785942]'}>
               নিজের ইচ্ছেমতো দাম টাইপ করুন অথবা +/- বোতামে বাড়ান বা কমান
             </span>
           </div>
@@ -884,7 +895,7 @@ export function AdminPlantFormTab({
             <div className="space-y-1.5">
               <div className="grid grid-cols-12 gap-2 items-center">
                 <div className="col-span-7 sm:col-span-8">
-                  <span className="block text-[11px] font-semibold text-[#785942]">ছোট / গ্রো-ব্যাগ চারা:</span>
+                  <span className="block text-xs font-semibold text-[#785942]">ছোট / গ্রো-ব্যাগ চারা:</span>
                   <input
                     type="text"
                     value={option1Label}
@@ -896,7 +907,7 @@ export function AdminPlantFormTab({
                   />
                 </div>
                 <div className="col-span-5 sm:col-span-4">
-                  <span className="block text-[11px] font-semibold text-[#785942]">দাম (₹):</span>
+                  <span className="block text-xs font-semibold text-[#785942]">দাম (₹):</span>
                   <input
                     type="number"
                     inputMode="numeric"
@@ -923,7 +934,7 @@ export function AdminPlantFormTab({
                       setOption1Price(next.toString());
                       setBasePrice(next.toString());
                     }}
-                    className={`px-2.5 py-1 rounded-lg font-mono tabular-nums text-[11px] font-bold border cursor-pointer transition-colors ${
+                    className={`px-2.5 py-1 rounded-lg font-mono tabular-nums text-xs font-bold border cursor-pointer transition-colors ${
                       delta < 0
                         ? 'bg-[#FEF2F2] border-[#FECACA] text-[#B34728] hover:bg-[#FEE2E2]'
                         : 'bg-[#F0FDF4] border-[#86EFAC] text-[#166534] hover:bg-[#DCFCE7]'
@@ -938,7 +949,7 @@ export function AdminPlantFormTab({
             <div className="space-y-1.5 pt-2 border-t border-[#F0E4D5]">
               <div className="grid grid-cols-12 gap-2 items-center">
                 <div className="col-span-7 sm:col-span-8">
-                  <span className="block text-[11px] font-semibold text-[#785942]">বড় / মাঝারি চারা:</span>
+                  <span className="block text-xs font-semibold text-[#785942]">বড় / মাঝারি চারা:</span>
                   <input
                     type="text"
                     value={option2Label}
@@ -950,7 +961,7 @@ export function AdminPlantFormTab({
                   />
                 </div>
                 <div className="col-span-5 sm:col-span-4">
-                  <span className="block text-[11px] font-semibold text-[#785942]">দাম (₹):</span>
+                  <span className="block text-xs font-semibold text-[#785942]">দাম (₹):</span>
                   <input
                     type="number"
                     inputMode="numeric"
@@ -973,7 +984,7 @@ export function AdminPlantFormTab({
                       const next = Math.max(1, Math.round(cur + delta));
                       setOption2Price(next.toString());
                     }}
-                    className={`px-2.5 py-1 rounded-lg font-mono tabular-nums text-[11px] font-bold border cursor-pointer transition-colors ${
+                    className={`px-2.5 py-1 rounded-lg font-mono tabular-nums text-xs font-bold border cursor-pointer transition-colors ${
                       delta < 0
                         ? 'bg-[#FEF2F2] border-[#FECACA] text-[#B34728] hover:bg-[#FEE2E2]'
                         : 'bg-[#F0FDF4] border-[#86EFAC] text-[#166534] hover:bg-[#DCFCE7]'
@@ -1037,7 +1048,7 @@ export function AdminPlantFormTab({
                 aria-label="Gemini AI Model Choice"
                 value={modelType}
                 onChange={(e) => setModelType(e.target.value as AiModelChoice)}
-                className="h-8 px-2 bg-white border border-[#D5C9B8] rounded-lg text-[11px] font-bold text-[#142318]"
+                className="h-8 px-2 bg-white border border-[#D5C9B8] rounded-lg text-xs font-bold text-[#142318]"
               >
                 <option value="auto">Auto (Gemini Cascade)</option>
                 <option value="flash25">Gemini 2.5 Flash</option>
@@ -1092,7 +1103,7 @@ export function AdminPlantFormTab({
           </div>
 
           <div>
-            <label className={`block font-bold text-[#142318] mb-1 ${isAdminSimpleView ? 'text-sm' : 'text-[11px]'}`}>
+            <label className={`block font-bold text-[#142318] mb-1 ${isAdminSimpleView ? 'text-sm' : 'text-xs'}`}>
               বাংলা বিবরণ ও বৈশিষ্ট্য
             </label>
             <textarea
@@ -1100,7 +1111,7 @@ export function AdminPlantFormTab({
               value={formDescBn}
               onChange={(e) => setFormDescBn(e.target.value)}
               placeholder="এই গাছটির বৈশিষ্ট্য, ফলন/ফুল ও যত্নের কথা লিখুন..."
-              className={`w-full p-3 bg-white border border-[#D5C9B8] rounded-xl focus:outline-none focus:border-[#1B8354] ${
+              className={`w-full p-3 bg-white border border-[#D5C9B8] rounded-xl focus:outline-2 focus:outline-[#1B8354] focus:outline-offset-1 focus:border-[#1B8354] ${
                 isAdminSimpleView ? 'text-base' : 'text-xs'
               }`}
             />
@@ -1146,7 +1157,7 @@ export function AdminPlantFormTab({
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <div>
-                  <label className="block text-[11px] font-bold text-[#142318] mb-1">
+                  <label className="block text-xs font-bold text-[#142318] mb-1">
                     বিশেষ বৈশিষ্ট্য (Badge)
                   </label>
                   <input
@@ -1158,7 +1169,7 @@ export function AdminPlantFormTab({
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-bold text-[#142318] mb-1">
+                  <label className="block text-xs font-bold text-[#142318] mb-1">
                     রোদ ও আলোর চাহিদা
                   </label>
                   <input
@@ -1169,7 +1180,7 @@ export function AdminPlantFormTab({
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-bold text-[#142318] mb-1">
+                  <label className="block text-xs font-bold text-[#142318] mb-1">
                     জল দেওয়ার নিয়ম
                   </label>
                   <input
@@ -1180,7 +1191,7 @@ export function AdminPlantFormTab({
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-bold text-[#142318] mb-1">
+                  <label className="block text-xs font-bold text-[#142318] mb-1">
                     মাটি ও সার পরামর্শ
                   </label>
                   <input
@@ -1193,7 +1204,7 @@ export function AdminPlantFormTab({
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-[#142318] mb-1">
+                <label className="block text-xs font-bold text-[#142318] mb-1">
                   স্বতন্ত্র ইংরেজি বিবরণ (Unique English Description)
                 </label>
                 <textarea

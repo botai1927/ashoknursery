@@ -77,7 +77,7 @@ export function AdminDiagnosticsModal({
               <h2 className="font-serif-bn text-base font-bold text-[#142318]">
                 ক্যাটালগ অডিট ও বাগ ফিক্স কেন্দ্র
               </h2>
-              <p className="text-[11px] text-[#785942]">
+              <p className="text-xs text-[#785942]">
                 ডুপ্লিকেট স্ক্যান, মূল কারণ বিশ্লেষণ ও ১-ক্লিক মেরামত
               </p>
             </div>
@@ -105,7 +105,7 @@ export function AdminDiagnosticsModal({
               key={t.id}
               type="button"
               onClick={() => setDiagnosticsTab(t.id)}
-              className={`py-1.5 px-1 text-[11px] font-bold rounded-lg transition-colors cursor-pointer text-center truncate tabular-nums ${
+              className={`py-1.5 px-1 text-xs font-bold rounded-lg transition-colors cursor-pointer text-center truncate tabular-nums ${
                 diagnosticsTab === t.id
                   ? t.id === 'rootcause'
                     ? 'bg-[#B34728] text-white'
@@ -125,7 +125,7 @@ export function AdminDiagnosticsModal({
               <div className="p-3 bg-[#FFF8F6] border border-[#FCD5CC] rounded-xl flex flex-wrap items-center justify-between gap-2">
                 <div className="min-w-0">
                   <p className="font-bold text-[#142318]">কোথায় সমস্যা ও মূল কারণ কী?</p>
-                  <p className="text-[11px] text-[#526356]">
+                  <p className="text-xs text-[#526356]">
                     সম্পূর্ণ ক্যাটালগ স্ক্যান ফলাফল ({activePlants.length}টি সক্রিয় চারা):
                   </p>
                 </div>
@@ -135,7 +135,7 @@ export function AdminDiagnosticsModal({
                       type="button"
                       disabled={isRunningBugFix}
                       onClick={onRunBugFix}
-                      className="px-2.5 py-1.5 bg-[#1B8354] hover:bg-[#146c44] disabled:opacity-60 text-white rounded-xl text-[11px] font-bold flex items-center gap-1 cursor-pointer"
+                      className="px-2.5 py-1.5 bg-[#1B8354] hover:bg-[#146c44] disabled:opacity-60 text-white rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer"
                     >
                       {isRunningBugFix ? (
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -152,7 +152,7 @@ export function AdminDiagnosticsModal({
                   <button
                     type="button"
                     onClick={() => onAskAiRootCause()}
-                    className="px-2.5 py-1.5 bg-[#142318] hover:bg-[#203425] text-white rounded-xl text-[11px] font-bold flex items-center gap-1 cursor-pointer"
+                    className="px-2.5 py-1.5 bg-[#142318] hover:bg-[#203425] text-white rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer"
                   >
                     <Bot className="w-3.5 h-3.5 text-[#A3E635]" />
                     <span>AI ব্যাখ্যা</span>
@@ -161,7 +161,7 @@ export function AdminDiagnosticsModal({
               </div>
 
               {bugFixLog.length > 0 && (
-                <div className="p-3 bg-[#F0FDF4] border border-[#86EFAC] rounded-xl space-y-1.5 text-[11px]">
+                <div className="p-3 bg-[#F0FDF4] border border-[#86EFAC] rounded-xl space-y-1.5 text-xs">
                   <p className="font-bold text-[#166534] flex items-center gap-1.5">
                     <CheckCircle className="w-4 h-4 shrink-0 text-[#1B8354]" />
                     <span>বাগ ফিক্স ফলাফল (Success: Catalog Validated & Updated):</span>
@@ -200,7 +200,7 @@ export function AdminDiagnosticsModal({
                         {issue.titleBn}
                       </h4>
                       <span
-                        className={`text-[10px] font-bold shrink-0 ${
+                        className={`text-xs font-bold shrink-0 ${
                           issue.severity === 'high'
                             ? 'text-[#B34728]'
                             : issue.severity === 'medium'
@@ -216,15 +216,15 @@ export function AdminDiagnosticsModal({
                       </span>
                     </div>
 
-                    <p className="text-[11px] text-[#142318]">
+                    <p className="text-xs text-[#142318]">
                       <strong>কোথায়: </strong>
                       {issue.whereBn}
                     </p>
-                    <p className="text-[11px] text-[#526356] leading-relaxed">
+                    <p className="text-xs text-[#526356] leading-relaxed">
                       <strong className="text-[#B34728]">কারণ: </strong>
                       {issue.rootReasonBn}
                     </p>
-                    <p className="text-[11px] text-[#166534] leading-relaxed">
+                    <p className="text-xs text-[#166534] leading-relaxed">
                       <strong>সমাধান: </strong>
                       {issue.solutionBn}
                     </p>
@@ -237,7 +237,7 @@ export function AdminDiagnosticsModal({
                             onClose();
                             onStartEditPlant(issue.plantToEdit!);
                           }}
-                          className="px-2.5 py-1 bg-[#1B8354] hover:bg-[#146c44] text-white text-[11px] font-bold rounded-lg cursor-pointer"
+                          className="px-2.5 py-1 bg-[#1B8354] hover:bg-[#146c44] text-white text-xs font-bold rounded-lg cursor-pointer"
                         >
                           &ldquo;{issue.plantToEdit.nameBn}&rdquo; এডিট করুন
                         </button>
@@ -247,7 +247,7 @@ export function AdminDiagnosticsModal({
                           type="button"
                           disabled={isRunningBugFix}
                           onClick={onRunBugFix}
-                          className="px-2.5 py-1 bg-[#142318] hover:bg-[#203425] disabled:opacity-60 text-white text-[11px] font-bold rounded-lg inline-flex items-center gap-1 cursor-pointer"
+                          className="px-2.5 py-1 bg-[#142318] hover:bg-[#203425] disabled:opacity-60 text-white text-xs font-bold rounded-lg inline-flex items-center gap-1 cursor-pointer"
                         >
                           {isRunningBugFix && <Loader2 className="w-3 h-3 animate-spin" />}
                           <span>
@@ -264,7 +264,7 @@ export function AdminDiagnosticsModal({
                             `এই সমস্যাটি বিস্তারিত ব্যাখ্যা করুন — "${issue.titleBn}" (${issue.whereBn})। মূল কারণ কী এবং স্থায়ী সমাধান কীভাবে করবো?`
                           )
                         }
-                        className="px-2.5 py-1 bg-white border border-[#D5C9B8] text-[#142318] text-[11px] font-bold rounded-lg cursor-pointer"
+                        className="px-2.5 py-1 bg-white border border-[#D5C9B8] text-[#142318] text-xs font-bold rounded-lg cursor-pointer"
                       >
                         AI-কে জিজ্ঞেস করুন
                       </button>
@@ -279,7 +279,7 @@ export function AdminDiagnosticsModal({
             <div className="space-y-3">
               <div className="p-3 bg-[#FBF9F5] rounded-xl border border-[#E8E1D5] space-y-1">
                 <p className="font-bold text-[#142318]">ডুপ্লিকেট ছবি ও চারা বিশ্লেষণ:</p>
-                <p className="text-[11px] text-[#526356] tabular-nums">
+                <p className="text-xs text-[#526356] tabular-nums">
                   {duplicateAnalysis.totalCount === 0
                     ? 'আপনার ক্যাটালগের সব ছবি ও নাম সম্পূর্ণ ইউনিক। কোনো ডুপ্লিকেট পাওয়া যায়নি।'
                     : `মোট ${duplicateAnalysis.duplicateImages.length} টি একই ছবি গ্রুপ এবং ${duplicateAnalysis.duplicateNames.length} টি একই নামের গ্রুপ পাওয়া গেছে।`}
@@ -293,12 +293,14 @@ export function AdminDiagnosticsModal({
                       src={resolvePlantImageUrl(group.url, PUJA_IMAGE)}
                       alt="duplicate"
                       className="w-12 h-12 rounded-xl object-cover border border-[#DDD5C7]"
+                      loading="lazy"
+                      decoding="async"
                     />
                     <div className="min-w-0 flex-1">
                       <p className="font-bold text-[#B34728]">
                         একই ছবি ব্যবহৃত গাছ ({group.plants.length} টি):
                       </p>
-                      <p className="text-[11px] text-[#526356] truncate">
+                      <p className="text-xs text-[#526356] truncate">
                         {group.plants.map((p) => p.nameBn).join(', ')}
                       </p>
                     </div>
@@ -309,7 +311,7 @@ export function AdminDiagnosticsModal({
                         key={p.id}
                         className="flex items-center justify-between gap-2 p-2 bg-[#FAF8F5] rounded-lg"
                       >
-                        <span className="font-bold truncate text-[11px] tabular-nums">
+                        <span className="font-bold truncate text-xs tabular-nums">
                           {p.nameBn} {p.colorBn ? `(${p.colorBn})` : ''} · ₹{p.options[0]?.price}
                         </span>
                         <button
@@ -318,7 +320,7 @@ export function AdminDiagnosticsModal({
                             onSoftDelete(p);
                             onClose();
                           }}
-                          className="px-2 py-1 bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#B34728] text-[10px] font-bold rounded-md cursor-pointer shrink-0"
+                          className="px-2 py-1 bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#B34728] text-xs font-bold rounded-md cursor-pointer shrink-0"
                         >
                           ট্র্যাশে পাঠান
                         </button>
@@ -342,7 +344,7 @@ export function AdminDiagnosticsModal({
               <div className="p-3 bg-[#F0FDF4] border border-[#86EFAC] rounded-xl flex items-center justify-between gap-2">
                 <div>
                   <p className="font-bold text-[#166534]">স্বয়ংক্রিয় বাগ ফিক্সার</p>
-                  <p className="text-[10px] text-[#15803D]">
+                  <p className="text-xs text-[#15803D]">
                     অসম্পূর্ণ/ডুপ্লিকেট বিবরণ, শূন্য মূল্য, ছবিহীন চারা ও যত্ন নির্দেশাবলীর ত্রুটি ১-ক্লিকে মেরামত
                   </p>
                 </div>
@@ -358,7 +360,7 @@ export function AdminDiagnosticsModal({
               </div>
 
               {bugFixLog.length > 0 && (
-                <div className="p-3 bg-[#FAF8F5] border border-[#E8E1D5] rounded-xl space-y-1.5 font-mono text-[11px]">
+                <div className="p-3 bg-[#FAF8F5] border border-[#E8E1D5] rounded-xl space-y-1.5 font-mono text-xs">
                   <p className="font-bold text-[#142318] font-sans-bn">মেরামত ফলাফল:</p>
                   {bugFixLog.map((log, i) => (
                     <p key={i} className="text-[#1B8354] flex items-center gap-1">
@@ -369,7 +371,7 @@ export function AdminDiagnosticsModal({
                 </div>
               )}
 
-              <div className="p-3 bg-white border border-[#E8E1D5] rounded-xl space-y-1.5 text-[11px] text-[#526356]">
+              <div className="p-3 bg-white border border-[#E8E1D5] rounded-xl space-y-1.5 text-xs text-[#526356]">
                 <p className="font-bold text-[#142318]">স্বয়ংক্রিয় চেকপয়েন্ট তালিকা:</p>
                 <p>১. প্রতিটি চারার ইউনিক ও বিস্তারিত বাংলা বিবরণ (৪৫+ অক্ষর, ডুপ্লিকেটমুক্ত) নিশ্চিতকরণ</p>
                 <p>২. প্রতিটি চারার অন্তত একটি ভ্যালিড মূল্য (₹৫০+) ও পলি গ্রো-ব্যাগ অপশন যুক্তকরণ</p>
@@ -386,31 +388,31 @@ export function AdminDiagnosticsModal({
                     <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
                     <span>ডাটাবেস সতর্কতা ({dbHealthMetrics.alerts.length}টি):</span>
                   </p>
-                  <p className="text-[11px]">{dbHealthMetrics.alerts[0].titleBn}</p>
+                  <p className="text-xs">{dbHealthMetrics.alerts[0].titleBn}</p>
                 </div>
               )}
 
               <div className="grid grid-cols-2 gap-2">
                 <div className="p-3 bg-[#FBF9F5] border border-[#E8E1D5] rounded-xl">
-                  <p className="text-[10px] text-[#785942] font-bold">মোট সক্রিয় চারা</p>
+                  <p className="text-xs text-[#785942] font-bold">মোট সক্রিয় চারা</p>
                   <p className="text-xl font-bold font-mono tabular-nums text-[#1B8354]">
                     {activePlants.length} টি
                   </p>
                 </div>
                 <div className="p-3 bg-[#FBF9F5] border border-[#E8E1D5] rounded-xl">
-                  <p className="text-[10px] text-[#785942] font-bold">মোট সার্ভার ডকুমেন্ট</p>
+                  <p className="text-xs text-[#785942] font-bold">মোট সার্ভার ডকুমেন্ট</p>
                   <p className="text-xl font-bold font-mono tabular-nums text-[#142318]">
                     {dbHealthMetrics.effectiveTotalDocs} টি
                   </p>
                 </div>
                 <div className="p-3 bg-[#FBF9F5] border border-[#E8E1D5] rounded-xl">
-                  <p className="text-[10px] text-[#785942] font-bold">আজকের রিড / রাইট</p>
+                  <p className="text-xs text-[#785942] font-bold">আজকের রিড / রাইট</p>
                   <p className="text-sm font-bold font-mono tabular-nums text-[#142318] mt-0.5">
                     {dbMonitorStats.today.serverReads} R · {dbMonitorStats.today.writes} W
                   </p>
                 </div>
                 <div className="p-3 bg-[#FBF9F5] border border-[#E8E1D5] rounded-xl">
-                  <p className="text-[10px] text-[#785942] font-bold">মোট সাইজ / ট্র্যাশ</p>
+                  <p className="text-xs text-[#785942] font-bold">মোট সাইজ / ট্র্যাশ</p>
                   <p className="text-sm font-bold font-mono tabular-nums text-[#142318] mt-0.5">
                     {formatBytesReadable(dbHealthMetrics.totalEstimatedBytes)} · {trashedCount} ট্র্যাশ
                   </p>
@@ -422,7 +424,7 @@ export function AdminDiagnosticsModal({
                 {ADMIN_CATEGORIES.map((cat) => {
                   const count = activePlants.filter((p) => p.category === cat).length;
                   return (
-                    <div key={cat} className="flex items-center justify-between text-[11px]">
+                    <div key={cat} className="flex items-center justify-between text-xs">
                       <span className="text-[#526356] truncate">{cat}</span>
                       <span className="font-bold font-mono tabular-nums text-[#142318]">{count} টি</span>
                     </div>

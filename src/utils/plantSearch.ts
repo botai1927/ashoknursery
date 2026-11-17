@@ -58,6 +58,9 @@ const PHONETIC_SYNONYMS: Record<string, string[]> = {
   snake: ['স্নেক', 'snake'],
   rubber: ['রাবার', 'rubber'],
   aloe: ['অ্যালোভেরা', 'ঘৃতকুমারী', 'aloe'],
+  camellia: ['ক্যামেলিয়া', 'ক্যামেলিয়ান', 'camellia'],
+  rhapis: ['র‍্যাফিস', 'পাম', 'rhapis'],
+  jade: ['সাকুলেন্ট', 'জেড', 'jade'],
 };
 
 // Classification helpers shared across search & catalog tabs
@@ -165,6 +168,7 @@ export function isFlowerPlant(p: BrahmyamanPlant): boolean {
     name.includes('টিকোমা') ||
     name.includes('তেকোমা') ||
     name.includes('সালভিয়া') ||
+    name.includes('ক্যামেলিয়া') ||
     name.includes('ক্যামেলিয়ান') ||
     name.includes('স্থলপদ্ম') ||
     name.includes('মুসান্ডা') ||

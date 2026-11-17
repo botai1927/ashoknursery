@@ -195,7 +195,7 @@ export function AdminCloudinaryTab({
               <h2 className="font-serif-bn text-base sm:text-lg font-bold text-[#142318]">
                 Cloudinary মিডিয়া ও স্টোরেজ কন্ট্রোল
               </h2>
-              <p className="text-[11px] text-[#526356]">
+              <p className="text-xs text-[#526356]">
                 {cloudinaryStatus === null
                   ? 'সার্ভার সংযোগ যাচাই করা হচ্ছে...'
                   : !cloudinaryStatus.configured
@@ -232,7 +232,7 @@ export function AdminCloudinaryTab({
             <button
               type="button"
               onClick={onVerifyCloudinary}
-              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#FAF8F5] hover:bg-[#F0EAE1] border border-[#D5C9B8] text-[11px] font-bold text-[#142318] cursor-pointer"
+              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#FAF8F5] hover:bg-[#F0EAE1] border border-[#D5C9B8] text-xs font-bold text-[#142318] cursor-pointer"
             >
               <RefreshCw className="w-3 h-3 text-[#1B8354]" />
               <span>পুনরায় যাচাই</span>
@@ -247,7 +247,7 @@ export function AdminCloudinaryTab({
               <AlertTriangle className="w-4 h-4 shrink-0" />
               <span>Cloudinary সংযোগ ত্রুটি ({cloudinaryStatus.errorCode || 'VERIFY_FAILED'})</span>
             </p>
-            <p className="text-[11px]">
+            <p className="text-xs">
               আপনার Cloudinary Dashboard &gt; Product Environment থেকে হুবহু ছোট হাতের{' '}
               <strong>Cloud Name</strong> (যেমন: <code>hgk8vecf</code> — বানানে <code>hkg8vecf</code> টাইপো নেই তো মিলিয়ে নিন),{' '}
               <strong>API Key</strong> ও <strong>API Secret</strong> Settings &gt; Secrets-এ আপডেট করুন। বর্তমান:{' '}
@@ -259,25 +259,25 @@ export function AdminCloudinaryTab({
         {/* 4 Summary Tiles */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
           <div className="p-3 bg-[#FBF9F5] border border-[#E8E1D5] rounded-2xl">
-            <p className="text-[10px] font-bold text-[#785942]">Cloudinary ফাইল</p>
+            <p className="text-xs font-bold text-[#785942]">Cloudinary ফাইল</p>
             <p className="font-mono text-lg font-bold text-[#142318]">
               {mediaAssets ? `${mediaAssets.length} টি` : '—'}
             </p>
-            <p className="text-[10px] text-[#526356]">
+            <p className="text-xs text-[#526356]">
               {mediaAssets ? formatKb(mediaLibraryTotalBytes) : 'লাইব্রেরি লোড করুন'}
             </p>
           </div>
 
           <div className="p-3 bg-[#FBF9F5] border border-[#E8E1D5] rounded-2xl">
-            <p className="text-[10px] font-bold text-[#785942]">ক্লাউড-যুক্ত চারা</p>
+            <p className="text-xs font-bold text-[#785942]">ক্লাউড-যুক্ত চারা</p>
             <p className="font-mono text-lg font-bold text-[#1B8354]">
               {catalogAudit.cloudinaryPlantCount} টি
             </p>
-            <p className="text-[10px] text-[#526356]">দ্রুত WebP/AVIF ডেলিভারি</p>
+            <p className="text-xs text-[#526356]">দ্রুত WebP/AVIF ডেলিভারি</p>
           </div>
 
           <div className="p-3 bg-[#FBF9F5] border border-[#E8E1D5] rounded-2xl">
-            <p className="text-[10px] font-bold text-[#785942]">ভারী Base64 চারা</p>
+            <p className="text-xs font-bold text-[#785942]">ভারী Base64 চারা</p>
             <p
               className={`font-mono text-lg font-bold ${
                 base64PhotoCount > 0 ? 'text-[#B34728]' : 'text-[#1B8354]'
@@ -285,17 +285,17 @@ export function AdminCloudinaryTab({
             >
               {base64PhotoCount} টি
             </p>
-            <p className="text-[10px] text-[#526356]">
+            <p className="text-xs text-[#526356]">
               {base64PhotoCount > 0 ? 'ক্লাউডে মাইগ্রেট যোগ্য' : 'সব হালকা ও অপ্টিমাইজড'}
             </p>
           </div>
 
           <div className="p-3 bg-[#FBF9F5] border border-[#E8E1D5] rounded-2xl">
-            <p className="text-[10px] font-bold text-[#785942]">স্ট্যান্ডার্ড/অন্য ছবি</p>
+            <p className="text-xs font-bold text-[#785942]">স্ট্যান্ডার্ড/অন্য ছবি</p>
             <p className="font-mono text-lg font-bold text-[#142318]">
               {catalogAudit.nonCloudinaryPlants.filter((i) => i.reason === 'preset').length} টি
             </p>
-            <p className="text-[10px] text-[#526356]">নিজস্ব ছবির অপেক্ষায়</p>
+            <p className="text-xs text-[#526356]">নিজস্ব ছবির অপেক্ষায়</p>
           </div>
         </div>
 
@@ -327,7 +327,7 @@ export function AdminCloudinaryTab({
             </button>
           </div>
         ) : (
-          <div className="p-2.5 rounded-xl bg-[#F0FDF4] border border-[#86EFAC] text-[11px] text-[#166534] font-semibold flex items-center gap-1.5">
+          <div className="p-2.5 rounded-xl bg-[#F0FDF4] border border-[#86EFAC] text-xs text-[#166534] font-semibold flex items-center gap-1.5">
             <CheckCircle2 className="w-4 h-4 text-[#1B8354] shrink-0" />
             <span>ডাটাবেসে কোনো ভারী Base64 ছবি জমে নেই — সব ছবি হালকা ফরম্যাটে আছে।</span>
           </div>
@@ -344,7 +344,7 @@ export function AdminCloudinaryTab({
                 <h3 className="font-serif-bn text-sm sm:text-base font-bold text-[#142318]">
                   Cloudinary মিডিয়া লাইব্রেরি ও অরফ্যান ম্যানেজার
                 </h3>
-                <p className="text-[11px] text-[#526356]">
+                <p className="text-xs text-[#526356]">
                   কোন ছবি কোন চারায় ব্যবহৃত হচ্ছে দেখুন, এডিট করুন বা অব্যবহৃত ছবি মুছে স্পেস খালি করুন
                 </p>
               </div>
@@ -391,7 +391,7 @@ export function AdminCloudinaryTab({
                   value={assetSearch}
                   onChange={(e) => setAssetSearch(e.target.value)}
                   placeholder="ফাইল আইডি (public_id) বা চারার নাম দিয়ে খুঁজুন..."
-                  className="w-full h-9 pl-9 pr-9 bg-[#FAF8F5] border border-[#E8E1D5] focus:border-[#1B8354] rounded-xl text-xs text-[#142318] focus:outline-none"
+                  className="w-full h-9 pl-9 pr-9 bg-[#FAF8F5] border border-[#E8E1D5] focus:border-[#1B8354] rounded-xl text-xs text-[#142318] focus:outline-2 focus:outline-[#1B8354] focus:outline-offset-1"
                 />
                 {assetSearch && (
                   <button
@@ -430,7 +430,7 @@ export function AdminCloudinaryTab({
               </div>
 
               {mediaLibraryTruncated && (
-                <p className="text-[10px] text-[#785942]">দ্রষ্টব্য: প্রথম ৫০০টি ছবি প্রদর্শিত হচ্ছে।</p>
+                <p className="text-xs text-[#785942]">দ্রষ্টব্য: প্রথম ৫০০টি ছবি প্রদর্শিত হচ্ছে।</p>
               )}
 
               {enrichedAssets.length === 0 ? (
@@ -452,11 +452,12 @@ export function AdminCloudinaryTab({
                             alt={asset.public_id}
                             className="w-full h-full object-cover"
                             loading="lazy"
+                            decoding="async"
                           />
                         </div>
 
                         <div className="flex-1 min-w-0 space-y-1">
-                          <div className="flex items-center justify-between gap-1 text-[10px]">
+                          <div className="flex items-center justify-between gap-1 text-xs">
                             <span
                               className={`font-bold ${
                                 status === 'active'
@@ -477,24 +478,24 @@ export function AdminCloudinaryTab({
                             </span>
                           </div>
 
-                          <p className="text-[10px] font-mono text-[#526356] truncate" title={asset.public_id}>
+                          <p className="text-xs font-mono text-[#526356] truncate" title={asset.public_id}>
                             {asset.public_id}
                           </p>
 
                           <div className="flex items-center justify-between gap-1.5">
                             {linked.length > 0 ? (
-                              <span className="text-[11px] font-bold text-[#142318] truncate">
+                              <span className="text-xs font-bold text-[#142318] truncate">
                                 {linked.map((p) => p.nameBn).join(', ')}
                               </span>
                             ) : (
-                              <span className="text-[10px] text-[#B34728]">কোনো চারার সাথে যুক্ত নয়</span>
+                              <span className="text-xs text-[#B34728]">কোনো চারার সাথে যুক্ত নয়</span>
                             )}
 
                             {activePlant ? (
                               <button
                                 type="button"
                                 onClick={() => onEditPlant(activePlant)}
-                                className="px-2 py-1 rounded-lg bg-[#EBF5EF] hover:bg-[#D5EBDC] text-[#14532D] text-[10px] font-bold flex items-center gap-1 shrink-0 cursor-pointer"
+                                className="px-2 py-1 rounded-lg bg-[#EBF5EF] hover:bg-[#D5EBDC] text-[#14532D] text-xs font-bold flex items-center gap-1 shrink-0 cursor-pointer"
                               >
                                 <Edit2 className="w-3 h-3" />
                                 <span>এডিট</span>
@@ -503,7 +504,7 @@ export function AdminCloudinaryTab({
                               <button
                                 type="button"
                                 onClick={onOpenTrash}
-                                className="px-2 py-1 rounded-lg bg-[#FEF3C7] text-[#92400E] text-[10px] font-bold shrink-0 cursor-pointer"
+                                className="px-2 py-1 rounded-lg bg-[#FEF3C7] text-[#92400E] text-xs font-bold shrink-0 cursor-pointer"
                               >
                                 ট্র্যাশ
                               </button>
@@ -512,7 +513,7 @@ export function AdminCloudinaryTab({
                                 type="button"
                                 disabled={deletingOrphanId === asset.public_id}
                                 onClick={() => onDeleteOrphan(asset.public_id)}
-                                className="px-2 py-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 text-[10px] font-bold flex items-center gap-1 shrink-0 cursor-pointer disabled:opacity-50"
+                                className="px-2 py-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold flex items-center gap-1 shrink-0 cursor-pointer disabled:opacity-50"
                               >
                                 <Trash2 className="w-3 h-3" />
                                 <span>{deletingOrphanId === asset.public_id ? '...' : 'মুছুন'}</span>
@@ -530,7 +531,7 @@ export function AdminCloudinaryTab({
 
           {/* Compact Orphan Report Summary if orphan scan was run separately */}
           {orphanReport && (
-            <div className="p-3 rounded-2xl bg-[#FAF7F2] border border-[#E8E1D5] space-y-2 text-[11px]">
+            <div className="p-3 rounded-2xl bg-[#FAF7F2] border border-[#E8E1D5] space-y-2 text-xs">
               <div className="flex items-center justify-between font-bold text-[#142318] flex-wrap gap-1">
                 <span>
                   অরফ্যান স্ক্যান: মোট {orphanReport.totalCloudinaryAssets} | সক্রিয়:{' '}
@@ -546,14 +547,14 @@ export function AdminCloudinaryTab({
                       key={orphan.publicId}
                       className="flex items-center justify-between gap-2 bg-white px-2.5 py-1.5 rounded-xl border border-[#E8E1D5]"
                     >
-                      <span className="truncate text-[10px] font-mono text-[#526356]">
+                      <span className="truncate text-xs font-mono text-[#526356]">
                         {orphan.publicId} ({(orphan.bytes / 1024).toFixed(1)} KB)
                       </span>
                       <button
                         type="button"
                         disabled={deletingOrphanId === orphan.publicId}
                         onClick={() => onDeleteOrphan(orphan.publicId)}
-                        className="px-2 py-0.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 text-[10px] font-bold shrink-0 cursor-pointer disabled:opacity-50"
+                        className="px-2 py-0.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold shrink-0 cursor-pointer disabled:opacity-50"
                       >
                         {deletingOrphanId === orphan.publicId ? '...' : 'ডিলিট'}
                       </button>
@@ -573,7 +574,7 @@ export function AdminCloudinaryTab({
             <h3 className="font-serif-bn text-sm font-bold text-[#142318]">
               এখনো Cloudinary-তে নেই এমন চারা ({catalogAudit.nonCloudinaryPlants.length} টি)
             </h3>
-            <p className="text-[11px] text-[#526356]">
+            <p className="text-xs text-[#526356]">
               নিচের চারাগুলোতে ক্লিক করে আপনার নার্সারির আসল ছবি সরাসরি Cloudinary-তে আপলোড করতে পারেন
             </p>
           </div>
@@ -588,10 +589,12 @@ export function AdminCloudinaryTab({
                     src={resolvePlantImageUrl(plant.image, PUJA_IMAGE)}
                     alt={plant.nameBn}
                     className="w-10 h-10 rounded-lg object-cover bg-[#EAE4D9] shrink-0"
+                    loading="lazy"
+                    decoding="async"
                   />
                   <div className="min-w-0">
                     <p className="text-xs font-bold text-[#142318] truncate">{plant.nameBn}</p>
-                    <p className="text-[10px] text-[#785942]">
+                    <p className="text-xs text-[#785942]">
                       {reason === 'base64' ? 'Base64 ছবি' : 'ডিফল্ট টেমপ্লেট'}
                     </p>
                   </div>
@@ -599,7 +602,7 @@ export function AdminCloudinaryTab({
                 <button
                   type="button"
                   onClick={() => onEditPlant(plant)}
-                  className="px-2.5 py-1 rounded-lg bg-[#EBF5EF] hover:bg-[#D5EBDC] text-[#14532D] text-[10px] font-bold shrink-0 cursor-pointer"
+                  className="px-2.5 py-1 rounded-lg bg-[#EBF5EF] hover:bg-[#D5EBDC] text-[#14532D] text-xs font-bold shrink-0 cursor-pointer"
                 >
                   ছবি বদলান
                 </button>

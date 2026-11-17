@@ -33,7 +33,7 @@ export function AdminTrashTab({
               <h2 className="font-serif-bn text-base sm:text-lg font-bold text-[#142318]">
                 ডিজিটাল ট্র্যাশ বিন ({trashedPlants.length} টি)
               </h2>
-              <p className="text-[11px] text-[#785942]">
+              <p className="text-xs text-[#785942]">
                 মুছে ফেলা চারা ৩০ দিন পর্যন্ত সুরক্ষিত থাকে এবং যেকোনো সময় রিস্টোর করা যায়
               </p>
             </div>
@@ -89,6 +89,8 @@ export function AdminTrashTab({
                       src={resolvePlantImageUrl(plant.image, PUJA_IMAGE)}
                       alt={plant.nameBn}
                       className="w-full h-full object-cover"
+                      loading="lazy"
+                      decoding="async"
                     />
                   </div>
 
@@ -101,7 +103,7 @@ export function AdminTrashTab({
                       {plant.nameBn}
                     </h3>
 
-                    <div className="flex items-center flex-wrap gap-x-1.5 text-[11px] text-[#785942] tabular-nums">
+                    <div className="flex items-center flex-wrap gap-x-1.5 text-xs text-[#785942] tabular-nums">
                       <span className="font-mono font-bold text-[#142318]">
                         ₹{plant.options[0]?.price || 0}
                       </span>
@@ -115,7 +117,7 @@ export function AdminTrashTab({
                       )}
                     </div>
 
-                    <div className="flex items-center gap-2 flex-wrap text-[11px] tabular-nums">
+                    <div className="flex items-center gap-2 flex-wrap text-xs tabular-nums">
                       <span className="inline-flex items-center gap-1 font-bold text-[#B34728]">
                         <Clock className="w-3 h-3" />
                         <span>আর {daysRemainingBn} দিন বাকি</span>

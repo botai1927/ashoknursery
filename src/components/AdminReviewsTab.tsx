@@ -13,6 +13,10 @@ import {
 import type { BrahmyamanPlant, CustomerReviewItem } from '../types/nursery';
 import { resolvePlantImageUrl } from '../utils/imageUrl';
 import { PUJA_IMAGE } from '../data/brahmyamanCatalog';
+import {
+  validateImageFile,
+  compressImageFileToDataUrl,
+} from '../utils/cloudinaryUpload';
 
 interface AdminReviewsTabProps {
   reviews: CustomerReviewItem[];
@@ -40,6 +44,7 @@ export function AdminReviewsTab({
   const [rating, setRating] = useState<number>(5);
   const [commentBn, setCommentBn] = useState('');
   const [photoUrl, setPhotoUrl] = useState('');
+  const [photoError, setPhotoError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const pendingCount = reviews.filter((r) => r.status === 'pending').length;
@@ -51,16 +56,27 @@ export function AdminReviewsTab({
     return true;
   });
 
-  const handlePhotoFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        setPhotoUrl(reader.result);
-      }
-    };
-    reader.readAsDataURL(file);
+    setPhotoError(null);
+    const check = validateImageFile(file);
+    if (!check.ok) {
+      setPhotoError(check.errorBn || 'শুধুমাত্র বৈধ ছবির ফাইল (JPG, PNG, WebP) আপলোড করা যাবে।');
+      e.target.value = '';
+      return;
+    }
+    try {
+      const compressed = await compressImageFileToDataUrl(file, {
+        maxWidth: 900,
+        maxHeight: 900,
+        quality: 0.78,
+      });
+      setPhotoUrl(compressed);
+    } catch (err: any) {
+      setPhotoError(err?.message || 'ছবি প্রসেস করা যায়নি।');
+      e.target.value = '';
+    }
   };
 
   const handleSubmit = (e: FormEvent) => {
@@ -100,7 +116,7 @@ export function AdminReviewsTab({
               >
                 কাস্টমার রিভিউ ও বাগান গ্যালারি অনুমোদন কেন্দ্র
               </h2>
-              <p className="text-[11px] text-[#526356]">
+              <p className="text-xs text-[#526356]">
                 ক্রেতাদের পাঠানো গাছের ছবি ও রিভিউ ১-ক্লিকে অনুমোদন করুন যাতে প্রতিটি গাছের পেজে ও রিভিউ গ্যালারিতে দেখা যায়
               </p>
             </div>
@@ -152,7 +168,7 @@ export function AdminReviewsTab({
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
               <div>
-                <label className="block text-[11px] font-bold text-[#142318] mb-1">
+                <label className="block text-xs font-bold text-[#142318] mb-1">
                   ক্রেতার নাম *
                 </label>
                 <input
@@ -166,7 +182,7 @@ export function AdminReviewsTab({
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-[#142318] mb-1">
+                <label className="block text-xs font-bold text-[#142318] mb-1">
                   এলাকা / ঠিকানা
                 </label>
                 <input
@@ -179,7 +195,7 @@ export function AdminReviewsTab({
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-[#142318] mb-1">
+                <label className="block text-xs font-bold text-[#142318] mb-1">
                   কোন গাছ? (ঐচ্ছিক)
                 </label>
                 <select
@@ -198,7 +214,7 @@ export function AdminReviewsTab({
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-[#142318] mb-1">
+              <label className="block text-xs font-bold text-[#142318] mb-1">
                 ক্রেতার মতামত *
               </label>
               <textarea
@@ -216,7 +232,7 @@ export function AdminReviewsTab({
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/*"
+                  accept="image/jpeg,image/png,image/webp,image/gif,image/avif,image/heic,image/heif"
                   onChange={handlePhotoFileChange}
                   className="hidden"
                 />
@@ -247,6 +263,9 @@ export function AdminReviewsTab({
                 সরাসরি ওয়েবসাইটে প্রকাশ করুন
               </button>
             </div>
+            {photoError && (
+              <p className="text-xs font-bold text-[#B34728]">{photoError}</p>
+            )}
           </form>
         )}
       </section>
@@ -273,6 +292,8 @@ export function AdminReviewsTab({
                     <img
                       src={resolvePlantImageUrl(rev.photoUrl, PUJA_IMAGE)}
                       alt={rev.plantNameBn || rev.customerName}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -283,17 +304,17 @@ export function AdminReviewsTab({
                     <span className="font-serif-bn text-sm font-bold text-[#142318]">
                       {rev.customerName}
                     </span>
-                    <span className="inline-flex items-center gap-1 text-[11px] text-[#526356]">
+                    <span className="inline-flex items-center gap-1 text-xs text-[#526356]">
                       <MapPin className="w-3 h-3 text-[#1B8354]" />
                       <span>{rev.locationBn}</span>
                     </span>
                     {rev.plantNameBn && (
-                      <span className="px-2 py-0.5 rounded bg-[#EBF5EF] text-[#14532D] text-[10px] font-bold">
+                      <span className="px-2 py-0.5 rounded bg-[#EBF5EF] text-[#14532D] text-xs font-bold">
                         চারা: {rev.plantNameBn}
                       </span>
                     )}
                     <span
-                      className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                      className={`px-2 py-0.5 rounded text-xs font-bold ${
                         rev.status === 'approved'
                           ? 'bg-[#F0FDF4] text-[#166534]'
                           : 'bg-[#FEF3C7] text-[#92400E]'
@@ -305,7 +326,7 @@ export function AdminReviewsTab({
 
                   <p className="text-xs text-[#142318] leading-relaxed">{rev.commentBn}</p>
 
-                  <p className="text-[10px] font-mono text-[#785942] flex items-center gap-1">
+                  <p className="text-xs font-mono text-[#785942] flex items-center gap-1">
                     <Clock className="w-3 h-3 text-[#1B8354]" />
                     <span>{rev.createdAtBn}</span>
                   </p>

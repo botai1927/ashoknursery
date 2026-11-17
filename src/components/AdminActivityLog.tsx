@@ -187,7 +187,7 @@ export function AdminActivityLog({
               <h2 className="font-serif-bn text-base sm:text-lg font-bold">
                 অ্যাডমিন অ্যাক্টিভিটি লগ (Firestore audit_logs)
               </h2>
-              <p className="text-[11px] text-[#526356]">
+              <p className="text-xs text-[#526356]">
                 ক্যাটালগ ব্যাচ আপডেট, বাগ ফিক্স, চারা মুছে ফেলা ও সমস্ত অ্যাডমিন কার্যক্রমের কালানুক্রমিক ইতিহাস
               </p>
             </div>
@@ -209,25 +209,25 @@ export function AdminActivityLog({
         {/* Quick Stats Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2">
           <div className="p-3 bg-[#FAF8F5] border border-[#E8E1D5] rounded-xl">
-            <p className="text-[10px] text-[#785942] font-bold">মোট লগ এন্ট্রি</p>
+            <p className="text-xs text-[#785942] font-bold">মোট লগ এন্ট্রি</p>
             <p className="font-mono text-base sm:text-lg font-bold text-[#142318] tabular-nums">
               {stats.total} টি
             </p>
           </div>
           <div className="p-3 bg-[#F0FDF4] border border-[#86EFAC] rounded-xl">
-            <p className="text-[10px] text-[#166534] font-bold">আপডেট ও ফিক্স</p>
+            <p className="text-xs text-[#166534] font-bold">আপডেট ও ফিক্স</p>
             <p className="font-mono text-base sm:text-lg font-bold text-[#1B8354] tabular-nums">
               {stats.fixesCount} টি
             </p>
           </div>
           <div className="p-3 bg-[#FEF2F2] border border-[#FCA5A5] rounded-xl">
-            <p className="text-[10px] text-[#991B1B] font-bold">মুছে ফেলা ও ট্র্যাশ</p>
+            <p className="text-xs text-[#991B1B] font-bold">মুছে ফেলা ও ট্র্যাশ</p>
             <p className="font-mono text-base sm:text-lg font-bold text-[#B34728] tabular-nums">
               {stats.deletionsCount} টি
             </p>
           </div>
           <div className="p-3 bg-[#FFFBEB] border border-[#FDE68A] rounded-xl">
-            <p className="text-[10px] text-[#B45309] font-bold">ছবি ও সংযোজন</p>
+            <p className="text-xs text-[#B45309] font-bold">ছবি ও সংযোজন</p>
             <p className="font-mono text-base sm:text-lg font-bold text-[#D97706] tabular-nums">
               {stats.uploadsCount} টি
             </p>
@@ -272,7 +272,7 @@ export function AdminActivityLog({
               placeholder="লগ বা চারার নাম দিয়ে খুঁজুন..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 bg-[#FAF8F5] border border-[#D5C9B8] rounded-xl text-xs text-[#142318] placeholder-[#785942] focus:outline-none focus:border-[#1B8354]"
+              className="w-full pl-9 pr-3 py-1.5 bg-[#FAF8F5] border border-[#D5C9B8] rounded-xl text-xs text-[#142318] placeholder-[#785942] focus:outline-2 focus:outline-[#1B8354] focus:outline-offset-1 focus:border-[#1B8354]"
             />
           </div>
         </div>
@@ -307,6 +307,8 @@ export function AdminActivityLog({
                       src={resolvePlantImageUrl(log.thumbnail, PUJA_IMAGE)}
                       alt=""
                       className="w-10 h-10 rounded-xl object-cover border border-[#D5C9B8]"
+                      loading="lazy"
+                      decoding="async"
                     />
                   ) : (
                     <div className="w-10 h-10 rounded-xl bg-white border border-[#D5C9B8] flex items-center justify-center shadow-2xs">
@@ -323,7 +325,7 @@ export function AdminActivityLog({
                         {log.titleBn}
                       </h4>
                       <span
-                        className={`px-2 py-0.5 rounded-md text-[10px] font-bold border ${getActionBadgeStyle(
+                        className={`px-2 py-0.5 rounded-md text-xs font-bold border ${getActionBadgeStyle(
                           log.actionType
                         )}`}
                       >
@@ -331,7 +333,7 @@ export function AdminActivityLog({
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2 text-[11px] text-[#785942] font-mono tabular-nums">
+                    <div className="flex items-center gap-2 text-xs text-[#785942] font-mono tabular-nums">
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
                         {log.dateBn}
@@ -349,7 +351,7 @@ export function AdminActivityLog({
                   </p>
 
                   {log.plantNameBn && (
-                    <p className="text-[11px] text-[#1B8354] font-bold pt-0.5">
+                    <p className="text-xs text-[#1B8354] font-bold pt-0.5">
                       সংশ্লিষ্ট চারা: {log.plantNameBn}
                     </p>
                   )}

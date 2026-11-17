@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Undo2, Redo2, History, CheckCircle2, AlertTriangle, RotateCcw } from 'lucide-react';
+import { Undo2, Redo2, History } from 'lucide-react';
 import type { AdminUndoRecord } from '../utils/adminUndoRedoStorage';
 
 interface AdminUndoRedoTabProps {
@@ -27,7 +27,7 @@ export function AdminUndoRedoTab({
           <h2 className={`font-serif-bn font-bold text-[#142318] ${isAdminSimpleView ? 'text-xl' : 'text-base sm:text-lg'}`}>
             ↩️ ক্যাটালগ আনডু ও রিডু হিস্ট্রি (Undo & Redo Management)
           </h2>
-          <p className={isAdminSimpleView ? 'text-sm text-[#526356]' : 'text-[11px] text-[#785942]'}>
+          <p className={isAdminSimpleView ? 'text-sm text-[#526356]' : 'text-xs text-[#785942]'}>
             এখানে আপনার প্রতিটি ক্যাটালগ পরিবর্তন, দাম বদল, চারা যোগ বা ট্র্যাশ মুছলে তার বিস্তারিত ইতিহাস সংরক্ষিত থাকে।
           </p>
         </div>
@@ -108,10 +108,10 @@ export function AdminUndoRedoTab({
                     </div>
                     <div className="min-w-0 space-y-0.5">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="px-2 py-0.5 rounded bg-[#DCFCE7] text-[#166534] text-[10px] font-bold uppercase">
+                        <span className="px-2 py-0.5 rounded bg-[#DCFCE7] text-[#166534] text-xs font-bold uppercase">
                           {item.type}
                         </span>
-                        <span className="text-[10px] text-[#785942] font-mono tabular-nums">
+                        <span className="text-xs text-[#785942] font-mono tabular-nums">
                           {item.timestampBn || 'সদ্য সংরক্ষিত'}
                         </span>
                       </div>
@@ -156,10 +156,10 @@ export function AdminUndoRedoTab({
                     </div>
                     <div className="min-w-0 space-y-0.5">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="px-2 py-0.5 rounded bg-[#FEF3C7] text-[#92400E] text-[10px] font-bold uppercase">
+                        <span className="px-2 py-0.5 rounded bg-[#FEF3C7] text-[#92400E] text-xs font-bold uppercase">
                           {item.type}
                         </span>
-                        <span className="text-[10px] text-[#785942] font-mono tabular-nums">
+                        <span className="text-xs text-[#785942] font-mono tabular-nums">
                           {item.timestampBn || 'সদ্য সংরক্ষিত'}
                         </span>
                       </div>

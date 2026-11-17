@@ -13,7 +13,7 @@ import {
   Sprout,
   BookOpen,
   Star,
-  Mic,
+  ShoppingBag,
 } from 'lucide-react';
 import { NURSERY_CONTACT } from '../data/brahmyamanCatalog';
 import { AudienceTag, BrahmyamanPlant, PlantPotOption } from '../types/nursery';
@@ -90,50 +90,59 @@ export function Header({
 
   return (
     <header className="sticky top-0 z-40 bg-[#F4F7F1]/95 backdrop-blur-md border-b border-[#D5DFD1]">
-      {/* Desktop Top Customer Trust Strip (hidden on narrow mobile to keep sticky bar slim) */}
-      <div className="hidden sm:flex bg-[#122619] text-[#E8EDE9] px-4 sm:px-8 py-1.5 text-[11px] font-sans-bn items-center justify-between">
-        <div className="flex items-center gap-2 truncate">
-          <span className="truncate">{NURSERY_CONTACT.sublineBn}</span>
+      {/* Customer Trust Top Strip — Responsive on all viewports without text cutoff */}
+      <div className="bg-[#122619] text-[#E8EDE9] px-3 sm:px-8 py-1.5 text-xs font-sans-bn flex flex-wrap items-center justify-between gap-x-3 gap-y-0.5">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <span className="font-medium text-[#E8EDE9]">
+            {lang === 'bn'
+              ? 'কালশুলি, বাঁকুড়া · সকাল ৬:৩০–৬:৩০'
+              : 'Kalsuli, Bankura · 6:30 AM–6:30 PM'}
+          </span>
+          <span className="hidden lg:inline text-[#A8BDB0]" aria-hidden="true">·</span>
+          <span className="hidden lg:inline text-[#A8BDB0]">
+            {lang === 'bn'
+              ? 'পারসোলা, খাতড়া, সিমলাপাল ডেলিভারি'
+              : 'Parsola, Khatra, Simlapal Delivery'}
+          </span>
         </div>
 
-        <div className="flex items-center gap-4 text-[#A8BDB0] shrink-0">
-          <span>সকাল ৬:৩০ – সন্ধ্যা ৬:৩০</span>
-          <span aria-hidden="true">·</span>
-          <span>কালশুলি, পারসোলা, খাতড়া, সিমলাপাল</span>
-          <span aria-hidden="true">·</span>
+        <div className="flex items-center gap-3 text-[#A8BDB0] shrink-0">
+          <span className="hidden md:inline text-[#CBD5E1]">
+            {lang === 'bn' ? 'সরাসরি নার্সারি দামে অর্ডার' : 'Direct Nursery Rate'}
+          </span>
           <a
             href={`tel:${NURSERY_CONTACT.phone}`}
-            className="text-[#FFD8C2] hover:text-white font-mono-num font-medium tabular-nums"
+            className="text-[#FFD8C2] hover:text-white font-mono-num font-semibold tabular-nums whitespace-nowrap"
           >
-            {NURSERY_CONTACT.phone}
+            {NURSERY_CONTACT.phoneDisplay}
           </a>
         </div>
       </div>
 
-      {/* Main Header Bar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-15 sm:h-16 flex items-center justify-between gap-3 lg:gap-5">
+      {/* Main Header Bar + Single Unified Responsive LiveSearchBox */}
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 flex flex-wrap md:flex-nowrap items-center justify-between gap-2.5 lg:gap-4">
         {/* Zone 1: Brand Wordmark */}
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-3 shrink-0 order-1">
           <button
             type="button"
             onClick={() => {
               onSearchChange('');
               handleNavClick('catalog', 'all');
             }}
-            className="group flex flex-col text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15803D] rounded cursor-pointer"
+            className="group flex flex-col text-left focus-visible:outline-2 focus-visible:outline-[#1B8354] focus-visible:outline-offset-2 focus-visible:ring-2 focus-visible:ring-[#15803D] rounded cursor-pointer"
           >
             <span className="font-serif-bn text-lg sm:text-2xl font-bold tracking-tight text-[#122619] group-hover:text-[#15803D] transition-colors whitespace-nowrap leading-none">
-              ভ্রম্যমাণ নার্সারি
+              ভ্রাম্যমাণ নার্সারি
             </span>
-            <span className="text-[10px] sm:text-[11px] font-sans-bn text-[#785942] mt-0.5 flex items-center gap-1 font-medium">
+            <span className="text-xs sm:text-xs font-sans-bn text-[#785942] mt-0.5 flex items-center gap-1 font-medium">
               <MapPin className="w-2.5 h-2.5 text-[#B84423]" />
               <span>কালশুলি · বাঁকুড়া</span>
             </span>
           </button>
         </div>
 
-        {/* Zone 2: Bilingual Live Search Bar with Suggestions (Desktop) */}
-        <div className="flex-1 max-w-md hidden md:block">
+        {/* Zone 2: Single Header Search Bar (Full width row on mobile, inline flex-1 on tablet/desktop) */}
+        <div className="w-full md:w-auto md:flex-1 md:max-w-md order-3 md:order-2">
           <LiveSearchBox
             variant="header-desktop"
             plants={plants}
@@ -150,7 +159,7 @@ export function Header({
         {/* Zone 3: Clean Text-First Window Navigation */}
         <nav
           aria-label="Primary Windows Navigation"
-          className="hidden lg:flex items-center gap-4 xl:gap-5 text-xs xl:text-[13px] font-semibold text-[#526356] font-sans-bn"
+          className="hidden lg:flex items-center gap-4 xl:gap-5 text-xs xl:text-[13px] font-semibold text-[#526356] font-sans-bn order-3"
         >
           {[
             { key: 'catalog' as WindowViewKey, bn: 'ক্যাটালগ', en: 'Catalog' },
@@ -180,8 +189,8 @@ export function Header({
           })}
         </nav>
 
-        {/* Zone 4: Language + Order Bag CTA + Compact Side Menu Trigger */}
-        <div className="flex items-center gap-2 shrink-0">
+        {/* Zone 4: Language + Cart Drawer Button + Compact Side Menu Trigger */}
+        <div className="flex items-center gap-2 shrink-0 order-2 md:order-4">
           <button
             type="button"
             onClick={onToggleLang}
@@ -194,12 +203,12 @@ export function Header({
           <button
             type="button"
             onClick={onOpenInquiryBag}
-            aria-label={`Open WhatsApp order list with ${inquiryCount} items`}
-            className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-2 bg-[#15803D] hover:bg-[#166534] active:scale-95 text-white text-xs sm:text-sm font-semibold rounded-xl shadow-xs transition-all cursor-pointer"
+            aria-label={`Open order bag drawer with ${inquiryCount} items`}
+            className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2 bg-[#15803D] hover:bg-[#166534] active:scale-95 text-white text-xs sm:text-sm font-semibold rounded-xl shadow-xs transition-all cursor-pointer"
           >
-            <MessageCircle className="w-4 h-4 fill-current" />
-            <span className="whitespace-nowrap hidden sm:inline">
-              {lang === 'bn' ? 'অর্ডার তালিকা' : 'Order List'}
+            <ShoppingBag className="w-4 h-4 shrink-0" />
+            <span className="whitespace-nowrap">
+              {lang === 'bn' ? 'অর্ডার ব্যাগ' : 'Bag'}
             </span>
             <span className="min-w-5 h-5 px-1 rounded-full bg-white text-[#15803D] text-xs font-bold inline-flex items-center justify-center tabular-nums font-mono-num">
               {inquiryCount}
@@ -211,26 +220,11 @@ export function Header({
             onClick={() => setMobileMenuOpen((prev) => !prev)}
             aria-label="Toggle side navigation panel"
             aria-expanded={mobileMenuOpen}
-            className="lg:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl border border-[#CEDAC9] bg-white text-[#142318] hover:bg-[#E4ECE0] cursor-pointer"
+            className="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-xl border border-[#CEDAC9] bg-white text-[#142318] hover:bg-[#E4ECE0] cursor-pointer"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
-      </div>
-
-      {/* Slim Mobile Live Search Row */}
-      <div className="md:hidden px-4 pb-2.5">
-        <LiveSearchBox
-          variant="header-mobile"
-          plants={plants}
-          lang={lang}
-          value={searchQuery}
-          onChange={handleSearchInput}
-          onSelectPlant={onSelectPlant}
-          onAddToInquiry={onAddToInquiry}
-          onSubmitSearch={handleSubmitSearch}
-          suggestionLimit={6}
-        />
       </div>
 
       {/* Compact Partial-Width Right Side Panel (keeps main website visible alongside) */}
@@ -263,7 +257,7 @@ export function Header({
 
             <div className="p-3 space-y-3">
               <div className="space-y-1">
-                <p className="text-[10px] font-bold text-[#785942] uppercase tracking-wider px-2">
+                <p className="text-xs font-bold text-[#785942] uppercase tracking-wider px-2">
                   {lang === 'bn' ? 'গাছপালার বিভাগসমূহ' : 'Plant Categories'}
                 </p>
                 <button
@@ -320,7 +314,7 @@ export function Header({
               </div>
 
               <div className="pt-2 border-t border-[#D5DFD1] space-y-1">
-                <p className="text-[10px] font-bold text-[#785942] uppercase tracking-wider px-2">
+                <p className="text-xs font-bold text-[#785942] uppercase tracking-wider px-2">
                   {lang === 'bn' ? 'অন্যান্য বিভাগ' : 'More'}
                 </p>
                 <button
@@ -355,25 +349,49 @@ export function Header({
                   <MapPin className="w-4 h-4 text-[#785942] shrink-0" />
                   <span className="truncate">নার্সারির ঠিকানা ও ম্যাপ</span>
                 </button>
+              </div>
 
-                <div className="pt-2 grid grid-cols-2 gap-1.5">
+              {/* Dedicated Bag & Direct Contact Section inside Menu */}
+              <div className="pt-2.5 border-t border-[#D5DFD1] space-y-2">
+                <p className="text-xs font-bold text-[#785942] uppercase tracking-wider px-2">
+                  {lang === 'bn' ? 'অর্ডার ব্যাগ ও সরাসরি যোগাযোগ' : 'Order Bag & Direct Contact'}
+                </p>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onOpenInquiryBag();
+                  }}
+                  className="w-full py-2.5 px-3 rounded-xl bg-[#122619] hover:bg-[#1E3B28] text-white text-xs font-bold flex items-center justify-between gap-2 shadow-xs transition-colors cursor-pointer"
+                >
+                  <span className="inline-flex items-center gap-2">
+                    <ShoppingBag className="w-4 h-4 text-[#A3E635] shrink-0" />
+                    <span>{lang === 'bn' ? 'আপনার অর্ডার ব্যাগ দেখুন' : 'View Order Bag'}</span>
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full bg-[#A3E635] text-[#122619] text-xs font-bold font-mono-num tabular-nums">
+                    {inquiryCount}
+                  </span>
+                </button>
+
+                <div className="grid grid-cols-2 gap-1.5">
                   <a
                     href={`tel:${NURSERY_CONTACT.phone}`}
-                    className="py-2 px-2 rounded-xl border border-[#CEDAC9] bg-white text-[#142318] text-[11px] font-bold flex items-center justify-center gap-1"
+                    className="py-2 px-2 rounded-xl border border-[#CEDAC9] bg-white text-[#142318] text-xs font-bold flex items-center justify-center gap-1"
                   >
                     <Phone className="w-3.5 h-3.5 text-[#1B8354]" />
-                    <span>কল করুন</span>
+                    <span>{lang === 'bn' ? 'কল করুন' : 'Call'}</span>
                   </a>
                   <a
                     href={`https://wa.me/${NURSERY_CONTACT.phoneRaw}?text=${encodeURIComponent(
-                      'নমস্কার অশোকদা, আমি কালশুলির নার্সারি থেকে মুখে বলে (Voice Note) চারাগাছ অর্ডার করতে চাই।'
+                      'নমস্কার অশোকদা, আমি কালশুলির ভ্রাম্যমাণ নার্সারি থেকে চারাগাছ অর্ডার করতে চাই।'
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="py-2 px-2 rounded-xl bg-[#1B8354] hover:bg-[#146c44] text-white text-[11px] font-bold flex items-center justify-center gap-1"
+                    className="py-2 px-2 rounded-xl bg-[#1B8354] hover:bg-[#146c44] text-white text-xs font-bold flex items-center justify-center gap-1"
                   >
-                    <Mic className="w-3.5 h-3.5" />
-                    <span>ভয়েস অর্ডার</span>
+                    <MessageCircle className="w-3.5 h-3.5 fill-current" />
+                    <span>WhatsApp</span>
                   </a>
                 </div>
               </div>

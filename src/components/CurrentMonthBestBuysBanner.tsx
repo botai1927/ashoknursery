@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Sparkles, X, Calendar, ArrowRight, ShieldCheck, Sun, MapPin, MessageCircle } from 'lucide-react';
+import { Sparkles, X, Calendar, ArrowRight, MessageCircle } from 'lucide-react';
 import { BrahmyamanPlant } from '../types/nursery';
-import { NURSERY_CONTACT, PUJA_IMAGE, lemonImg, roseImg, lotusImg } from '../data/brahmyamanCatalog';
+import { NURSERY_CONTACT, PUJA_IMAGE } from '../data/brahmyamanCatalog';
 import { resolvePlantImageUrl } from '../utils/imageUrl';
 
 interface CurrentMonthBestBuysBannerProps {
@@ -35,7 +35,7 @@ export function CurrentMonthBestBuysBanner({ lang, plants, onSelectPlant }: Curr
   const getWhatsAppUrl = (plant: BrahmyamanPlant) => {
     const opt = plant.options?.[0] || { labelBn: 'গ্রো ব্যাগ চারা', price: 50 };
     const msg = encodeURIComponent(
-      `নমস্কার, আমি কালশুলির ব্রাহ্ম্যমাণ নার্সারি থেকে চলতি মাসের সেরা চারা "${plant.nameBn}" (${opt.labelBn} - ₹${opt.price}) নিতে আগ্রহী। বিস্তারিত জানাবেন কি?`
+      `নমস্কার, আমি কালশুলির ভ্রাম্যমাণ নার্সারি থেকে চলতি মাসের সেরা চারা "${plant.nameBn}" (${opt.labelBn} - ₹${opt.price}) নিতে আগ্রহী। বিস্তারিত জানাবেন কি?`
     );
     return `https://wa.me/${NURSERY_CONTACT.phoneRaw}?text=${msg}`;
   };
@@ -50,7 +50,7 @@ export function CurrentMonthBestBuysBanner({ lang, plants, onSelectPlant }: Curr
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="px-2.5 py-0.5 rounded-md bg-[#A3E635] text-[#142318] text-[10px] font-bold tracking-wide">
+              <span className="px-2.5 py-0.5 rounded-md bg-[#A3E635] text-[#142318] text-xs font-bold tracking-wide">
                 চলতি মাসের সেরা চারা (Best Buys)
               </span>
               <span className="text-xs text-[#CBD5E1] font-mono flex items-center gap-1">
@@ -96,7 +96,7 @@ export function CurrentMonthBestBuysBanner({ lang, plants, onSelectPlant }: Curr
                   <h3 className="text-xs font-bold text-white truncate font-serif-bn">{plant.nameBn}</h3>
                   <div className="flex items-center gap-2 mt-0.5">
                     <span className="text-xs font-mono font-bold text-[#A3E635]">₹{baseOpt.price}</span>
-                    <span className="text-[10px] text-[#94A3B8] truncate">{baseOpt.containerType}</span>
+                    <span className="text-xs text-[#94A3B8] truncate">{baseOpt.containerType}</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-1">

@@ -16,7 +16,7 @@ export function SeasonalOffersSection({ lang, plants, onSelectPlant }: SeasonalO
   const getWhatsAppUrl = (plant: BrahmyamanPlant) => {
     const opt = plant.options?.[0] || { labelBn: 'গ্রো ব্যাগ চারা', price: 50 };
     const msg = encodeURIComponent(
-      `নমস্কার, আমি কালশুলির ব্রাহ্ম্যমাণ নার্সারি থেকে বর্তমান মরশুমের অফার অফার "${plant.nameBn}" (${opt.labelBn} - ₹${opt.price}) নিতে আগ্রহী। বিস্তারিত জানাবেন কি?`
+      `নমস্কার, আমি কালশুলির ভ্রাম্যমাণ নার্সারি থেকে বর্তমান মরশুমের অফার "${plant.nameBn}" (${opt.labelBn} - ₹${opt.price}) নিতে আগ্রহী। বিস্তারিত জানাবেন কি?`
     );
     return `https://wa.me/${NURSERY_CONTACT.phoneRaw}?text=${msg}`;
   };
@@ -81,7 +81,7 @@ export function SeasonalOffersSection({ lang, plants, onSelectPlant }: SeasonalO
                     }}
                   />
                   <div className="absolute top-3 left-3 z-20">
-                    <span className={`px-2 py-0.5 rounded-md text-[10px] font-semibold text-white ${plant.inStock !== false ? 'bg-[#B34728]' : 'bg-[#785942]'}`}>
+                    <span className={`px-2 py-0.5 rounded-md text-xs font-semibold text-white ${plant.inStock !== false ? 'bg-[#B34728]' : 'bg-[#785942]'}`}>
                       {plant.inStock !== false ? (lang === 'bn' ? 'বিশেষ ছাড়' : 'Seasonal Deal') : (lang === 'bn' ? 'স্টক শেষ' : 'Sold Out')}
                     </span>
                   </div>
@@ -103,7 +103,7 @@ export function SeasonalOffersSection({ lang, plants, onSelectPlant }: SeasonalO
                       <span className="text-base font-bold text-[#B34728] tabular-nums font-mono-num">
                         ₹{baseOpt.price}
                       </span>
-                      <span className="block text-[10px] text-[#785942]">{baseOpt.containerType}</span>
+                      <span className="block text-xs text-[#785942]">{baseOpt.containerType}</span>
                     </div>
 
                     <div className="flex items-center gap-1.5">

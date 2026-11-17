@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, MessageCircle, Trash2, Plus, Minus, ArrowRight, ShoppingBag, Mic, ShieldCheck, AlertCircle, Copy, Check, Clock, Truck } from 'lucide-react';
 import { WhatsAppInquiryItem, BrahmyamanPlant } from '../types/nursery';
 import { NURSERY_CONTACT, PUJA_IMAGE } from '../data/brahmyamanCatalog';
@@ -32,6 +33,17 @@ export function WhatsAppCartModal({
   const [pickupPreference, setPickupPreference] = useState<'pickup' | 'delivery'>('pickup');
   const [specialNote, setSpecialNote] = useState('');
   const [copiedOrderText, setCopiedOrderText] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   const resolvedItems = useMemo(() => {
     return items.map((item) => {
@@ -75,7 +87,7 @@ export function WhatsAppCartModal({
       )
       .join('\n');
 
-    return `নমস্কার ব্রাহ্ম্যমাণ নার্সারি (কালশুলি, বাঁকুড়া),
+    return `নমস্কার ভ্রাম্যমাণ নার্সারি (কালশুলি, বাঁকুড়া),
 আমি আপনার নার্সারি থেকে নিম্নলিখিত চারাগাছ ও কলম অর্ডার/জিজ্ঞাসা করতে চাই:
 
 ${orderLines}
@@ -100,7 +112,7 @@ ${orderLines}
 
   const voiceOrderUrl = useMemo(() => {
     const msg = encodeURIComponent(
-      `নমস্কার অশোকদা (ব্রাহ্ম্যমাণ নার্সারি, কালশুলি), আমি টাইপ না করে মুখে বলে (Voice Note) চারাগাছ অর্ডার করতে চাই। অনুগ্রহ করে এই চ্যাটে একটু শুনবেন।`
+      `নমস্কার অশোকদা (ভ্রাম্যমাণ নার্সারি, কালশুলি), আমি টাইপ না করে মুখে বলে (Voice Note) চারাগাছ অর্ডার করতে চাই। অনুগ্রহ করে এই চ্যাটে একটু শুনবেন।`
     );
     return `https://wa.me/${NURSERY_CONTACT.phoneRaw}?text=${msg}`;
   }, []);
@@ -131,29 +143,29 @@ ${orderLines}
     }
   };
 
-  return (
+  const drawerContent = (
     <div
       role="dialog"
       aria-modal="true"
       aria-labelledby="cart-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-[#121914]/60 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex justify-end bg-[#121914]/60 backdrop-blur-xs"
       onClick={onClose}
     >
       <div
-        className="bg-white border border-[#D5DFD1] rounded-3xl max-w-xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden"
+        className="bg-white border-l border-[#D5DFD1] max-w-md w-full h-full flex flex-col shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="px-6 py-4 border-b border-[#D5DFD1] bg-[#F3F6F1] flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-[#1B8354]/15 flex items-center justify-center text-[#1B8354]">
-              <MessageCircle className="w-5 h-5 fill-current" />
+        {/* Drawer Header */}
+        <div className="px-5 py-4 border-b border-[#D5DFD1] bg-[#F3F6F1] flex items-center justify-between gap-3 shrink-0">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-9 h-9 rounded-xl bg-[#15803D]/15 flex items-center justify-center text-[#15803D] shrink-0">
+              <ShoppingBag className="w-5 h-5" />
             </div>
-            <div>
-              <h3 id="cart-title" className="font-serif-bn text-lg font-bold text-[#142318]">
-                {lang === 'bn' ? 'WhatsApp অর্ডার তালিকা' : 'WhatsApp Order List'}
+            <div className="min-w-0">
+              <h3 id="cart-title" className="font-serif-bn text-lg font-bold text-[#142318] truncate">
+                {lang === 'bn' ? 'অর্ডার ব্যাগ (Cart Drawer)' : 'Your Plant Cart'}
               </h3>
-              <p className="text-[11px] text-[#785942] font-sans-bn -mt-0.5">
+              <p className="text-xs text-[#785942] font-sans-bn -mt-0.5 truncate">
                 কালশুলি, পারসোলা, খাতড়া ও সিমলাপাল অঞ্চল
               </p>
             </div>
@@ -161,15 +173,15 @@ ${orderLines}
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close"
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-[#526356] hover:text-[#142318] hover:bg-[#E4ECE0] transition-colors cursor-pointer"
+            aria-label="Close drawer"
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-[#526356] hover:text-[#142318] bg-white border border-[#CEDAC9] hover:bg-[#E4ECE0] transition-colors cursor-pointer shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Content Body */}
-        <div className="p-6 overflow-y-auto flex-1 font-sans-bn">
+        {/* Drawer Content Body */}
+        <div className="p-5 overflow-y-auto flex-1 font-sans-bn">
           {resolvedItems.length === 0 ? (
             <div className="py-10 text-center space-y-4">
               <div className="w-14 h-14 rounded-2xl bg-[#E4ECE0] flex items-center justify-center mx-auto text-[#785942]">
@@ -223,6 +235,8 @@ ${orderLines}
                           src={resolvePlantImageUrl(item.image, PUJA_IMAGE)}
                           alt={item.nameBn}
                           className="w-full h-full object-cover"
+                          loading="lazy"
+                          decoding="async"
                           referrerPolicy="no-referrer"
                           onError={(e) => {
                             const target = e.currentTarget as HTMLImageElement;
@@ -237,12 +251,12 @@ ${orderLines}
                             {item.nameBn}
                           </p>
                           {item.isOutOfStock && (
-                            <span className="px-1.5 py-0.5 rounded bg-[#B34728]/15 text-[#B34728] text-[10px] font-bold shrink-0">
+                            <span className="px-1.5 py-0.5 rounded bg-[#B34728]/15 text-[#B34728] text-xs font-bold shrink-0">
                               স্টক শেষ
                             </span>
                           )}
                         </div>
-                        <p className="text-[#785942] text-[11px] truncate">
+                        <p className="text-[#785942] text-xs truncate">
                           {item.optionLabelBn} · ₹{item.price}
                           {item.priceChanged && (
                             <span className="text-[#1B8354] font-semibold ml-1">(আপডেটেড দাম)</span>
@@ -324,7 +338,7 @@ ${orderLines}
                       }`}
                     >
                       <span className="block">{z.label}</span>
-                      <span className="text-[10px] text-[#785942] block mt-0.5">{z.note}</span>
+                      <span className="text-xs text-[#785942] block mt-0.5">{z.note}</span>
                     </button>
                   ))}
                 </div>
@@ -351,7 +365,7 @@ ${orderLines}
                             : 'খাতড়া ও সিমলাপাল রুট ডেলিভারির জন্য যোগ্য ✓'}
                         </span>
                       </span>
-                      <span className="font-mono-num font-bold text-[11px] tabular-nums">
+                      <span className="font-mono-num font-bold text-xs tabular-nums">
                         ₹{Math.min(totalEstimate, 250)} / ₹250
                       </span>
                     </div>
@@ -364,7 +378,7 @@ ${orderLines}
                       />
                     </div>
                     {isBelowMinimum && (
-                      <p className="text-[11px] mt-1.5 text-amber-800">
+                      <p className="text-xs mt-1.5 text-amber-800">
                         অথবা "কালশুলি নার্সারি থেকে নেব" বেছে নিলে কোনো ন্যূনতম সীমা নেই।
                       </p>
                     )}
@@ -376,7 +390,7 @@ ${orderLines}
               <div className="space-y-3 pt-2 border-t border-[#D5DFD1]">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label htmlFor="customer-name" className="block text-[11px] text-[#526356] mb-1 font-medium">
+                    <label htmlFor="customer-name" className="block text-xs text-[#526356] mb-1 font-medium">
                       আপনার নাম (Your Name)
                     </label>
                     <input
@@ -385,11 +399,11 @@ ${orderLines}
                       value={customerName}
                       onChange={(e) => setCustomerName(e.target.value)}
                       placeholder="যেমন: শুভাশিস মণ্ডল"
-                      className="w-full h-9 px-3 border border-[#CEDAC9] rounded-xl text-xs text-[#142318] focus:outline-none focus:ring-2 focus:ring-[#1B8354]"
+                      className="w-full h-9 px-3 border border-[#CEDAC9] rounded-xl text-xs text-[#142318] focus:outline-2 focus:outline-[#1B8354] focus:outline-offset-1 focus:ring-2 focus:ring-[#1B8354]"
                     />
                   </div>
                   <div>
-                    <label htmlFor="customer-loc" className="block text-[11px] text-[#526356] mb-1 font-medium">
+                    <label htmlFor="customer-loc" className="block text-xs text-[#526356] mb-1 font-medium">
                       গ্রামের বিস্তারিত পাড়া / ল্যান্ডমার্ক
                     </label>
                     <input
@@ -398,13 +412,13 @@ ${orderLines}
                       value={customLocality}
                       onChange={(e) => setCustomLocality(e.target.value)}
                       placeholder="যেমন: বটতলা মোড় / পোস্ট অফিসের পাশে"
-                      className="w-full h-9 px-3 border border-[#CEDAC9] rounded-xl text-xs text-[#142318] focus:outline-none focus:ring-2 focus:ring-[#1B8354]"
+                      className="w-full h-9 px-3 border border-[#CEDAC9] rounded-xl text-xs text-[#142318] focus:outline-2 focus:outline-[#1B8354] focus:outline-offset-1 focus:ring-2 focus:ring-[#1B8354]"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="customer-note" className="block text-[11px] text-[#526356] mb-1 font-medium">
+                  <label htmlFor="customer-note" className="block text-xs text-[#526356] mb-1 font-medium">
                     বিশেষ অনুরোধ / সময় (ঐচ্ছিক)
                   </label>
                   <input
@@ -413,13 +427,13 @@ ${orderLines}
                     value={specialNote}
                     onChange={(e) => setSpecialNote(e.target.value)}
                     placeholder="যেমন: ভালো কলম দেবেন, বিকাল ৪টার পর ডেলিভারি হলে সুবিধা..."
-                    className="w-full h-9 px-3 border border-[#CEDAC9] rounded-xl text-xs text-[#142318] focus:outline-none focus:ring-2 focus:ring-[#1B8354]"
+                    className="w-full h-9 px-3 border border-[#CEDAC9] rounded-xl text-xs text-[#142318] focus:outline-2 focus:outline-[#1B8354] focus:outline-offset-1 focus:ring-2 focus:ring-[#1B8354]"
                   />
                 </div>
 
                 {/* Pickup or Delivery Option */}
                 <div>
-                  <label className="block text-[11px] text-[#526356] mb-1.5 font-medium">
+                  <label className="block text-xs text-[#526356] mb-1.5 font-medium">
                     গাছ সংগ্রহের পদ্ধতি:
                   </label>
                   <div className="grid grid-cols-2 gap-2">
@@ -433,7 +447,7 @@ ${orderLines}
                       }`}
                     >
                       <span className="block">কালশুলি নার্সারি থেকে নেব</span>
-                      <span className="block text-[10px] text-[#785942] mt-0.5">স্বশরীরে এসে দেখে পছন্দ</span>
+                      <span className="block text-xs text-[#785942] mt-0.5">স্বশরীরে এসে দেখে পছন্দ</span>
                     </button>
                     <button
                       type="button"
@@ -445,7 +459,7 @@ ${orderLines}
                       }`}
                     >
                       <span className="block">হোম ডেলিভারি চাই</span>
-                      <span className="block text-[10px] text-[#785942] mt-0.5">নিরাপদ রুট ডেলিভারি</span>
+                      <span className="block text-xs text-[#785942] mt-0.5">নিরাপদ রুট ডেলিভারি</span>
                     </button>
                   </div>
                 </div>
@@ -458,7 +472,7 @@ ${orderLines}
                       <strong>বাস্তব ছবি ও শিকড় সুরক্ষা:</strong> ডেলিভারির পূর্বে চারার বর্তমান ছবি WhatsApp-এ পাঠানো হবে এবং রাস্তায় মাটির বল অক্ষত রাখতে ভেজা কোকোপিট ও চটের প্যাকিং দেওয়া হয়।
                     </span>
                   </div>
-                  <p className="text-[11px] text-[#526356] pl-6 flex items-center gap-1">
+                  <p className="text-xs text-[#526356] pl-6 flex items-center gap-1">
                     <Clock className="w-3 h-3 text-[#1B8354] shrink-0" />
                     <span>{NURSERY_CONTACT.responsePromiseBn} ডেলিভারির আগে ফোনে নিশ্চিত হয়ে তবেই গাড়ি ছাড়া হয় (COD যাচাই)।</span>
                   </p>
@@ -558,7 +572,7 @@ ${orderLines}
               </button>
             </div>
 
-            <div className="text-center text-[11px] text-[#785942] pt-1">
+            <div className="text-center text-xs text-[#785942] pt-1">
               যেকোনো জরুরি প্রয়োজনে কল:{' '}
               <a href={`tel:${NURSERY_CONTACT.phone}`} className="font-mono-num font-bold text-[#142318] hover:underline">
                 {NURSERY_CONTACT.phone}
@@ -569,4 +583,9 @@ ${orderLines}
       </div>
     </div>
   );
+
+  if (typeof document !== 'undefined') {
+    return createPortal(drawerContent, document.body);
+  }
+  return drawerContent;
 }

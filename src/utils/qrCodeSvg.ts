@@ -340,7 +340,7 @@ export function buildPrintableQrTagSheetHtml(
       const optLabel = p.options?.[0]?.labelBn || 'গ্রো ব্যাগ চারা';
       return `<article class="tag-card">
         <div class="tag-top">
-          <span class="nursery-name">ভ্রম্যমাণ নার্সারি · কালশুলি</span>
+          <span class="nursery-name">ভ্রাম্যমাণ নার্সারি · কালশুলি</span>
           <span class="nursery-phone">${esc(NURSERY_PHONE_DISPLAY)}</span>
         </div>
         <div class="tag-main">
@@ -370,7 +370,7 @@ export function buildPrintableQrTagSheetHtml(
 <html lang="bn">
 <head>
 <meta charset="UTF-8" />
-<title>ভ্রম্যমাণ নার্সারি — প্রিন্টেবল QR প্ল্যান্ট ট্যাগ (${plants.length}টি চারা)</title>
+<title>ভ্রাম্যমাণ নার্সারি — প্রিন্টেবল QR প্ল্যান্ট ট্যাগ (${plants.length}টি চারা)</title>
 <style>
   @page { size: A4; margin: 10mm; }
   * { box-sizing: border-box; }
@@ -473,7 +473,7 @@ export function buildPrintableQrTagSheetHtml(
 <body>
   <div class="toolbar">
     <div>
-      <strong>ভ্রম্যমাণ নার্সারি — প্রিন্টেবল QR প্ল্যান্ট ট্যাগ (${plants.length}টি চারা)</strong>
+      <strong>ভ্রাম্যমাণ নার্সারি — প্রিন্টেবল QR প্ল্যান্ট ট্যাগ (${plants.length}টি চারা)</strong>
       <div style="font-size:12px;opacity:0.85;">A4 কাগজে প্রিন্ট করে লেমিনেশন বা টবের গায়ে লাগিয়ে দিন</div>
     </div>
     <button onclick="window.print()">🖨️ এখনই প্রিন্ট / PDF সেভ করুন</button>

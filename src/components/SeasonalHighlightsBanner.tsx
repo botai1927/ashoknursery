@@ -80,13 +80,13 @@ export function SeasonalHighlightsBanner({ lang, plants, onSelectPlant }: Season
               </div>
 
               <div className="min-w-0 flex-1">
-                <span className="block text-[10px] font-semibold text-[#B34728] truncate font-sans-bn">
+                <span className="block text-xs font-semibold text-[#B34728] truncate font-sans-bn">
                   {lang === 'bn' ? item.tagBn : item.tagEn}
                 </span>
                 <p className="font-serif-bn text-xs sm:text-sm font-bold text-[#142318] group-hover:text-[#1B8354] transition-colors truncate mt-0.5">
                   {lang === 'bn' ? item.titleBn : item.titleEn}
                 </p>
-                <div className="flex items-center justify-between text-[11px] font-sans-bn text-[#785942] mt-0.5">
+                <div className="flex items-center justify-between text-xs font-sans-bn text-[#785942] mt-0.5">
                   <span className="font-mono-num font-semibold text-[#142318]">
                     {lang === 'bn' ? item.priceNoteBn : item.priceNoteEn}
                   </span>

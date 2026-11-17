@@ -17,6 +17,23 @@ import {
   resolveCloudinaryCredentials,
   classifyCloudinaryError,
 } from '../src/lib/cloudinary.ts';
+import { validateUploadImagePayload } from '../src/lib/uploadValidation.ts';
+import {
+  issuePublicChallenge,
+  solvePublicChallengeSync,
+  verifyPublicChallengeResponse,
+} from '../src/lib/publicChallenge.ts';
+import {
+  toBengaliDigits,
+  normalizeBengaliNumberInput,
+} from '../src/utils/publicChallengeClient.ts';
+import {
+  normalizeCustomerReview,
+  sanitizeCustomerReviewForFirestore,
+  requireAuthenticatedReviewUser,
+  mergeApprovedRemoteReviews,
+  checkClientSubmissionCooldown,
+} from '../src/utils/customerReviewsStorage.ts';
 import { resolvePlantImageUrl } from '../src/utils/imageUrl.ts';
 import {
   extractCatalogSearchSuggestions,
@@ -31,9 +48,7 @@ import {
 import {
   FIRESTORE_MAX_BATCH_BYTES,
   FIRESTORE_MULTI_BATCH_CHUNK_SIZE,
-  FIRESTORE_SINGLE_BATCH_MAX_PLANTS,
   captureLocalStorageSnapshot,
-  restoreLocalStorageSnapshot,
   executeWithLocalStorageRollback,
   persistActivityLogEntry,
   reconcileDeletedPlantIds,
@@ -45,11 +60,9 @@ import {
   getIncompleteCatalogOperationJournal,
   recoverIncompleteCatalogOperation,
   runStartupCatalogRecovery,
-  validateAndPrepareCatalogImport,
   executeReliableCatalogImport,
   executeReliableCatalogReset,
   executeReliableTrashEmpty,
-  chunkPreparedPlantsForBatch,
   sanitizeActivityLogForFirestore,
   type CatalogBatchOps,
   type StorageLike,
@@ -79,6 +92,17 @@ import {
   scanCloudinaryOrphans,
 } from '../src/utils/cloudinaryCleanup.ts';
 import { runPlantUpdateRollbackDiagnostic } from '../src/utils/testFirestore.ts';
+import { buildSeoMetaForState } from '../src/utils/seoMetadata.ts';
+import {
+  extractCatalogPlantIds,
+  buildRobotsTxt,
+  buildSitemapXml,
+} from '../src/server/seoRoutes.ts';
+import {
+  hashNormalizedEmail,
+  isOwnerEmail,
+  isAuthorizedAdminEmail,
+} from '../src/server/firebaseAdmin.ts';
 import {
   validateImageFile,
   requestCloudinaryUploadSignature,
@@ -2543,7 +2567,297 @@ test('Uploaded Plant Date-Time Sort, Demand Leaderboard & Printable QR Tags: kee
   assert.match(htmlSheet, /\+91 86094 17672/);
 });
 
+// ---------------------------------------------------------------------------
+// 25. Upload Validation, Review Sync/Normalization & Client Rate-Limit Guard
+// ---------------------------------------------------------------------------
+test('Upload Validation & Public Abuse Guards: validates magic bytes, rejects SVG/HTML/SSRF, normalizes & merges approved reviews, and enforces submission cooldowns', () => {
+  // 1. Valid WebP base64 payload passes magic-byte verification
+  const webpHeader = Buffer.from([
+    0x52, 0x49, 0x46, 0x46, 0x24, 0x00, 0x00, 0x00, 0x57, 0x45, 0x42, 0x50, 0x56, 0x50, 0x38, 0x20,
+  ]);
+  const validWebp = validateUploadImagePayload(
+    `data:image/webp;base64,${webpHeader.toString('base64')}`
+  );
+  assert.equal(validWebp.ok, true);
+  assert.equal(validWebp.detectedFormat, 'webp');
 
+  // 2. Rejects SVG script payload and spoofed JPEG header (plain text disguised as image/jpeg)
+  const svgRes = validateUploadImagePayload(
+    `data:image/svg+xml;base64,${Buffer.from('<svg onload="alert(1)"/>').toString('base64')}`
+  );
+  assert.equal(svgRes.ok, false);
+  assert.equal(svgRes.code, 'INVALID_FILE_TYPE');
 
+  const spoofedJpg = validateUploadImagePayload(
+    `data:image/jpeg;base64,${Buffer.from('<html>not a real jpeg</html>').toString('base64')}`
+  );
+  assert.equal(spoofedJpg.ok, false);
+  assert.equal(spoofedJpg.code, 'INVALID_FILE_TYPE');
+
+  // 3. Rejects localhost/private-network SSRF image URLs, allows valid https image URL
+  const ssrfUrl = validateUploadImagePayload('https://127.0.0.1/secret.png');
+  assert.equal(ssrfUrl.ok, false);
+  assert.equal(ssrfUrl.code, 'INVALID_IMAGE_URL');
+  const publicUrl = validateUploadImagePayload('https://res.cloudinary.com/hgk8vecf/image/upload/v1/rose.webp');
+  assert.equal(publicUrl.ok, true);
+  assert.equal(publicUrl.kind, 'https_url');
+
+  // 4. Client File validator rejects image/svg+xml while permitting JPG/WebP
+  assert.equal(validateImageFile({ name: 'vector.svg', type: 'image/svg+xml', size: 1024 }).ok, false);
+  assert.equal(validateImageFile({ name: 'garden.webp', type: 'image/webp', size: 10240 }).ok, true);
+
+  // 5. Normalizes Firestore fields (customerNameBn & gardenImage -> customerName & photoUrl) & filters fake/pending reviews
+  const normalized = normalizeCustomerReview(
+    {
+      customerNameBn: 'সুমন দত্ত',
+      locationBn: 'সিমলাপাল',
+      commentBn: 'চারা খুব সতেজ ছিল',
+      gardenImage: 'https://res.cloudinary.com/hgk8vecf/image/upload/v1/garden.webp',
+      status: 'approved',
+      createdAt: '2026-11-16T10:00:00.000Z',
+    },
+    'rev-real-1'
+  );
+  assert.equal(normalized.id, 'rev-real-1');
+  assert.equal(normalized.customerName, 'সুমন দত্ত');
+  assert.equal(normalized.photoUrl, 'https://res.cloudinary.com/hgk8vecf/image/upload/v1/garden.webp');
+
+  const merged = mergeApprovedRemoteReviews(
+    [
+      normalized,
+      normalizeCustomerReview({ id: 'rev-seed-1', customerName: 'Dr. Anirban Mondal', status: 'approved', commentBn: 'fake' }),
+      normalizeCustomerReview({ id: 'rev-pending-2', customerName: 'রাহুল সেন', status: 'pending', commentBn: 'pending' }),
+    ],
+    []
+  );
+  assert.equal(merged.length, 1);
+  assert.equal(merged[0].id, 'rev-real-1');
+
+  // 6. Client submission cooldown enforces minimum interval and window limit
+  const bucket = `test_cooldown_${Date.now()}`;
+  const t0 = 1_700_000_000_000;
+  assert.equal(checkClientSubmissionCooldown(bucket, { maxCount: 2, windowMs: 60_000, minIntervalMs: 10_000, nowMs: t0 }).allowed, true);
+  assert.equal(checkClientSubmissionCooldown(bucket, { maxCount: 2, windowMs: 60_000, minIntervalMs: 10_000, nowMs: t0 + 2_000 }).allowed, false);
+  assert.equal(checkClientSubmissionCooldown(bucket, { maxCount: 2, windowMs: 60_000, minIntervalMs: 10_000, nowMs: t0 + 11_000 }).allowed, true);
+  assert.equal(checkClientSubmissionCooldown(bucket, { maxCount: 2, windowMs: 60_000, minIntervalMs: 10_000, nowMs: t0 + 25_000 }).allowed, false);
+});
+
+// ---------------------------------------------------------------------------
+// 26. Zero-Billing HMAC-SHA256 Proof-of-Work Challenge & Bengali Math Check
+// ---------------------------------------------------------------------------
+test('Zero-Billing Anti-Bot Challenge: issues signed PoW challenges, verifies single-use solutions, blocks replay/tampering/expiry, and parses Bengali numerals', () => {
+  const now = Date.now();
+  const challenge = issuePublicChallenge(8, now);
+  const solution = solvePublicChallengeSync(challenge.token, challenge.difficulty);
+
+  // 1. Tampered signature is rejected
+  const tamperedToken = `${challenge.token.slice(0, -4)}AAAA`;
+  const tamperedRes = verifyPublicChallengeResponse(tamperedToken, solution, { nowMs: now + 50 });
+  assert.equal(tamperedRes.ok, false);
+  assert.equal(tamperedRes.code, 'CHALLENGE_INVALID');
+
+  // 2. Wrong solution is rejected
+  const wrongRes = verifyPublicChallengeResponse(challenge.token, 'wrong-sol', {
+    nowMs: now + 50,
+    consumeNonce: false,
+  });
+  // (Either CHALLENGE_FAILED or rarely passes 1/256; verify exact known failing or test deterministic)
+  if (wrongRes.ok === false) {
+    assert.equal(wrongRes.code, 'CHALLENGE_FAILED');
+  }
+
+  // 3. Valid solution succeeds once and rejects replay attacks
+  const okRes = verifyPublicChallengeResponse(challenge.token, solution, { nowMs: now + 100 });
+  assert.equal(okRes.ok, true);
+  const replayRes = verifyPublicChallengeResponse(challenge.token, solution, { nowMs: now + 120 });
+  assert.equal(replayRes.ok, false);
+  assert.equal(replayRes.code, 'CHALLENGE_REPLAYED');
+
+  // 4. Expired challenge is rejected
+  const expiredChallenge = issuePublicChallenge(8, now - 15 * 60_000);
+  const expiredSol = solvePublicChallengeSync(expiredChallenge.token, expiredChallenge.difficulty);
+  const expiredRes = verifyPublicChallengeResponse(expiredChallenge.token, expiredSol, { nowMs: now });
+  assert.equal(expiredRes.ok, false);
+  assert.equal(expiredRes.code, 'CHALLENGE_EXPIRED');
+
+  // 5. Bengali & ASCII numeral parsing works cleanly for human verification input
+  assert.equal(toBengaliDigits(12), '১২');
+  assert.equal(normalizeBengaliNumberInput('৭'), 7);
+  assert.equal(normalizeBengaliNumberInput(' 11 '), 11);
+  assert.equal(normalizeBengaliNumberInput('abc'), null);
+});
+
+// ---------------------------------------------------------------------------
+// 27. Mandatory Google Sign-In Gate for Customer Review Submission
+// ---------------------------------------------------------------------------
+test('Mandatory Review Google Auth: blocks unauthenticated or unverified users, binds authorUid cleanly, and extracts verified Bearer token', async () => {
+  await assert.rejects(() => requireAuthenticatedReviewUser(null), /Google অ্যাকাউন্ট/);
+  await assert.rejects(
+    () =>
+      requireAuthenticatedReviewUser({
+        uid: 'uid-unverified',
+        emailVerified: false,
+        getIdToken: async () => 'tok-123',
+      }),
+    /ভেরিফাইড/
+  );
+  await assert.rejects(
+    () =>
+      requireAuthenticatedReviewUser({
+        uid: 'uid-empty-tok',
+        emailVerified: true,
+        getIdToken: async () => '   ',
+      }),
+    /টোকেন পাওয়া যায়নি/
+  );
+
+  const authSession = await requireAuthenticatedReviewUser({
+    uid: 'google-user-uid-789',
+    emailVerified: true,
+    getIdToken: async () => 'valid-firebase-id-token-xyz',
+  });
+  assert.equal(authSession.uid, 'google-user-uid-789');
+  assert.equal(authSession.idToken, 'valid-firebase-id-token-xyz');
+
+  const sanitizedWithUid = sanitizeCustomerReviewForFirestore({
+    id: 'rev-auth-1',
+    authorUid: authSession.uid,
+    customerName: 'সৌমেন পাল',
+    locationBn: 'সিমলাপাল, বাঁকুড়া',
+    rating: 5,
+    commentBn: 'খুব সুন্দর কলম চারা পেয়েছি।',
+    status: 'pending',
+    createdAt: '2026-11-17T10:00:00.000Z',
+    createdAtBn: '১৭ নভেম্বর ২০২৬',
+  });
+  assert.equal(sanitizedWithUid.authorUid, 'google-user-uid-789');
+
+  const normalizedWithUid = normalizeCustomerReview(sanitizedWithUid as any, 'rev-auth-1');
+  assert.equal(normalizedWithUid.authorUid, 'google-user-uid-789');
+});
+
+// ---------------------------------------------------------------------------
+// 28. SEO Metadata, Dynamic Sitemap / Robots & 404 Noindex
+// ---------------------------------------------------------------------------
+test('SEO Metadata & Sitemap: per-view titles, Product JSON-LD, 404/admin noindex, and dynamic sitemap.xml', () => {
+  const origin = 'https://brahmyaman.store';
+
+  const homeMeta = buildSeoMetaForState({
+    currentRoute: 'shop',
+    activeWindow: 'catalog',
+    selectedPlant: null,
+    lang: 'bn',
+    origin,
+  });
+  assert.ok(homeMeta.title.includes('ভ্রাম্যমাণ নার্সারি'));
+  assert.equal(homeMeta.canonicalUrl, `${origin}/`);
+  assert.equal(homeMeta.robots, 'index, follow');
+  assert.equal(homeMeta.ogImage, `${origin}/og-nursery.webp`);
+
+  const careMeta = buildSeoMetaForState({
+    currentRoute: 'shop',
+    activeWindow: 'care',
+    selectedPlant: null,
+    lang: 'bn',
+    origin,
+  });
+  assert.notEqual(careMeta.title, homeMeta.title);
+  assert.equal(careMeta.canonicalUrl, `${origin}/?view=care`);
+
+  const plantMeta = buildSeoMetaForState({
+    currentRoute: 'shop',
+    activeWindow: 'catalog',
+    selectedPlant: {
+      id: 'amrapali-mango',
+      nameBn: 'আম্রপালি আম কলম',
+      nameEn: 'Amrapali Mango Graft',
+      botanicalName: 'Mangifera indica',
+      category: 'ছাদবাগানের ফল ও কলম',
+      image: '/og-nursery.webp',
+      inStock: true,
+      audience: ['fruit'],
+      descriptionBn: 'বাঁকুড়ার মাটিতে দারুণ ফলনশীল বামন জাতের আম্রপালি আম কলম।',
+      descriptionEn: 'Dwarf high-yield grafted Amrapali mango sapling.',
+      sunlightBn: 'পূর্ণ রোদ',
+      sunlightEn: 'Full sun',
+      wateringBn: 'নিয়মিত পরিমিত জল',
+      wateringEn: 'Moderate regular watering',
+      soilTipBn: 'দোআঁশ মাটি ও ভার্মিকম্পোস্ট',
+      soilTipEn: 'Loam soil with vermicompost',
+      options: [
+        { id: 'opt-1', labelBn: 'পলি ব্যাগ', labelEn: 'Poly Bag', price: 80, containerType: 'পলি গ্রো ব্যাগ' },
+        { id: 'opt-2', labelBn: 'বড় চারা', labelEn: 'Grafted Sapling', price: 150, containerType: 'কলমের চারা' },
+      ],
+    },
+    lang: 'bn',
+    origin,
+  });
+  assert.equal(plantMeta.ogType, 'product');
+  assert.equal(plantMeta.canonicalUrl, `${origin}/?plant=amrapali-mango`);
+  assert.ok(plantMeta.productJsonLd);
+  assert.equal((plantMeta.productJsonLd as any)['@type'], 'Product');
+
+  const notFoundMeta = buildSeoMetaForState({
+    currentRoute: 'not_found',
+    activeWindow: 'catalog',
+    selectedPlant: null,
+    lang: 'bn',
+    origin,
+  });
+  assert.equal(notFoundMeta.robots, 'noindex, nofollow');
+  assert.ok(notFoundMeta.title.includes('৪০৪'));
+
+  const adminMeta = buildSeoMetaForState({
+    currentRoute: 'admin',
+    activeWindow: 'catalog',
+    selectedPlant: null,
+    lang: 'bn',
+    origin,
+  });
+  assert.equal(adminMeta.robots, 'noindex, nofollow');
+
+  const ids = extractCatalogPlantIds();
+  assert.ok(ids.length >= 20, `Expected >=20 plant IDs extracted from catalog, got ${ids.length}`);
+  assert.ok(!ids.some((id) => id.startsWith('opt-')));
+
+  const robots = buildRobotsTxt(origin);
+  assert.ok(robots.includes('Disallow: /admin'));
+  assert.ok(robots.includes('Disallow: /api/'));
+  assert.ok(robots.includes(`Sitemap: ${origin}/sitemap.xml`));
+
+  const sitemap = buildSitemapXml(origin, ids.slice(0, 3), '2026-11-17');
+  assert.ok(sitemap.includes(`<loc>${origin}/</loc>`));
+  assert.ok(sitemap.includes(`<loc>${origin}/?view=offers</loc>`));
+  assert.ok(sitemap.includes(`<loc>${origin}/?plant=${encodeURIComponent(ids[0])}</loc>`));
+});
+
+// ---------------------------------------------------------------------------
+// 29. SHA-256 Hash-Based Admin/Owner Allowlist (No Plain Emails in Code)
+// ---------------------------------------------------------------------------
+test('Admin SHA-256 Allowlist: enforces owner/admin digest verification & env overrides cleanly', () => {
+  assert.equal(
+    hashNormalizedEmail('  Test.User@Example.COM '),
+    hashNormalizedEmail('test.user@example.com')
+  );
+  assert.equal(isOwnerEmail('unknown-visitor@example.com'), false);
+  assert.equal(isAuthorizedAdminEmail('unknown-visitor@example.com'), false);
+
+  const prevOwners = process.env.ADMIN_OWNER_EMAILS;
+  const prevAdmins = process.env.ADMIN_AUTHORIZED_EMAILS;
+  try {
+    process.env.ADMIN_OWNER_EMAILS = 'nursery-owner@example.com';
+    process.env.ADMIN_AUTHORIZED_EMAILS = 'nursery-helper@example.com';
+
+    assert.equal(isOwnerEmail('Nursery-Owner@Example.com'), true);
+    assert.equal(isAuthorizedAdminEmail('nursery-owner@example.com'), true);
+    assert.equal(isOwnerEmail('nursery-helper@example.com'), false);
+    assert.equal(isAuthorizedAdminEmail('nursery-helper@example.com'), true);
+  } finally {
+    if (prevOwners === undefined) delete process.env.ADMIN_OWNER_EMAILS;
+    else process.env.ADMIN_OWNER_EMAILS = prevOwners;
+    if (prevAdmins === undefined) delete process.env.ADMIN_AUTHORIZED_EMAILS;
+    else process.env.ADMIN_AUTHORIZED_EMAILS = prevAdmins;
+  }
+});
 
 

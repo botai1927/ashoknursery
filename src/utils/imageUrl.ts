@@ -23,6 +23,10 @@ export function resolveBundledPlantAsset(rawPath: string): string | null {
   if (normalizedKey in VITE_BUNDLED_ASSET_MAP) {
     return VITE_BUNDLED_ASSET_MAP[normalizedKey] || null;
   }
+  const webpKey = normalizedKey.replace(/\.(jpe?g|png)$/i, '.webp');
+  if (webpKey in VITE_BUNDLED_ASSET_MAP) {
+    return VITE_BUNDLED_ASSET_MAP[webpKey] || null;
+  }
   return null;
 }
 

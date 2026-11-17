@@ -81,7 +81,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               </button>
             </div>
 
-            <div className="pt-3 border-t border-[#DFE7DC] text-[11px] text-[#785942]">
+            <div className="pt-3 border-t border-[#DFE7DC] text-xs text-[#785942]">
               জরুরি সহায়তার জন্য কল করুন:{' '}
               <a
                 href={`tel:${NURSERY_CONTACT.phone}`}

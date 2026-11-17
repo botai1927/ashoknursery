@@ -136,6 +136,7 @@ export interface WhatsAppOrderLogItem {
 
 export interface CustomerReviewItem {
   id: string;
+  authorUid?: string;
   plantId?: string;
   plantNameBn?: string;
   plantBought?: string;

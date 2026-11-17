@@ -137,7 +137,7 @@ export function AdminSettingsTab({
               {isOwner ? 'Owner (পূর্ণ অধিকার)' : 'Admin (সহজ ও নিরাপদ মোড)'}
             </span>
           </div>
-          <p className="text-[11px] text-[#166534]">
+          <p className="text-xs text-[#166534]">
             Firebase Authentication ID টোকেন Express সার্ভার ও Firestore Security Rules দ্বারা যাচাইকৃত।
           </p>
         </div>
@@ -157,7 +157,7 @@ export function AdminSettingsTab({
                     <span className="truncate">{em}</span>
                   </span>
                   <span
-                    className={`text-[11px] font-bold shrink-0 ${
+                    className={`text-xs font-bold shrink-0 ${
                       emailIsOwner ? 'text-[#1B8354]' : 'text-[#785942]'
                     }`}
                   >
@@ -193,13 +193,13 @@ export function AdminSettingsTab({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
           <div className="p-3 bg-[#FAF8F5] border border-[#E8E1D5] rounded-xl space-y-1">
-            <p className="text-[11px] text-[#785942] font-semibold">AI ও আপলোড রেট-লিমিট</p>
+            <p className="text-xs text-[#785942] font-semibold">AI ও আপলোড রেট-লিমিট</p>
             <p className="font-mono font-bold text-[#142318]">
               {serverSecurityMeta.rateLimitMode === 'firestore-shared'
                 ? 'Shared Firestore (ডিস্ট্রিবিউটেড ✓)'
                 : 'In-Memory Instance Fallback'}
             </p>
-            <p className="text-[11px] text-[#526356]">
+            <p className="text-xs text-[#526356]">
               {serverSecurityMeta.hasExplicitServiceAccount
                 ? 'FIREBASE_SERVICE_ACCOUNT_JSON সক্রিয় আছে।'
                 : 'Secrets-এ FIREBASE_SERVICE_ACCOUNT_JSON না থাকায় একক-ইনস্ট্যান্স মেমোরি মোড চলছে।'}
@@ -207,13 +207,13 @@ export function AdminSettingsTab({
           </div>
 
           <div className="p-3 bg-[#FAF8F5] border border-[#E8E1D5] rounded-xl space-y-1">
-            <p className="text-[11px] text-[#785942] font-semibold">টোকেন যাচাই পদ্ধতি</p>
+            <p className="text-xs text-[#785942] font-semibold">টোকেন যাচাই পদ্ধতি</p>
             <p className="font-mono font-bold text-[#142318]">
               {serverSecurityMeta.revocationMethod === 'admin-sdk'
                 ? 'Firebase Admin SDK (স্থানীয় যাচাই)'
                 : 'Identity Toolkit Live Lookup'}
             </p>
-            <p className="text-[11px] text-[#526356]">
+            <p className="text-xs text-[#526356]">
               Fail-Closed নীতি সক্রিয় — অবৈধ বা বাতিল সেশন তাৎক্ষণিক ব্লক হয়।
             </p>
           </div>
@@ -229,7 +229,7 @@ export function AdminSettingsTab({
               <h2 className="font-serif-bn text-base font-bold">
                 Firestore ডাটাবেস হেলথ ও ফ্রি কোটা মনিটর
               </h2>
-              <p className="text-[11px] text-[#526356]">
+              <p className="text-xs text-[#526356]">
                 রিয়েল-টাইম ডকুমেন্ট সংখ্যা, রিড/রাইট মিটার ও লগ রক্ষণাবেক্ষণ
               </p>
             </div>
@@ -256,7 +256,7 @@ export function AdminSettingsTab({
               type="button"
               disabled={serverDocCounts.isLoading}
               onClick={onRefreshDocCounts}
-              className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-[#FAF8F5] hover:bg-[#F0EAE1] border border-[#D5C9B8] rounded-xl text-[11px] font-bold text-[#142318] cursor-pointer disabled:opacity-50"
+              className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-[#FAF8F5] hover:bg-[#F0EAE1] border border-[#D5C9B8] rounded-xl text-xs font-bold text-[#142318] cursor-pointer disabled:opacity-50"
             >
               <RefreshCw
                 className={`w-3 h-3 text-[#1B8354] ${serverDocCounts.isLoading ? 'animate-spin' : ''}`}
@@ -282,8 +282,8 @@ export function AdminSettingsTab({
                   <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
                   <span>{alert.titleBn}</span>
                 </p>
-                <p className="text-[11px] opacity-90">{alert.detailBn}</p>
-                <p className="text-[11px] font-semibold">করণীয়: {alert.actionBn}</p>
+                <p className="text-xs opacity-90">{alert.detailBn}</p>
+                <p className="text-xs font-semibold">করণীয়: {alert.actionBn}</p>
               </div>
             ))}
           </div>
@@ -297,7 +297,7 @@ export function AdminSettingsTab({
         )}
 
         {serverDocCounts.error && (
-          <p className="text-[11px] text-[#B34728] font-semibold bg-[#FEF2F2] p-2.5 rounded-xl border border-[#FCA5A5]">
+          <p className="text-xs text-[#B34728] font-semibold bg-[#FEF2F2] p-2.5 rounded-xl border border-[#FCA5A5]">
             {serverDocCounts.error}
           </p>
         )}
@@ -305,39 +305,39 @@ export function AdminSettingsTab({
         {/* Document Counts Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
           <div className="p-3 bg-[#FBF9F5] border border-[#E8E1D5] rounded-xl">
-            <p className="text-[10px] font-bold text-[#785942]">মোট সার্ভার ডকুমেন্ট</p>
+            <p className="text-xs font-bold text-[#785942]">মোট সার্ভার ডকুমেন্ট</p>
             <p className="text-lg font-bold font-mono tabular-nums text-[#142318]">
               {dbHealthMetrics.effectiveTotalDocs}
             </p>
-            <p className="text-[10px] text-[#526356]">
+            <p className="text-xs text-[#526356]">
               {serverDocCounts.checkedAt ? `লাইভ (${serverDocCounts.checkedAt})` : 'ক্যাশ গণনা'}
             </p>
           </div>
 
           <div className="p-3 bg-[#FBF9F5] border border-[#E8E1D5] rounded-xl">
-            <p className="text-[10px] font-bold text-[#785942]">plants + trash</p>
+            <p className="text-xs font-bold text-[#785942]">plants + trash</p>
             <p className="text-lg font-bold font-mono tabular-nums text-[#1B8354]">
               {dbHealthMetrics.effectivePlantDocs}
             </p>
-            <p className="text-[10px] text-[#526356] tabular-nums">
+            <p className="text-xs text-[#526356] tabular-nums">
               সক্রিয় {activePlantsCount} · ট্র্যাশ {trashedPlantsCount}
             </p>
           </div>
 
           <div className="p-3 bg-[#FBF9F5] border border-[#E8E1D5] rounded-xl">
-            <p className="text-[10px] font-bold text-[#785942]">activity_logs</p>
+            <p className="text-xs font-bold text-[#785942]">activity_logs</p>
             <p className="text-lg font-bold font-mono tabular-nums text-[#142318]">
               {dbHealthMetrics.effectiveLogsDocs}
             </p>
-            <p className="text-[10px] text-[#526356]">শেয়ার্ড অডিট লগ</p>
+            <p className="text-xs text-[#526356]">শেয়ার্ড অডিট লগ</p>
           </div>
 
           <div className="p-3 bg-[#FBF9F5] border border-[#E8E1D5] rounded-xl">
-            <p className="text-[10px] font-bold text-[#785942]">ভিজিটর ক্ষমতা/দিন</p>
+            <p className="text-xs font-bold text-[#785942]">ভিজিটর ক্ষমতা/দিন</p>
             <p className="text-lg font-bold font-mono tabular-nums text-[#1B8354]">
               ~{dbHealthMetrics.estimatedDailyVisitorCapacity}
             </p>
-            <p className="text-[10px] text-[#526356] tabular-nums">
+            <p className="text-xs text-[#526356] tabular-nums">
               {dbHealthMetrics.readsPerFreshVisitor} রিড/জন
             </p>
           </div>
@@ -349,13 +349,13 @@ export function AdminSettingsTab({
             <span className="font-bold text-[#142318] tabular-nums">
               আজকের অপারেশন ({dbMonitorStats.today.dateKey})
             </span>
-            <span className="text-[11px] font-semibold text-[#1B8354] tabular-nums">
+            <span className="text-xs font-semibold text-[#1B8354] tabular-nums">
               IndexedDB ক্যাশে সেভ: {dbMonitorStats.today.cacheHits.toLocaleString()} রিড
             </span>
           </div>
 
           <div className="space-y-1">
-            <div className="flex justify-between text-[11px]">
+            <div className="flex justify-between text-xs">
               <span className="text-[#526356]">সার্ভার রিড (Reads):</span>
               <span className="font-mono tabular-nums font-bold text-[#142318]">
                 {dbMonitorStats.today.serverReads.toLocaleString()} / ৫০,০০০ ({dbHealthMetrics.readsPct}%)
@@ -376,7 +376,7 @@ export function AdminSettingsTab({
           </div>
 
           <div className="space-y-1">
-            <div className="flex justify-between text-[11px]">
+            <div className="flex justify-between text-xs">
               <span className="text-[#526356]">রাইট অপারেশন (Writes):</span>
               <span className="font-mono tabular-nums font-bold text-[#142318]">
                 {dbMonitorStats.today.writes.toLocaleString()} / ২০,০০০ ({dbHealthMetrics.writesPct}%)
@@ -394,7 +394,7 @@ export function AdminSettingsTab({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
             <div className="space-y-1">
-              <div className="flex justify-between text-[10px]">
+              <div className="flex justify-between text-xs">
                 <span className="text-[#526356]">ডিলিট (Deletes):</span>
                 <span className="font-mono tabular-nums font-bold text-[#142318]">
                   {dbMonitorStats.today.deletes} / ২০,০০০ ({dbHealthMetrics.deletesPct}%)
@@ -409,7 +409,7 @@ export function AdminSettingsTab({
             </div>
 
             <div className="space-y-1">
-              <div className="flex justify-between text-[10px]">
+              <div className="flex justify-between text-xs">
                 <span className="text-[#526356]">সর্ববৃহৎ ডকুমেন্ট / ১ MB:</span>
                 <span className="font-mono tabular-nums font-bold text-[#142318]">
                   {formatBytesReadable(dbHealthMetrics.largestPlantBytes)} ({dbHealthMetrics.largestDocPct}%)
@@ -430,7 +430,7 @@ export function AdminSettingsTab({
             </div>
           </div>
 
-          <div className="flex items-center justify-between text-[10px] text-[#785942] pt-2 border-t border-[#E8E1D5] flex-wrap gap-2">
+          <div className="flex items-center justify-between text-xs text-[#785942] pt-2 border-t border-[#E8E1D5] flex-wrap gap-2">
             <span className="flex items-center gap-1 tabular-nums">
               <HardDrive className="w-3 h-3" />
               <span>
@@ -444,7 +444,7 @@ export function AdminSettingsTab({
                   type="button"
                   disabled={isCleaningLogs}
                   onClick={() => onCleanupOldLogs(100, false)}
-                  className="inline-flex items-center gap-1 text-[11px] font-bold text-[#B34728] hover:underline cursor-pointer disabled:opacity-50"
+                  className="inline-flex items-center gap-1 text-xs font-bold text-[#B34728] hover:underline cursor-pointer disabled:opacity-50"
                 >
                   <Trash2 className="w-3 h-3" />
                   <span>{isCleaningLogs ? 'ক্লিন হচ্ছে...' : 'পুরনো লগ ক্লিন'}</span>
@@ -457,7 +457,7 @@ export function AdminSettingsTab({
                   resetDailyMonitorCounter();
                   onShowToast('আজকের লোকাল কাউন্টার রিসেট হয়েছে।', 'info');
                 }}
-                className="text-[11px] font-bold text-[#785942] hover:text-[#142318] underline cursor-pointer"
+                className="text-xs font-bold text-[#785942] hover:text-[#142318] underline cursor-pointer"
               >
                 কাউন্টার রিসেট
               </button>
@@ -466,7 +466,7 @@ export function AdminSettingsTab({
                 href="https://console.firebase.google.com/project/hidden-catalyst-7ln7n/firestore/databases/ai-studio-brahmyamannurser-7e886e4b-1ef0-4a8e-b1f9-77dc3b21d71b/data?openUpgradeDialog=true"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-[11px] font-bold text-[#1B8354] hover:underline"
+                className="inline-flex items-center gap-1 text-xs font-bold text-[#1B8354] hover:underline"
               >
                 <span>Firebase কনসোল</span>
                 <ExternalLink className="w-3 h-3" />
@@ -478,12 +478,12 @@ export function AdminSettingsTab({
         {/* 7-Day Recorded Pattern History */}
         {dbMonitorStats.history.length > 0 && (
           <div className="p-3 bg-[#FBF9F5] border border-[#E8E1D5] rounded-xl space-y-1.5">
-            <p className="text-[11px] font-bold text-[#142318]">বিগত দিনের ব্যবহারের রেকর্ড:</p>
+            <p className="text-xs font-bold text-[#142318]">বিগত দিনের ব্যবহারের রেকর্ড:</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
               {dbMonitorStats.history.slice(0, 4).map((day) => (
                 <div
                   key={day.dateKey}
-                  className="flex items-center justify-between px-2.5 py-1.5 bg-white border border-[#E8E1D5] rounded-lg text-[10px] font-mono tabular-nums"
+                  className="flex items-center justify-between px-2.5 py-1.5 bg-white border border-[#E8E1D5] rounded-lg text-xs font-mono tabular-nums"
                 >
                   <span className="font-bold text-[#142318]">{day.dateKey}</span>
                   <span className="text-[#526356]">

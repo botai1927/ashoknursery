@@ -7,7 +7,7 @@ interface LocationSectionProps {
 
 export function LocationSection({ lang }: LocationSectionProps) {
   const whatsappUrl = `https://wa.me/${NURSERY_CONTACT.phoneRaw}?text=${encodeURIComponent(
-    'নমস্কার, আমি কালশুলির ব্রাহ্ম্যমাণ নার্সারির লোকেশন ও পরিদর্শন সময় নিয়ে জানতে চাই।'
+    'নমস্কার, আমি কালশুলির ভ্রাম্যমাণ নার্সারির লোকেশন ও পরিদর্শন সময় নিয়ে জানতে চাই।'
   )}`;
 
   return (

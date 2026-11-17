@@ -1,5 +1,12 @@
 import { initializeApp } from 'firebase/app';
 import {
+  initializeAppCheck,
+  ReCaptchaV3Provider,
+  ReCaptchaEnterpriseProvider,
+  getToken as getAppCheckTokenSdk,
+  type AppCheck,
+} from 'firebase/app-check';
+import {
   getAuth,
   GoogleAuthProvider,
   signInWithPopup,
@@ -120,26 +127,59 @@ if (typeof window !== 'undefined') {
     },
     true
   );
-
-  const win = window as unknown as { __firebasePopupConsoleGuardInstalled?: boolean };
-  if (!win.__firebasePopupConsoleGuardInstalled) {
-    win.__firebasePopupConsoleGuardInstalled = true;
-    const origError = console.error.bind(console);
-    console.error = (...args: unknown[]) => {
-      if (args.some((arg) => isFirebasePopupPendingPromiseAssertion(arg))) {
-        return;
-      }
-      origError(...args);
-    };
-  }
 }
 
 const app = initializeApp(firebaseConfig);
 
-// Silence internal @firebase/firestore WebChannel 10s transport timeout console.error noise
-// when operating in offline/local-cache mode; real operation errors still log via handleFirestoreError.
+// Optional Firebase App Check initialization (activates automatically when VITE_FIREBASE_APPCHECK_SITE_KEY is configured)
+const viteEnv =
+  ((import.meta as unknown as { env?: Record<string, string | undefined> }).env) || {};
+const APPCHECK_SITE_KEY = (viteEnv.VITE_FIREBASE_APPCHECK_SITE_KEY || '').trim();
+const APPCHECK_PROVIDER_TYPE = (viteEnv.VITE_FIREBASE_APPCHECK_PROVIDER || 'v3').trim().toLowerCase();
+const APPCHECK_DEBUG_TOKEN = (viteEnv.VITE_FIREBASE_APPCHECK_DEBUG_TOKEN || '').trim();
+
+let appCheckInstance: AppCheck | null = null;
+if (typeof window !== 'undefined' && APPCHECK_SITE_KEY) {
+  try {
+    if (APPCHECK_DEBUG_TOKEN) {
+      (window as unknown as { FIREBASE_APPCHECK_DEBUG_TOKEN?: string | boolean }).FIREBASE_APPCHECK_DEBUG_TOKEN =
+        APPCHECK_DEBUG_TOKEN === 'true' ? true : APPCHECK_DEBUG_TOKEN;
+    }
+    const provider =
+      APPCHECK_PROVIDER_TYPE === 'enterprise'
+        ? new ReCaptchaEnterpriseProvider(APPCHECK_SITE_KEY)
+        : new ReCaptchaV3Provider(APPCHECK_SITE_KEY);
+    appCheckInstance = initializeAppCheck(app, {
+      provider,
+      isTokenAutoRefreshEnabled: true,
+    });
+  } catch {
+    appCheckInstance = null;
+  }
+}
+
+export function isAppCheckConfigured(): boolean {
+  return Boolean(appCheckInstance);
+}
+
+export async function getAppCheckTokenValue(forceRefresh = false): Promise<string | null> {
+  if (!appCheckInstance) return null;
+  try {
+    const res = await getAppCheckTokenSdk(appCheckInstance, forceRefresh);
+    return res?.token || null;
+  } catch {
+    return null;
+  }
+}
+
+export async function getAppCheckHeaders(): Promise<Record<string, string>> {
+  const token = await getAppCheckTokenValue(false);
+  return token ? { 'X-Firebase-AppCheck': token } : {};
+}
+
+// Log only real Firestore errors while keeping offline/local-cache operation clean
 try {
-  setLogLevel('silent');
+  setLogLevel('error');
 } catch {
   // Ignore if unsupported in test environment
 }

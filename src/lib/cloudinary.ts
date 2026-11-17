@@ -1,4 +1,5 @@
 import { v2 as cloudinary, type UploadApiResponse } from 'cloudinary';
+import { validateUploadImagePayload } from './uploadValidation.ts';
 
 export const CLOUDINARY_DEFAULT_FOLDER = 'brahmyaman_plants';
 
@@ -391,19 +392,6 @@ export interface CloudinaryUploadResult {
   bytes: number;
 }
 
-function isValidUploadPayload(image: string): boolean {
-  const trimmed = image.trim();
-  if (trimmed.startsWith('data:image/')) {
-    return trimmed.includes(';base64,');
-  }
-  try {
-    const parsed = new URL(trimmed);
-    return parsed.protocol === 'https:';
-  } catch {
-    return false;
-  }
-}
-
 /**
  * Server-side authenticated Cloudinary image upload with automatic
  * resolution capping (1400x1400) and quality:auto:good compression.
@@ -414,8 +402,11 @@ export async function uploadImageToCloudinary(
 ): Promise<CloudinaryUploadResult> {
   const creds = ensureCloudinaryConfigured();
 
-  if (!input.image || typeof input.image !== 'string' || !isValidUploadPayload(input.image)) {
-    throw new Error('অবৈধ ছবির ফরম্যাট। অনুগ্রহ করে বৈধ ছবি (JPEG/PNG/WebP/HTTPS URL) পাঠান।');
+  const validation = validateUploadImagePayload(input.image);
+  if (!validation.ok) {
+    throw new Error(
+      validation.error || 'অবৈধ ছবির ফরম্যাট। অনুগ্রহ করে বৈধ ছবি (JPEG/PNG/WebP/HTTPS URL) পাঠান।'
+    );
   }
 
   const safeTag = sanitizeCloudinaryTag(input.plantName || 'plant');
@@ -428,7 +419,7 @@ export async function uploadImageToCloudinary(
     const uploadResponse: UploadApiResponse = await cloudinary.uploader.upload(input.image, {
       folder,
       resource_type: 'image',
-      allowed_formats: ['jpg', 'png', 'webp', 'jpeg', 'avif', 'heic'],
+      allowed_formats: ['jpg', 'png', 'webp', 'jpeg', 'gif', 'avif', 'heic'],
       tags: ['brahmyaman_nursery', safeTag, `slot_${slotNum}`],
       transformation: [
         {

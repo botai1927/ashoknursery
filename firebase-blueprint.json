@@ -98,6 +98,7 @@
       "type": "object",
       "properties": {
         "id": { "type": "string", "maxLength": 128 },
+        "authorUid": { "type": "string", "maxLength": 128 },
         "customerNameBn": { "type": "string", "maxLength": 120 },
         "customerNameEn": { "type": "string", "maxLength": 120 },
         "locationBn": { "type": "string", "maxLength": 160 },

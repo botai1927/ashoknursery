@@ -1,37 +1,9 @@
 import { useState, useRef, useEffect, FormEvent, ChangeEvent, useMemo } from 'react';
 import {
-  Package,
   Plus,
-  Trash2,
-  Sparkles,
-  ExternalLink,
-  Loader2,
-  Bot,
-  Lock,
-  LogOut,
-  CheckCircle2,
-  Mail,
-  ArrowLeft,
-  History,
-  Smartphone,
   RefreshCw,
   AlertTriangle,
-  ShieldCheck,
   Database,
-  Download,
-  Eye,
-  X,
-  Cloud,
-  Cpu,
-  Menu,
-  ShoppingBag,
-  Percent,
-  Star,
-  QrCode,
-  Undo2,
-  Redo2,
-  Activity,
-  Layers,
 } from 'lucide-react';
 import {
   BrahmyamanPlant,
@@ -75,19 +47,16 @@ import {
 } from '../firebase';
 import { resolvePlantImageUrl } from '../utils/imageUrl';
 import {
-  SPARK_DAILY_LIMITS,
   StoredMonitorState,
   getFirestoreUsageStats,
   subscribeFirestoreMonitor,
   trackFirestoreRead,
   trackFirestoreWrite,
   trackFirestoreDelete,
-  formatBytesReadable,
 } from '../utils/firestoreMonitor';
 import {
   persistActivityLogEntry,
   sanitizeActivityLogForFirestore,
-  type StartupCatalogRecoveryResult,
 } from '../utils/firestoreCatalogTransactions';
 import {
   alignPlantImageSlots,
@@ -168,6 +137,7 @@ import {
 import {
   isRemovedFakeReview,
   loadLocalCustomerReviews,
+  normalizeCustomerReview,
   saveLocalCustomerReviews,
   submitCustomerReview,
   updateCustomerReviewStatus,
@@ -178,74 +148,34 @@ import {
   buildCatalogBugFixPlan,
 } from '../utils/catalogBugFixer';
 
-interface AdminPageProps {
-  lang: 'bn' | 'en';
-  plants: BrahmyamanPlant[];
-  onNavigateToShop: () => void;
-  onAddPlant: (plant: BrahmyamanPlant) => Promise<boolean> | void;
-  onUpdatePlant: (plant: BrahmyamanPlant) => Promise<boolean> | void;
-  onBatchUpdatePlants?: (plants: BrahmyamanPlant[]) => Promise<boolean> | void;
-  onSoftDeletePlant: (plantId: string) => Promise<boolean> | void;
-  onRestorePlant: (plantId: string) => Promise<boolean> | void;
-  onPermanentDeletePlant: (plantId: string) => Promise<boolean> | void;
-  onEmptyTrash: () => Promise<boolean> | void;
-  onResetCatalog: () => Promise<boolean> | void;
-  onImportCatalogBackup?: (
-    plants: BrahmyamanPlant[],
-    restoredDeletedIds?: string[]
-  ) => Promise<boolean | void>;
-  startupRecoveryStatus?: StartupCatalogRecoveryResult | null;
-  onRetryStartupRecovery?: () => Promise<boolean>;
-}
+import {
+  STORAGE_ACTIVITY_LOG,
+  safeSetLocalStorage,
+  type AdminPageProps,
+  type AdminToast,
+  type AdminToastType,
+  type ConfirmDialogState,
+  type ServerSecurityMeta,
+} from './admin/adminTypes';
+import {
+  buildPrintablePhotoCatalogHtml,
+  computeDbHealthMetrics,
+  inlineImageAsDataUrl,
+} from './admin/adminHealthUtils';
+import { AdminLoginView } from './admin/AdminLoginView';
+import {
+  AdminDesktopSidebar,
+  AdminHeaderBar,
+  AdminMobileBottomNav,
+  AdminMobileDrawer,
+} from './admin/AdminHeaderNav';
+import {
+  buildAdminNavigationData,
+  TAB_TO_SECTION_MAP,
+} from './admin/adminNavConfig';
+import { AdminModalsAndToast } from './admin/AdminModalsAndToast';
 
-interface ConfirmDialogState {
-  isOpen: boolean;
-  type: 'soft_delete' | 'permanent_delete' | 'empty_trash' | 'reset_catalog' | 'custom_action';
-  plant?: BrahmyamanPlant;
-  titleBn: string;
-  messageBn: string;
-  confirmBtnBn: string;
-  cancelBtnBn?: string;
-  isDanger?: boolean;
-  onConfirm: () => void;
-}
-
-export type AdminToastType = 'success' | 'error' | 'warning' | 'info';
-
-interface AdminToast {
-  id: string;
-  titleBn: string;
-  messageBn: string;
-  type: AdminToastType;
-  timestampBn: string;
-  actionLabelBn?: string;
-  onAction?: () => void;
-}
-
-const STORAGE_ACTIVITY_LOG = 'brahmyaman_admin_activity_log_v2';
-const AUTHORIZED_ADMIN_EMAILS = [
-  'apurbax3@gmail.com',
-  'mahataapurba278@gmail.com',
-  'amahata169@gmail.com',
-];
-
-function safeSetLocalStorage(key: string, value: string) {
-  try {
-    localStorage.setItem(key, value);
-  } catch (err: any) {
-    console.warn(`LocalStorage quota safe-guard for ${key}:`, err);
-    try {
-      const parsed = JSON.parse(value);
-      if (Array.isArray(parsed)) {
-        const lightweight = parsed.map((item: any) => ({
-          ...item,
-          image: typeof item.image === 'string' && item.image.length > 500 ? '' : item.image,
-        }));
-        localStorage.setItem(key, JSON.stringify(lightweight));
-      }
-    } catch {}
-  }
-}
+export type { AdminToastType };
 
 export function AdminPage({
   plants,
@@ -291,22 +221,14 @@ export function AdminPage({
   const [loginError, setLoginError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const [serverRole, setServerRole] = useState<'owner' | 'admin'>('admin');
-  const [serverSecurityMeta, setServerSecurityMeta] = useState<{
-    rateLimitMode: 'firestore-shared' | 'in-memory-fallback';
-    rateLimitReason: string | null;
-    hasExplicitServiceAccount: boolean;
-    revocationMethod: string | null;
-  }>({
+  const [serverSecurityMeta, setServerSecurityMeta] = useState<ServerSecurityMeta>({
     rateLimitMode: 'in-memory-fallback',
     rateLimitReason: null,
     hasExplicitServiceAccount: false,
     revocationMethod: null,
   });
-  const [ownerEmailsList, setOwnerEmailsList] = useState<string[]>([
-    'apurbax3@gmail.com',
-    'mahataapurba278@gmail.com',
-  ]);
-  const [authorizedEmailsList, setAuthorizedEmailsList] = useState<string[]>(AUTHORIZED_ADMIN_EMAILS);
+  const [ownerEmailsList, setOwnerEmailsList] = useState<string[]>([]);
+  const [authorizedEmailsList, setAuthorizedEmailsList] = useState<string[]>([]);
   const [previewAdminMode, setPreviewAdminMode] = useState<boolean>(false);
   const [adminSearchQuery, setAdminSearchQuery] = useState<string>('');
   const [isExportingFullBackup, setIsExportingFullBackup] = useState<boolean>(false);
@@ -369,7 +291,7 @@ export function AdminPage({
 
         const errDetail =
           data.error ||
-          `অননুমোদিত জিমেইল (${user.email || 'অজানা'})! শুধুমাত্র ${AUTHORIZED_ADMIN_EMAILS.join(' অথবা ')} ব্যবহার করুন।`;
+          `অননুমোদিত জিমেইল (${user.email || 'অজানা'})! অনুগ্রহ করে সার্ভার-অনুমোদিত নার্সারি অ্যাডমিন Google অ্যাকাউন্ট ব্যবহার করুন।`;
         const errWithCode = data.code
           ? `${errDetail} [${res.status}: ${data.code}]`
           : `${errDetail} [HTTP ${res.status}]`;
@@ -578,7 +500,7 @@ export function AdminPage({
           timeBn: dt.timeBn,
           actionType: 'plant_add',
           titleBn: 'নার্সারি পোর্টাল সক্রিয়',
-          descriptionBn: 'ভ্রম্যমাণ নার্সারি কালশুলির পোর্টাল প্রস্তুত।',
+          descriptionBn: 'ভ্রাম্যমাণ নার্সারি কালশুলির পোর্টাল প্রস্তুত।',
         },
       ];
     } catch {
@@ -766,7 +688,7 @@ export function AdminPage({
       id: 'init',
       role: 'model',
       text: `নমস্কার নার্সারি মালিক মহাশয়! এটি আপনার Google Gemini AI সহকারী।
-শুধুমাত্র আপনার অনুমোদিত জিমেইল (${AUTHORIZED_ADMIN_EMAILS.join(' ও ')}) দিয়ে সুরক্ষিত।
+সার্ভার-অনুমোদিত নার্সারি অ্যাডমিন Google অ্যাকাউন্ট দিয়ে সুরক্ষিত।
 
 আমি আপনাকে যা সাহায্য করতে পারি:
 • ওয়েবসাইট বা ক্যাটালগে কোথায় সমস্যা ও তার মূল কারণ (Root Reason) ও সমাধান জানানো
@@ -1098,36 +1020,19 @@ export function AdminPage({
           );
           const remoteReviews: CustomerReviewItem[] = [];
           snap.forEach((docSnap) => {
-            const raw = docSnap.data() as CustomerReviewItem & { gardenImage?: string };
-            const normalized: CustomerReviewItem = {
-              ...raw,
-              id: raw.id || docSnap.id,
-              photoUrl: raw.photoUrl || raw.gardenImage,
-            };
+            const raw = docSnap.data() as Partial<CustomerReviewItem> & { gardenImage?: string };
+            const normalized = normalizeCustomerReview(raw, docSnap.id);
             if (isRemovedFakeReview(normalized)) {
               deleteDoc(docSnap.ref).catch(() => {});
               return;
             }
             remoteReviews.push(normalized);
           });
-          if (remoteReviews.length > 0) {
-            setCustomerReviews((prev) => {
-              const merged = new Map<string, CustomerReviewItem>();
-              for (const item of remoteReviews) {
-                if (!isRemovedFakeReview(item)) merged.set(item.id, item);
-              }
-              for (const local of prev) {
-                if (!isRemovedFakeReview(local) && !merged.has(local.id)) {
-                  merged.set(local.id, local);
-                }
-              }
-              const sorted = Array.from(merged.values()).sort((a, b) =>
-                (b.createdAt || '').localeCompare(a.createdAt || '')
-              );
-              saveLocalCustomerReviews(sorted);
-              return sorted;
-            });
-          }
+          const sorted = remoteReviews.sort((a, b) =>
+            (b.createdAt || '').localeCompare(a.createdAt || '')
+          );
+          setCustomerReviews(sorted);
+          saveLocalCustomerReviews(sorted);
         },
         () => {}
       );
@@ -1261,7 +1166,8 @@ export function AdminPage({
     reviewId: string,
     nextStatus: 'approved' | 'pending'
   ) => {
-    const updated = await updateCustomerReviewStatus(reviewId, nextStatus);
+    const existingReview = customerReviews.find((r) => r.id === reviewId);
+    const updated = await updateCustomerReviewStatus(reviewId, nextStatus, existingReview);
     if (updated) {
       setCustomerReviews(loadLocalCustomerReviews());
       showToast(
@@ -1523,249 +1429,16 @@ export function AdminPage({
     }
   }, [isAuthenticated, mobileTab, showDiagnosticsModal, diagnosticsTab]);
 
-  const dbHealthMetrics = useMemo(() => {
-    let totalPlantBytes = 0;
-    let largestPlantBytes = 0;
-    let largestPlantName = '';
-    let base64PhotoCount = 0;
-
-    for (const plant of plants) {
-      const bytes = new TextEncoder().encode(JSON.stringify(plant)).length;
-      totalPlantBytes += bytes;
-      if (bytes > largestPlantBytes) {
-        largestPlantBytes = bytes;
-        largestPlantName = plant.nameBn;
-      }
-      const hasBase64Slot = [
-        plant.image,
-        ...(Array.isArray(plant.images) ? plant.images : []),
-      ].some((u) => typeof u === 'string' && u.startsWith('data:image'));
-      if (hasBase64Slot) {
-        base64PhotoCount += 1;
-      }
-    }
-
-    const totalLogsBytes = new TextEncoder().encode(JSON.stringify(activityLogs)).length;
-    const totalEstimatedBytes = totalPlantBytes + totalLogsBytes;
-    const effectivePlantDocs = serverDocCounts.plants ?? plants.length;
-    const effectiveLogsDocs = serverDocCounts.logs ?? activityLogs.length;
-    const effectiveTotalDocs =
-      serverDocCounts.total ?? effectivePlantDocs + effectiveLogsDocs + 1;
-
-    const today = dbMonitorStats.today;
-    const readsPct = Math.min(100, Math.round((today.serverReads / SPARK_DAILY_LIMITS.reads) * 100));
-    const writesPct = Math.min(100, Math.round((today.writes / SPARK_DAILY_LIMITS.writes) * 100));
-    const deletesPct = Math.min(100, Math.round((today.deletes / SPARK_DAILY_LIMITS.deletes) * 100));
-    const storagePct = Math.min(
-      100,
-      Number(((totalEstimatedBytes / SPARK_DAILY_LIMITS.storageBytes) * 100).toFixed(2))
-    );
-    const largestDocPct = Math.min(
-      100,
-      Math.round((largestPlantBytes / SPARK_DAILY_LIMITS.maxDocBytes) * 100)
-    );
-
-    const readsPerFreshVisitor = Math.max(1, effectivePlantDocs + 1);
-    const estimatedDailyVisitorCapacity = Math.floor(
-      SPARK_DAILY_LIMITS.reads / readsPerFreshVisitor
-    );
-
-    const alerts: Array<{
-      id: string;
-      severity: 'critical' | 'warning';
-      titleBn: string;
-      detailBn: string;
-      actionBn: string;
-    }> = [];
-
-    if (today.serverReads >= SPARK_DAILY_LIMITS.reads * 0.85) {
-      alerts.push({
-        id: 'reads-critical',
-        severity: 'critical',
-        titleBn: `জরুরি: দৈনিক রিড ${readsPct}% পূর্ণ (${today.serverReads.toLocaleString()}/৫০,০০০)`,
-        detailBn:
-          'আজকের Spark ফ্রি দৈনিক রিড সীমা প্রায় শেষ। লিমিট পার হলে ভিজিটররা নতুন আপডেট দেখতে সমস্যায় পড়বেন।',
-        actionBn:
-          'ক্যাটালগ ক্যাশিং চালু করুন অথবা Firebase Blaze প্ল্যানে বাজেট অ্যালার্ট সহ আপগ্রেড করুন।',
-      });
-    } else if (today.serverReads >= SPARK_DAILY_LIMITS.reads * 0.7) {
-      alerts.push({
-        id: 'reads-warning',
-        severity: 'warning',
-        titleBn: `সতর্কতা: দৈনিক রিড ${readsPct}% ছুঁয়েছে`,
-        detailBn: `আজ ${today.serverReads.toLocaleString()} টি সার্ভার রিড হয়েছে (ফ্রি লিমিট ৫০,০০০/দিন)।`,
-        actionBn: 'রিড অপ্টিমাইজেশন করলে একই ভিজিটরে ৫০ গুণ কম রিড খরচ হবে।',
-      });
-    }
-
-    if (today.writes >= SPARK_DAILY_LIMITS.writes * 0.7) {
-      alerts.push({
-        id: 'writes-threshold',
-        severity: today.writes >= SPARK_DAILY_LIMITS.writes * 0.85 ? 'critical' : 'warning',
-        titleBn: `দৈনিক রাইট সীমা ${writesPct}% (${today.writes.toLocaleString()}/২০,০০০)`,
-        detailBn: 'একই দিনে ঘনঘন ক্যাটালগ এডিট বা বেশি লগ লেখার কারণে রাইট সংখ্যা বাড়ছে।',
-        actionBn: 'সব এডিট একসাথে সেরে সেভ করুন ও ব্যাকআপ রাখুন।',
-      });
-    }
-
-    if (largestPlantBytes >= 750 * 1024) {
-      alerts.push({
-        id: 'doc-size-critical',
-        severity: 'critical',
-        titleBn: `১ MB ডকুমেন্ট সীমার কাছে: "${largestPlantName}" (${formatBytesReadable(
-          largestPlantBytes
-        )})`,
-        detailBn:
-          'Firestore-এ একটি ডকুমেন্টের সর্বোচ্চ সীমা ১ MB। এর বেশি হলে সেই চারা সেভ হওয়া বন্ধ হয়ে যাবে।',
-        actionBn: 'এই চারার ছবিটি ছোট করে আপলোড করুন বা Cloudinary লিংক ব্যবহার করুন।',
-      });
-    } else if (largestPlantBytes >= 500 * 1024) {
-      alerts.push({
-        id: 'doc-size-warning',
-        severity: 'warning',
-        titleBn: `বড় ডকুমেন্ট সাইজ: "${largestPlantName}" (${formatBytesReadable(
-          largestPlantBytes
-        )})`,
-        detailBn: 'মোবাইল ছবির সাইজ ৫০০ KB পেরিয়েছে (১ MB সীমার কাছাকাছি)।',
-        actionBn: 'ছবি কমপ্রেস করে সেভ করলে ডেটা ট্রান্সফার দ্রুত ও নিরাপদ থাকবে।',
-      });
-    }
-
-    if (effectiveLogsDocs >= 400) {
-      alerts.push({
-        id: 'logs-critical',
-        severity: 'critical',
-        titleBn: `অ্যাক্টিভিটি লগ অনেক জমেছে (${effectiveLogsDocs} টি ডকুমেন্ট)`,
-        detailBn: 'পুরনো অ্যাক্টিভিটি লগ জমতে থাকায় অযথা স্টোরেজ ও রিড খরচ বাড়ছে।',
-        actionBn: 'পুরনো লগ অটো-ক্লিনআপ চালু করুন (সর্বশেষ ১০০টি রেখে)।',
-      });
-    } else if (effectiveLogsDocs >= 150) {
-      alerts.push({
-        id: 'logs-warning',
-        severity: 'warning',
-        titleBn: `পুরনো অ্যাক্টিভিটি লগ বাড়ছে (${effectiveLogsDocs} টি ডকুমেন্ট)`,
-        detailBn: 'লগ সংখ্যা ১৫০ ছাড়িয়েছে; দীর্ঘমেয়াদে হালকা রাখতে পুরনো লগ পরিষ্কার রাখা ভালো।',
-        actionBn: 'প্রয়োজনে পুরনো লগ ক্লিনআপ নীতি চালু করুন।',
-      });
-    }
-
-    if (base64PhotoCount >= 35) {
-      alerts.push({
-        id: 'base64-growth',
-        severity: 'warning',
-        titleBn: `${base64PhotoCount}টি মোবাইল ছবি সরাসরি ডাটাবেসে সেভ আছে`,
-        detailBn:
-          'বেশি মোবাইল ছবি Firestore-এ থাকলে প্রতি পেজ লোডে ব্যান্ডউইথ (১০ GiB/মাস) দ্রুত খরচ হয়।',
-        actionBn: 'Cloudinary ট্যাবে গিয়ে ১-ক্লিকে সব Base64 ছবি মাইগ্রেট করুন।',
-      });
-    }
-
-    if (estimatedDailyVisitorCapacity < 500) {
-      alerts.push({
-        id: 'visitor-headroom',
-        severity: 'warning',
-        titleBn: `দৈনিক ভিজিটর ক্যাপাসিটি কমছে (~${estimatedDailyVisitorCapacity} জন/দিন)`,
-        detailBn: `মোট ${effectivePlantDocs}টি চারা থাকায় প্রতি নতুন ভিজিটরে ${readsPerFreshVisitor}টি রিড হচ্ছে।`,
-        actionBn: 'রিড-সেভিং ক্যাশ চালু করলে এই সীমা কয়েক হাজার ভিজিটর পর্যন্ত বাড়বে।',
-      });
-    }
-
-    const statusLevel: 'healthy' | 'warning' | 'critical' = alerts.some(
-      (a) => a.severity === 'critical'
-    )
-      ? 'critical'
-      : alerts.length > 0
-      ? 'warning'
-      : 'healthy';
-
-    return {
-      totalPlantBytes,
-      totalLogsBytes,
-      totalEstimatedBytes,
-      largestPlantBytes,
-      largestPlantName,
-      largestDocPct,
-      base64PhotoCount,
-      effectivePlantDocs,
-      effectiveLogsDocs,
-      effectiveTotalDocs,
-      readsPct,
-      writesPct,
-      deletesPct,
-      storagePct,
-      readsPerFreshVisitor,
-      estimatedDailyVisitorCapacity,
-      alerts,
-      statusLevel,
-    };
-  }, [plants, activityLogs, dbMonitorStats, serverDocCounts]);
-
-  const inlineImageAsDataUrl = async (rawSrc: string): Promise<string> => {
-    const resolved = resolvePlantImageUrl(rawSrc, PUJA_IMAGE);
-    if (!resolved) return '';
-    if (resolved.startsWith('data:image/')) return resolved;
-
-    const canvasAttempt = (): Promise<string | null> =>
-      new Promise((resolve) => {
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        const timeout = setTimeout(() => resolve(null), 6000);
-        img.onload = () => {
-          clearTimeout(timeout);
-          try {
-            const maxDim = 520;
-            let w = img.naturalWidth || 400;
-            let h = img.naturalHeight || 400;
-            if (w > maxDim || h > maxDim) {
-              if (w > h) {
-                h = Math.max(1, Math.round((h * maxDim) / w));
-                w = maxDim;
-              } else {
-                w = Math.max(1, Math.round((w * maxDim) / h));
-                h = maxDim;
-              }
-            }
-            const canvas = document.createElement('canvas');
-            canvas.width = w;
-            canvas.height = h;
-            const ctx = canvas.getContext('2d');
-            if (!ctx) {
-              resolve(null);
-              return;
-            }
-            ctx.drawImage(img, 0, 0, w, h);
-            const encoded = canvas.toDataURL('image/jpeg', 0.72);
-            resolve(encoded && encoded.startsWith('data:image/') ? encoded : null);
-          } catch {
-            resolve(null);
-          }
-        };
-        img.onerror = () => {
-          clearTimeout(timeout);
-          resolve(null);
-        };
-        img.src = resolved;
-      });
-
-    const viaCanvas = await canvasAttempt();
-    if (viaCanvas) return viaCanvas;
-
-    try {
-      const res = await fetch(resolved, { mode: 'cors' });
-      if (res.ok) {
-        const blob = await res.blob();
-        const dataUrl = await new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onload = () =>
-            resolve(typeof reader.result === 'string' ? reader.result : '');
-          reader.onerror = () => resolve('');
-          reader.readAsDataURL(blob);
-        });
-        if (dataUrl.startsWith('data:image/')) return dataUrl;
-      }
-    } catch {}
-    return resolved;
-  };
+  const dbHealthMetrics = useMemo(
+    () =>
+      computeDbHealthMetrics({
+        plants,
+        activityLogs,
+        dbMonitorStats,
+        serverDocCounts,
+      }),
+    [plants, activityLogs, dbMonitorStats, serverDocCounts]
+  );
 
   const uploadImageWithResilience = (
     imagePayload: string,
@@ -2032,103 +1705,7 @@ export function AdminPage({
     if (isExportingFullBackup) return;
     setIsExportingFullBackup(true);
     try {
-      const esc = (s: string) =>
-        (s || '')
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
-
-      const plantsEmbedded = await Promise.all(
-        activePlants.map(async (p) => ({
-          ...p,
-          embeddedImg: await inlineImageAsDataUrl(p.image),
-        }))
-      );
-
-      const dt = getBengaliDateTime();
-      const cardsHtml = plantsEmbedded
-        .map((p) => {
-          const optsHtml = (p.options || [])
-            .map(
-              (o) =>
-                `<div class="price-row"><span>${esc(o.labelBn)}</span><strong>₹${
-                  o.price
-                }</strong></div>`
-            )
-            .join('');
-          return `<article class="card">
-            <img src="${p.embeddedImg || ''}" alt="${esc(p.nameBn)}" />
-            <div class="body">
-              <div class="badges">
-                <span class="cat">${esc(p.category)}</span>
-                ${p.colorBn ? `<span class="clr">${esc(p.colorBn)}</span>` : ''}
-                <span class="${p.inStock === false ? 'out' : 'in'}">${
-            p.inStock === false ? 'স্টক শেষ' : 'স্টকে আছে'
-          }</span>
-              </div>
-              <h2>${esc(p.nameBn)}</h2>
-              <p class="en">${esc(p.nameEn)}${
-            p.botanicalName ? ` · <em>${esc(p.botanicalName)}</em>` : ''
-          }</p>
-              <div class="prices">${optsHtml}</div>
-              <p class="desc">${esc(p.descriptionBn)}</p>
-              <div class="care">
-                <div><strong>রোদ:</strong> ${esc(p.sunlightBn)}</div>
-                <div><strong>জল:</strong> ${esc(p.wateringBn)}</div>
-                <div><strong>মাটি:</strong> ${esc(p.soilTipBn)}</div>
-              </div>
-            </div>
-          </article>`;
-        })
-        .join('\n');
-
-      const htmlDoc = `<!DOCTYPE html>
-<html lang="bn">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ভ্রম্যমাণ নার্সারি - সম্পূর্ণ ফটো ও দাম ক্যাটালগ (${dt.dateBn})</title>
-<style>
-  body { font-family: system-ui, -apple-system, sans-serif; margin: 0; padding: 20px; background: #FAF7F2; color: #142318; }
-  .top { max-width: 1100px; margin: 0 auto 20px; background: #142318; color: #fff; padding: 20px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
-  .top h1 { margin: 0 0 6px; font-size: 22px; }
-  .top p { margin: 0; font-size: 13px; color: #CBE5D2; }
-  .print-btn { background: #A3E635; color: #142318; border: 0; padding: 12px 18px; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; }
-  .grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 16px; }
-  .card { background: #fff; border: 1px solid #E8E1D5; border-radius: 16px; overflow: hidden; break-inside: avoid; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
-  .card img { width: 100%; height: 210px; object-fit: cover; display: block; background: #EAE4D9; }
-  .body { padding: 14px; }
-  .badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; font-size: 11px; font-weight: 700; }
-  .cat { background: #F5EFE6; color: #785942; padding: 3px 8px; border-radius: 99px; }
-  .clr { background: #FEF3C7; color: #92400E; padding: 3px 8px; border-radius: 99px; }
-  .in { background: #DCFCE7; color: #166534; padding: 3px 8px; border-radius: 99px; }
-  .out { background: #FEE2E2; color: #991B1B; padding: 3px 8px; border-radius: 99px; }
-  h2 { margin: 0 0 4px; font-size: 18px; }
-  .en { margin: 0 0 10px; font-size: 12px; color: #526356; }
-  .prices { background: #FFFBF5; border: 1px solid #EADBCC; border-radius: 10px; padding: 8px 10px; margin-bottom: 10px; }
-  .price-row { display: flex; justify-content: space-between; font-size: 13px; padding: 3px 0; border-bottom: 1px dashed #EFE5D8; }
-  .price-row:last-child { border-bottom: 0; }
-  .price-row strong { color: #B34728; font-size: 15px; }
-  .desc { font-size: 12.5px; line-height: 1.5; color: #273B2E; margin: 0 0 10px; }
-  .care { font-size: 11.5px; color: #526356; background: #F7F5F0; padding: 8px 10px; border-radius: 10px; line-height: 1.55; }
-  @media print { body { background: #fff; padding: 0; } .print-btn { display: none; } .card { box-shadow: none; } }
-</style>
-</head>
-<body>
-  <header class="top">
-    <div>
-      <h1>ভ্রম্যমাণ নার্সারি · অফলাইন ফটো ও দাম ক্যাটালগ</h1>
-      <p>গ্রাম: কালশুলি, বাঁকুড়া, পিন ৭২২১৬০ · হোয়াটসঅ্যাপ/ফোন: +91 86094 17672 · মোট গাছ: ${
-        plantsEmbedded.length
-      } টি · তারিখ: ${esc(dt.dateBn)}</p>
-    </div>
-    <button class="print-btn" onclick="window.print()">প্রিন্ট / PDF সেভ করুন</button>
-  </header>
-  <main class="grid">${cardsHtml}</main>
-</body>
-</html>`;
-
+      const htmlDoc = await buildPrintablePhotoCatalogHtml(activePlants);
       const blob = new Blob([htmlDoc], { type: 'text/html;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -3570,7 +3147,7 @@ export function AdminPage({
     setIsRunningBugFix(true);
     try {
       const dtNow = getBengaliDateTime();
-      const { plantsToUpdate, candidateFixLogs } = buildCatalogBugFixPlan({
+      const { plantsToUpdate } = buildCatalogBugFixPlan({
         activePlants,
         fallbackImageUrl: PUJA_IMAGE,
         timestampIso: dtNow.iso,
@@ -4096,85 +3673,13 @@ export function AdminPage({
   /* ------------------------------------------------------------- */
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-[#142318] text-[#E8EDE9] flex flex-col justify-between p-4 sm:p-6 font-sans-bn selection:bg-[#A3E635] selection:text-[#142318]">
-        <div className="w-full max-w-md mx-auto flex items-center justify-between pt-2">
-          <button
-            type="button"
-            onClick={onNavigateToShop}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#213526] hover:bg-[#2e4735] text-xs font-semibold text-[#CBD5E1] transition-colors cursor-pointer"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>নার্সারি ওয়েবসাইট</span>
-          </button>
-          <span className="text-[11px] text-[#A3E635] font-mono">Admin Portal</span>
-        </div>
-
-        <div className="w-full max-w-md mx-auto my-auto bg-white text-[#142318] rounded-3xl p-6 sm:p-8 shadow-2xl border border-[#304836]">
-          <div className="text-center mb-6">
-            <div className="w-14 h-14 rounded-2xl bg-[#1B8354]/10 text-[#1B8354] flex items-center justify-center mx-auto mb-3 border border-[#1B8354]/20">
-              <Smartphone className="w-7 h-7" />
-            </div>
-            <h1 className="font-serif-bn text-2xl font-bold tracking-tight text-[#142318]">
-              ভ্রম্যমাণ নার্সারি · Admin ও Owner পোর্টাল
-            </h1>
-            <p className="text-sm text-[#526356] mt-1 font-medium">
-              মোবাইল ও ডেস্কটপ থেকে গাছের ছবি, স্টক ও দাম বদলানোর সুরক্ষিত পোর্টাল
-            </p>
-          </div>
-
-          <div className="space-y-4">
-            <div className="p-4 bg-[#F5EFE6] border border-[#E8E1D5] rounded-2xl text-sm text-[#526356] space-y-2">
-              <div className="flex items-center gap-2 text-[#142318] font-bold">
-                <ShieldCheck className="w-5 h-5 text-[#1B8354] shrink-0" />
-                <span>নিরাপদ Google অ্যাকাউন্ট যাচাই</span>
-              </div>
-              <p className="text-xs leading-relaxed">
-                শুধুমাত্র অনুমোদিত Owner ও Admin Google অ্যাকাউন্ট দিয়েই প্রবেশ করা যাবে। অন্য কোনো পাসওয়ার্ড বা PIN মনে রাখার দরকার নেই।
-              </p>
-              <div className="pt-1 flex flex-wrap gap-1.5">
-                {authorizedEmailsList.map((em) => (
-                  <span
-                    key={em}
-                    className="inline-flex items-center gap-1 text-xs font-mono font-semibold px-2.5 py-1 rounded-lg bg-white text-[#142318] border border-[#D5C9B8]"
-                  >
-                    <Mail className="w-3.5 h-3.5 text-[#1B8354]" />
-                    <span>{em}</span>
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {loginError && (
-              <p className="text-sm text-[#B34728] font-semibold bg-[#B34728]/10 border border-[#B34728]/20 p-3 rounded-xl text-center">
-                {loginError}
-              </p>
-            )}
-
-            <button
-              type="button"
-              disabled={isAuthChecking || isVerifying}
-              onClick={handleGoogleSignIn}
-              className="w-full h-14 bg-[#142318] hover:bg-[#203425] active:scale-[0.99] disabled:opacity-60 text-white font-bold rounded-2xl transition-all cursor-pointer flex items-center justify-center gap-2.5 shadow-md text-base"
-            >
-              {isAuthChecking || isVerifying ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin text-[#A3E635]" />
-                  <span>{isAuthChecking ? 'যাচাই করা হচ্ছে...' : 'Google লগইন চলছে...'}</span>
-                </>
-              ) : (
-                <>
-                  <ShieldCheck className="w-5 h-5 text-[#A3E635]" />
-                  <span>Google দিয়ে লগইন করুন</span>
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-
-        <div className="text-center text-[11px] text-[#7B9584] py-3">
-          ভ্রম্যমাণ নার্সারি, কালশুলি গ্রাম · বাঁকুড়া, ৭২২১৬০
-        </div>
-      </div>
+      <AdminLoginView
+        onNavigateToShop={onNavigateToShop}
+        loginError={loginError}
+        isAuthChecking={isAuthChecking}
+        isVerifying={isVerifying}
+        onGoogleSignIn={handleGoogleSignIn}
+      />
     );
   }
 
@@ -4182,25 +3687,6 @@ export function AdminPage({
   /* SCREEN 2: ORGANIZED WORKSPACE SHELL                           */
   /* ------------------------------------------------------------- */
   const currentDateTime = getBengaliDateTime();
-
-  const TAB_TO_SECTION_MAP: Record<AdminTab, AdminSection> = {
-    inventory: 'catalog',
-    add: 'catalog',
-    logs: 'catalog',
-    bulk_price: 'bulk',
-    qr_tags: 'bulk',
-    orders: 'bulk',
-    reviews: 'bulk',
-    trash: 'recovery',
-    backup: 'recovery',
-    undo_redo: 'recovery',
-    diagnostics: 'diagnostics',
-    api: 'diagnostics',
-    chatbot: 'diagnostics',
-    cloudinary: 'diagnostics',
-    settings: 'diagnostics',
-  };
-
   const activeSection: AdminSection = TAB_TO_SECTION_MAP[mobileTab] || 'catalog';
 
   const switchAdminSection = (section: AdminSection) => {
@@ -4221,512 +3707,66 @@ export function AdminPage({
     }
   };
 
-  const ADMIN_SECTIONS_CONFIG: Array<{
-    id: AdminSection;
-    labelBn: string;
-    shortLabelBn: string;
-    descBn: string;
-    icon: any;
-    badge?: string | number | null;
-  }> = [
-    {
-      id: 'catalog',
-      labelBn: 'ক্যাটালগ পরিচালনা',
-      shortLabelBn: 'ক্যাটালগ',
-      descBn: 'গাছের ইনভেন্টরি, নতুন চারা ও আপলোড ইতিহাস',
-      icon: Package,
-      badge: `${activePlants.length}`,
-    },
-    {
-      id: 'bulk',
-      labelBn: 'বাল্ক অপারেশন ও বিক্রয়',
-      shortLabelBn: 'বাল্ক ও বিক্রয়',
-      descBn: 'বাল্ক দাম পরিবর্তন, QR ট্যাগ, অর্ডার ও রিভিউ',
-      icon: Percent,
-      badge:
-        orderLogs.length > 0 || customerReviews.filter((r) => r.status === 'pending').length > 0
-          ? `${orderLogs.length + customerReviews.filter((r) => r.status === 'pending').length}`
-          : null,
-    },
-    {
-      id: 'recovery',
-      labelBn: 'ট্র্যাশ ও পুনরুদ্ধার',
-      shortLabelBn: 'ট্র্যাশ/রিকভারি',
-      descBn: 'মুছে ফেলা চারা (৩০ দিন), ব্যাকআপ ও রিস্টোর',
-      icon: Trash2,
-      badge: trashedPlants.length > 0 ? `${trashedPlants.length}` : null,
-    },
-    {
-      id: 'diagnostics',
-      labelBn: 'সিস্টেম ডায়াগনস্টিকস ও কোটা',
-      shortLabelBn: 'ডায়াগনস্টিকস',
-      descBn: 'ক্যাটালগ অডিট, ১-ক্লিক ফিক্স, AI কোটা ও ডাটাবেস',
-      icon: Activity,
-      badge: rootCauseDiagnostics.length > 0 ? `${rootCauseDiagnostics.length}` : null,
-    },
-  ];
-
-  const navGroups = [
-    {
-      sectionId: 'catalog' as AdminSection,
-      groupLabel: 'ক্যাটালগ পরিচালনা (Manage Catalog)',
-      icon: Package,
-      items: [
-        {
-          id: 'inventory' as AdminTab,
-          label: 'সব গাছ (Inventory)',
-          badge: `${activePlants.length}`,
-          icon: Package,
-          onClick: () => switchAdminTab('inventory'),
-        },
-        {
-          id: 'add' as AdminTab,
-          label: editingPlantId ? 'চারা এডিট ফর্ম' : '+ নতুন চারা যোগ',
-          badge: null,
-          icon: Plus,
-          onClick: () => handleStartAddPlant(),
-        },
-        {
-          id: 'logs' as AdminTab,
-          label: 'আপলোড হিস্ট্রি (ডেট-টাইম)',
-          badge: null,
-          icon: History,
-          onClick: () => switchAdminTab('logs'),
-        },
-      ],
-    },
-    {
-      sectionId: 'bulk' as AdminSection,
-      groupLabel: 'বাল্ক অপারেশন ও বিক্রয় (Bulk Operations)',
-      icon: Percent,
-      items: [
-        {
-          id: 'bulk_price' as AdminTab,
-          label: 'বাল্ক দাম ও ছাড় আপডেটার',
-          badge: null,
-          icon: Percent,
-          onClick: () => switchAdminTab('bulk_price'),
-        },
-        {
-          id: 'qr_tags' as AdminTab,
-          label: 'প্রিন্টেবল QR প্ল্যান্ট ট্যাগ',
-          badge: null,
-          icon: QrCode,
-          onClick: () => switchAdminTab('qr_tags'),
-        },
-        {
-          id: 'orders' as AdminTab,
-          label: 'অর্ডার ও চাহিদা ট্র্যাকার',
-          badge: orderLogs.length > 0 ? `${orderLogs.length}` : null,
-          icon: ShoppingBag,
-          onClick: () => switchAdminTab('orders'),
-        },
-        {
-          id: 'reviews' as AdminTab,
-          label: 'কাস্টমার রিভিউ ও গ্যালারি',
-          badge:
-            customerReviews.filter((r) => r.status === 'pending').length > 0
-              ? `${customerReviews.filter((r) => r.status === 'pending').length}`
-              : null,
-          icon: Star,
-          onClick: () => switchAdminTab('reviews'),
-        },
-      ],
-    },
-    {
-      sectionId: 'recovery' as AdminSection,
-      groupLabel: 'ট্র্যাশ ও পুনরুদ্ধার (Trash / Recovery)',
-      icon: Trash2,
-      items: [
-        {
-          id: 'trash' as AdminTab,
-          label: 'ট্র্যাশ বিন (৩০ দিন)',
-          badge: trashedPlants.length > 0 ? `${trashedPlants.length}` : null,
-          icon: Trash2,
-          onClick: () => switchAdminTab('trash'),
-        },
-        {
-          id: 'backup' as AdminTab,
-          label: 'ব্যাকআপ ও রিস্টোর',
-          badge: null,
-          icon: Download,
-          onClick: () => switchAdminTab('backup'),
-        },
-        {
-          id: 'undo_redo' as AdminTab,
-          label: 'অ্যাকশন হিস্ট্রি ও অডিট',
-          badge: undoStack.length > 0 ? `${undoStack.length}` : null,
-          icon: History,
-          onClick: () => switchAdminTab('undo_redo'),
-        },
-      ],
-    },
-    {
-      sectionId: 'diagnostics' as AdminSection,
-      groupLabel: 'সিস্টেম ডায়াগনস্টিকস (System Diagnostics)',
-      icon: Activity,
-      items: [
-        {
-          id: 'diagnostics' as AdminTab,
-          label: 'ক্যাটালগ অডিট ও ১-ক্লিক ফিক্স',
-          badge: rootCauseDiagnostics.length > 0 ? `${rootCauseDiagnostics.length}` : null,
-          icon: Activity,
-          onClick: () => switchAdminTab('diagnostics'),
-        },
-        {
-          id: 'api' as AdminTab,
-          label: 'Gemini AI ও ২৪ঘণ্টার কোটা',
-          badge: null,
-          icon: Cpu,
-          onClick: () => switchAdminTab('api'),
-        },
-        {
-          id: 'chatbot' as AdminTab,
-          label: 'Gemini AI পরামর্শক',
-          badge: null,
-          icon: Bot,
-          onClick: () => switchAdminTab('chatbot'),
-        },
-        {
-          id: 'cloudinary' as AdminTab,
-          label: 'Cloudinary মিডিয়া ও স্টোরেজ',
-          badge:
-            dbHealthMetrics.base64PhotoCount > 0
-              ? `${dbHealthMetrics.base64PhotoCount}`
-              : null,
-          icon: Cloud,
-          onClick: () => switchAdminTab('cloudinary'),
-        },
-        {
-          id: 'settings' as AdminTab,
-          label: 'নিরাপত্তা ও ডাটাবেস',
-          badge:
-            dbHealthMetrics.alerts.length > 0 ? `${dbHealthMetrics.alerts.length}` : null,
-          icon: Lock,
-          onClick: () => switchAdminTab('settings'),
-        },
-      ],
-    },
-  ];
+  const {
+    sectionsConfig: ADMIN_SECTIONS_CONFIG,
+    navGroups,
+    sectionMeta: activeSectionMeta,
+  } = buildAdminNavigationData({
+    activePlantsCount: activePlants.length,
+    trashedPlantsCount: trashedPlants.length,
+    orderLogs,
+    customerReviews,
+    undoStack,
+    rootCauseCount: rootCauseDiagnostics.length,
+    base64PhotoCount: dbHealthMetrics.base64PhotoCount,
+    dbAlertsCount: dbHealthMetrics.alerts.length,
+    editingPlantId,
+    switchAdminTab,
+    onStartAddPlant: handleStartAddPlant,
+  });
 
   const activeNavGroup = navGroups.find((g) => g.sectionId === activeSection) || navGroups[0];
-
-  const activeSectionMeta: Record<AdminTab, { titleBn: string; subtitleBn: string }> = {
-    inventory: {
-      titleBn: 'ক্যাটালগ ও ইনভেন্টরি (নতুন আপলোড সবার উপরে)',
-      subtitleBn: `মোট ${activePlants.length} টি সক্রিয় চারা · সারি ওয়াইজ ডেট-টাইম লিস্ট ও দ্রুত ফিল্টার`,
-    },
-    add: {
-      titleBn: editingPlantId ? 'চারার তথ্য ও ছবি সম্পাদনা' : 'নতুন চারা যোগ করুন',
-      subtitleBn: 'ক্যামেরা, ৩-স্লট গ্যালারি, দাম ও Gemini AI অটো-ফিল',
-    },
-    logs: {
-      titleBn: 'আপলোড করা চারার ডেট-টাইম লিস্ট ও হিস্ট্রি',
-      subtitleBn: 'নতুন আপলোড করা চারা সবার উপরে সারি ওয়াইজ দেখুন ও ১-ক্লিকে এডিট করুন',
-    },
-    orders: {
-      titleBn: 'হোয়াটসঅ্যাপ অর্ডার ও চাহিদা ট্র্যাকার',
-      subtitleBn: 'সবচেয়ে বেশি চাহিদার চারা ও কাস্টমার অর্ডার/শেয়ার লিস্ট',
-    },
-    bulk_price: {
-      titleBn: 'বাল্ক প্রাইস ও সিজনাল ডিসকাউন্ট আপডেটার',
-      subtitleBn: 'বর্ষা বা শীতের মৌসুমে ১-ক্লিকে নির্দিষ্ট ক্যাটাগরির দাম শতকরা হারে কমান বা বাড়ান',
-    },
-    reviews: {
-      titleBn: 'কাস্টমার রিভিউ ও বাগান গ্যালারি অনুমোদন',
-      subtitleBn: 'ক্রেতাদের পাঠানো গাছের ছবি ও মতামত অনুমোদন করে ওয়েবসাইটে দেখান',
-    },
-    qr_tags: {
-      titleBn: 'প্রিন্টেবল QR কোড প্ল্যান্ট ট্যাগ জেনারেটর',
-      subtitleBn: 'নার্সারির টব বা চারার গায়ে লাগানোর জন্য নাম, দাম ও QR কোডসহ প্রিন্টেবল ট্যাগ',
-    },
-    trash: {
-      titleBn: 'ডিজিটাল ট্র্যাশ বিন',
-      subtitleBn: 'মুছে ফেলা চারা ৩০ দিন পর্যন্ত সুরক্ষিত থাকে',
-    },
-    chatbot: {
-      titleBn: 'Google Gemini AI নার্সারি পরামর্শক',
-      subtitleBn: 'Gemini AI দিয়ে ক্যাটালগ সমস্যা নির্ণয় ও গাছের পরিচর্যা পরামর্শ',
-    },
-    api: {
-      titleBn: 'Gemini AI কনফিগারেশন ও কোটা স্ট্যাটাস',
-      subtitleBn: 'Gemini ৪-স্লট কী পুল, অটো-রোটেশন ও সার্ভার ডায়াগনস্টিকস',
-    },
-    cloudinary: {
-      titleBn: 'Cloudinary মিডিয়া ও স্টোরেজ কন্ট্রোল',
-      subtitleBn: 'CDN ছবি লাইব্রেরি, Base64 মাইগ্রেশন ও অরফ্যান স্ক্যানার',
-    },
-    backup: {
-      titleBn: 'ব্যাকআপ, অফলাইন ক্যাটালগ ও রিস্টোর',
-      subtitleBn: 'JSON ব্যাকআপ, প্রিন্টযোগ্য ফটো ক্যাটালগ ও পুনরুদ্ধার',
-    },
-    settings: {
-      titleBn: 'নিরাপত্তা, অ্যাকাউন্ট ও ডাটাবেস হেলথ',
-      subtitleBn: 'অনুমোদিত অ্যাডমিন রোল ও Firestore কোটা মনিটর',
-    },
-    undo_redo: {
-      titleBn: 'ক্যাটালগ আনডু ও রিডু হিস্ট্রি স্ট্যাক',
-      subtitleBn: 'কোন কোন পরিবর্তন করা হয়েছে এবং ১-ক্লিকে কী আনডু বা রিডু করবেন তা দেখুন',
-    },
-    diagnostics: {
-      titleBn: 'ক্যাটালগ অডিট ও ১-ক্লিক মেরামত কেন্দ্র',
-      subtitleBn: 'ক্যাটালগের ভুলত্রুটি, রুট কজ বিশ্লেষণ, ডুপ্লিকেট স্ক্যান ও স্বয়ংক্রিয় মেরামত',
-    },
-  };
+  const currentUserEmail = verifiedEmail || firebaseUser?.email || '';
 
   return (
     <div className="min-h-screen bg-[#F7F5F0] text-[#142318] flex flex-col font-sans-bn select-text overflow-x-hidden pb-44">
-      {/* 1. STICKY TOP HEADER BAR */}
-      <header className="sticky top-0 z-40 bg-[#142318] text-white border-b border-[#25392A]">
-        <div className="max-w-7xl mx-auto px-3 sm:px-5 h-14 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0">
-            {/* Mobile Drawer Trigger */}
-            <button
-              type="button"
-              onClick={() => setIsMobileDrawerOpen(true)}
-              aria-label="সব সেকশন মেনু খুলুন"
-              className="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-xl bg-[#213526] hover:bg-[#2c4533] text-white cursor-pointer shrink-0"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
+      <AdminHeaderBar
+        onOpenMobileDrawer={() => setIsMobileDrawerOpen(true)}
+        showBackButton={tabHistory.length > 0 || mobileTab !== 'inventory'}
+        onAdminBack={handleAdminBack}
+        isAdminSimpleView={isAdminSimpleView}
+        sectionTitleBn={activeSectionMeta[mobileTab].titleBn}
+        relativeTimeBn={currentDateTime.relativeBn}
+        isRefreshingAdmin={isRefreshingAdmin}
+        onManualRefresh={handleManualAdminRefresh}
+        isOwner={isOwner}
+        previewAdminMode={previewAdminMode}
+        onTogglePreviewAdminMode={() => {
+          const next = !previewAdminMode;
+          setPreviewAdminMode(next);
+          if (next) setMobileTab('inventory');
+        }}
+        onNavigateToShop={onNavigateToShop}
+        onLogout={handleLogout}
+      />
 
-            {/* Contextual Internal Back Button */}
-            {(tabHistory.length > 0 || mobileTab !== 'inventory') && (
-              <button
-                type="button"
-                onClick={handleAdminBack}
-                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#213526] hover:bg-[#2c4533] text-[#E8EDE9] hover:text-white text-xs font-bold transition-colors cursor-pointer shrink-0"
-                title="আগের সেকশনে ফিরুন"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">পিছনে</span>
-              </button>
-            )}
-
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <h1 className="font-serif-bn font-bold text-sm sm:text-base text-white truncate">
-                  ভ্রম্যমাণ নার্সারি
-                </h1>
-                <span className="text-[11px] font-mono font-bold text-[#A3E635] shrink-0">
-                  · {isAdminSimpleView ? 'Admin' : 'Owner'}
-                </span>
-              </div>
-              <p className="text-[10px] text-[#A8BDB0] font-mono truncate">
-                {activeSectionMeta[mobileTab].titleBn} · {currentDateTime.relativeBn}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            {/* Quick Refresh Control */}
-            <button
-              type="button"
-              disabled={isRefreshingAdmin}
-              onClick={handleManualAdminRefresh}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#213526] hover:bg-[#2c4533] border border-[#304836] text-[#E8EDE9] text-xs font-bold transition-colors cursor-pointer"
-              title="সকল ক্যাটালগ তথ্য ও ডাটাবেস স্ট্যাটাস রিফ্রেশ করুন"
-            >
-              <RefreshCw
-                className={`w-3.5 h-3.5 text-[#A3E635] ${
-                  isRefreshingAdmin ? 'animate-spin' : ''
-                }`}
-              />
-              <span className="hidden sm:inline">রিফ্রেশ</span>
-            </button>
-
-            {isOwner && (
-              <button
-                type="button"
-                onClick={() => {
-                  const next = !previewAdminMode;
-                  setPreviewAdminMode(next);
-                  if (next) setMobileTab('inventory');
-                }}
-                className={`inline-flex items-center gap-1 rounded-xl font-bold transition-colors cursor-pointer ${
-                  previewAdminMode
-                    ? 'px-3 py-1.5 bg-[#F59E0B] hover:bg-[#D97706] text-[#142318] text-xs'
-                    : 'px-2.5 py-1.5 bg-[#213526] hover:bg-[#2c4533] text-[#A3E635] text-[11px] border border-[#304836]'
-                }`}
-                title="Admin বড়-ফন্ট ভিউ দেখুন বা Owner মোডে ফিরুন"
-              >
-                <Eye className="w-3.5 h-3.5 shrink-0" />
-                <span>{previewAdminMode ? 'Owner মোড' : 'Admin ভিউ'}</span>
-              </button>
-            )}
-
-            <button
-              type="button"
-              onClick={onNavigateToShop}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1B8354] hover:bg-[#146c44] text-white text-xs font-bold rounded-xl transition-colors cursor-pointer"
-              title="পাবলিক নার্সারি ওয়েবসাইটে যান"
-            >
-              <ExternalLink className="w-3.5 h-3.5 text-[#A3E635]" />
-              <span className="hidden sm:inline">ওয়েবসাইট</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="lg:hidden inline-flex items-center gap-1 px-2.5 py-1.5 bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#B34728] text-xs font-bold rounded-xl transition-colors cursor-pointer"
-              title="লগআউট করুন"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span className="hidden xs:inline">লগআউট</span>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* 2. MOBILE SLIDE-OVER NAVIGATION DRAWER */}
-      {isMobileDrawerOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden flex">
-          <div
-            className="fixed inset-0 bg-black/35 backdrop-blur-[1px]"
-            onClick={() => setIsMobileDrawerOpen(false)}
-          />
-          <aside className="relative w-64 sm:w-72 max-w-[74vw] bg-white h-full shadow-2xl border-r border-[#E8E1D5] flex flex-col justify-between z-10 overflow-y-auto">
-            <div className="p-4 space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-[#E8E1D5]">
-                <div>
-                  <p className="font-serif-bn text-base font-bold text-[#142318]">
-                    অ্যাডমিন নেভিগেশন
-                  </p>
-                  <p className="text-[11px] font-mono text-[#526356] truncate max-w-[190px]">
-                    {verifiedEmail || firebaseUser?.email}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setIsMobileDrawerOpen(false)}
-                  aria-label="মেনু বন্ধ করুন"
-                  className="w-8 h-8 rounded-lg bg-[#F5EFE6] text-[#142318] flex items-center justify-center cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                {navGroups.map((group) => (
-                  <div key={group.groupLabel} className="space-y-1">
-                    <p className="px-2.5 text-[10px] font-bold text-[#785942] uppercase tracking-wider">
-                      {group.groupLabel}
-                    </p>
-                    {group.items.map((item) => {
-                      const Icon = item.icon;
-                      const isActive = mobileTab === item.id;
-                      return (
-                        <button
-                          key={item.id}
-                          type="button"
-                          onClick={item.onClick}
-                          className={`w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
-                            isActive
-                              ? 'bg-[#142318] text-white'
-                              : 'text-[#142318] hover:bg-[#FAF8F5]'
-                          }`}
-                        >
-                          <span className="flex items-center gap-2.5 truncate">
-                            <Icon
-                              className={`w-4 h-4 shrink-0 ${
-                                isActive ? 'text-[#A3E635]' : 'text-[#1B8354]'
-                              }`}
-                            />
-                            <span className="truncate">{item.label}</span>
-                          </span>
-                          {item.badge && (
-                            <span
-                              className={`font-mono tabular-nums text-[11px] ${
-                                isActive ? 'text-[#A3E635]' : 'text-[#785942]'
-                              }`}
-                            >
-                              {item.badge}
-                            </span>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="p-4 border-t border-[#E8E1D5]">
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="w-full py-2.5 px-3 bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#B34728] rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer"
-              >
-                <LogOut className="w-4 h-4" />
-                <span>লগআউট করুন</span>
-              </button>
-            </div>
-          </aside>
-        </div>
-      )}
+      <AdminMobileDrawer
+        isOpen={isMobileDrawerOpen}
+        onClose={() => setIsMobileDrawerOpen(false)}
+        userEmail={currentUserEmail}
+        navGroups={navGroups}
+        mobileTab={mobileTab}
+        onLogout={handleLogout}
+      />
 
       {/* 3. WORKSPACE BODY: DESKTOP LEFT SIDEBAR + MAIN STAGE */}
       <div className="flex-1 max-w-7xl w-full mx-auto flex gap-6 px-3 sm:px-5 pt-4 pb-32 lg:pb-8">
-        {/* Desktop Persistent Left Sidebar (lg+) */}
-        <aside className="hidden lg:flex w-60 shrink-0 flex-col justify-between bg-white border border-[#E8E1D5] rounded-2xl p-3.5 h-[calc(100dvh-5.25rem)] sticky top-18 overflow-y-auto">
-          <div className="space-y-4">
-            {navGroups.map((group) => (
-              <div key={group.groupLabel} className="space-y-1">
-                <p className="px-2.5 text-[10px] font-bold text-[#785942] uppercase tracking-wider">
-                  {group.groupLabel}
-                </p>
-                {group.items.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = mobileTab === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={item.onClick}
-                      className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
-                        isActive
-                          ? 'bg-[#142318] text-white'
-                          : 'text-[#142318] hover:bg-[#FAF8F5]'
-                      }`}
-                    >
-                      <span className="flex items-center gap-2 truncate">
-                        <Icon
-                          className={`w-4 h-4 shrink-0 ${
-                            isActive ? 'text-[#A3E635]' : 'text-[#1B8354]'
-                          }`}
-                        />
-                        <span className="truncate">{item.label}</span>
-                      </span>
-                      {item.badge && (
-                        <span
-                          className={`font-mono tabular-nums text-[11px] ${
-                            isActive ? 'text-[#A3E635]' : 'text-[#785942]'
-                          }`}
-                        >
-                          {item.badge}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            ))}
-          </div>
-
-          <div className="pt-3 border-t border-[#E8E1D5] space-y-2">
-            <div className="px-2 text-[10px] text-[#526356] truncate font-mono">
-              {verifiedEmail || firebaseUser?.email}
-            </div>
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="w-full py-2 px-3 bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#B34728] rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span>লগআউট</span>
-            </button>
-          </div>
-        </aside>
+        <AdminDesktopSidebar
+          navGroups={navGroups}
+          mobileTab={mobileTab}
+          userEmail={currentUserEmail}
+          onLogout={handleLogout}
+        />
 
         {/* Main Stage */}
         <main className="flex-1 min-w-0 space-y-4">
@@ -4737,7 +3777,7 @@ export function AdminPage({
                 <span className="text-xs font-bold uppercase tracking-wider text-[#785942]">
                   অ্যাডমিন বিভাগ (Workspaces)
                 </span>
-                <span className="text-[11px] text-[#A8BDB0] font-mono hidden sm:inline">
+                <span className="text-xs text-[#A8BDB0] font-mono hidden sm:inline">
                   · ৪টি মূল বিভাগের মাধ্যমে সহজে নেভিগেট করুন
                 </span>
               </div>
@@ -4800,7 +3840,7 @@ export function AdminPage({
                           {sec.labelBn}
                         </p>
                         <p
-                          className={`text-[10px] truncate ${
+                          className={`text-xs truncate ${
                             isSecActive ? 'text-[#A8BDB0]' : 'text-[#785942]'
                           }`}
                         >
@@ -4810,7 +3850,7 @@ export function AdminPage({
                     </div>
                     {sec.badge && (
                       <span
-                        className={`font-mono text-[10px] font-bold px-1.5 py-0.5 rounded-full shrink-0 ${
+                        className={`font-mono text-xs font-bold px-1.5 py-0.5 rounded-full shrink-0 ${
                           isSecActive
                             ? 'bg-[#A3E635] text-[#142318]'
                             : 'bg-[#1B8354]/10 text-[#1B8354]'
@@ -4826,7 +3866,7 @@ export function AdminPage({
 
             {/* Sub-tabs for the Active Workspace */}
             <div className="pt-2 border-t border-[#F0EAE1] flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-              <span className="text-[11px] font-bold text-[#785942] uppercase tracking-wider shrink-0 mr-1 hidden sm:inline">
+              <span className="text-xs font-bold text-[#785942] uppercase tracking-wider shrink-0 mr-1 hidden sm:inline">
                 পেজ:
               </span>
               {activeNavGroup?.items.map((item) => {
@@ -4851,7 +3891,7 @@ export function AdminPage({
                     <span>{item.label}</span>
                     {item.badge && (
                       <span
-                        className={`font-mono text-[10px] font-bold px-1.5 py-0.2 rounded-full ${
+                        className={`font-mono text-xs font-bold px-1.5 py-0.2 rounded-full ${
                           isTabActive
                             ? 'bg-white/20 text-white'
                             : 'bg-[#142318]/10 text-[#142318]'
@@ -4869,7 +3909,7 @@ export function AdminPage({
           {/* Section Breadcrumb & Title Strip */}
           <div className="flex items-center justify-between gap-2 flex-wrap bg-white border border-[#E8E1D5] rounded-2xl px-4 py-3">
             <div>
-              <div className="flex items-center gap-1.5 text-[11px] font-semibold text-[#1B8354] mb-0.5">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-[#1B8354] mb-0.5">
                 <span>{activeNavGroup.groupLabel}</span>
                 <span>/</span>
                 <span className="text-[#142318]">{activeSectionMeta[mobileTab].titleBn}</span>
@@ -4926,7 +3966,7 @@ export function AdminPage({
                           );
                         }
                       }}
-                      className="px-2.5 py-1 bg-[#991B1B] text-white text-[11px] font-bold rounded-lg cursor-pointer"
+                      className="px-2.5 py-1 bg-[#991B1B] text-white text-xs font-bold rounded-lg cursor-pointer"
                     >
                       রিকভার করুন
                     </button>
@@ -4945,7 +3985,7 @@ export function AdminPage({
                     <button
                       type="button"
                       onClick={() => switchAdminTab('settings')}
-                      className="text-[11px] font-bold underline cursor-pointer"
+                      className="text-xs font-bold underline cursor-pointer"
                     >
                       ডাটাবেস হেলথ দেখুন
                     </button>
@@ -4965,14 +4005,14 @@ export function AdminPage({
                           `এইমাত্র অ্যাপে এই সমস্যাটি ধরা পড়েছে: "${runtimeIssues[0]?.message}"। এর মূল কারণ কী এবং কীভাবে সমাধান করবো?`
                         )
                       }
-                      className="px-2 py-0.5 bg-[#142318] text-white text-[10px] font-bold rounded-md cursor-pointer"
+                      className="px-2 py-0.5 bg-[#142318] text-white text-xs font-bold rounded-md cursor-pointer"
                     >
                       AI সমাধান
                     </button>
                     <button
                       type="button"
                       onClick={() => clearRuntimeIssues()}
-                      className="text-[10px] font-bold underline cursor-pointer"
+                      className="text-xs font-bold underline cursor-pointer"
                     >
                       মুছুন
                     </button>
@@ -5321,268 +4361,18 @@ export function AdminPage({
         </main>
       </div>
 
-      {/* 4. QUICK PRICE EDIT MODAL */}
-      {quickPricePlant && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-3 sm:p-4 bg-black/50 backdrop-blur-xs">
-          <div className="w-full max-w-sm bg-white rounded-2xl p-5 shadow-xl border border-[#E8E1D5]">
-            <div className="flex items-center justify-between pb-3 border-b border-[#E8E1D5]">
-              <div className="flex items-center gap-2.5">
-                <img
-                  src={resolvePlantImageUrl(quickPricePlant.image, PUJA_IMAGE)}
-                  alt={quickPricePlant.nameBn}
-                  className="w-10 h-10 rounded-xl object-cover border border-[#DDD5C7]"
-                />
-                <div>
-                  <h3 className="font-serif-bn text-sm font-bold text-[#142318]">
-                    {quickPricePlant.nameBn}
-                  </h3>
-                  <p className="text-[11px] text-[#785942] font-mono tabular-nums">
-                    বর্তমান মূল্য: ₹{quickPricePlant.options[0]?.price}
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setQuickPricePlant(null)}
-                className="text-xs text-[#785942] hover:text-[#142318] p-1 cursor-pointer"
-              >
-                বন্ধ
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveQuickPrice} className="mt-4 space-y-3.5">
-              <div>
-                <label
-                  className={`block font-bold text-[#142318] mb-1.5 ${
-                    isAdminSimpleView ? 'text-base' : 'text-xs'
-                  }`}
-                >
-                  নতুন বিক্রয়মূল্য লিখুন (₹)
-                </label>
-                <div className="relative">
-                  <span
-                    className={`absolute left-3.5 top-1/2 -translate-y-1/2 font-mono font-bold text-[#B34728] ${
-                      isAdminSimpleView ? 'text-2xl' : 'text-base'
-                    }`}
-                  >
-                    ₹
-                  </span>
-                  <input
-                    type="number"
-                    inputMode="numeric"
-                    required
-                    value={quickPriceValue}
-                    onChange={(e) => setQuickPriceValue(e.target.value)}
-                    className={`w-full pl-9 pr-3 border border-[#D5C9B8] rounded-xl font-mono tabular-nums font-bold text-[#142318] focus:outline-none focus:border-[#1B8354] ${
-                      isAdminSimpleView ? 'h-14 text-2xl' : 'h-12 text-lg'
-                    }`}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-4 gap-2">
-                {[-10, -5, 5, 10].map((delta) => (
-                  <button
-                    key={delta}
-                    type="button"
-                    onClick={() => {
-                      const cur = parseFloat(quickPriceValue) || 0;
-                      const next = Math.max(1, Math.round(cur + delta));
-                      setQuickPriceValue(next.toString());
-                    }}
-                    className={`rounded-xl font-mono tabular-nums font-bold border cursor-pointer transition-all active:scale-95 ${
-                      delta < 0
-                        ? 'bg-[#FEF2F2] border-[#FECACA] text-[#B34728] hover:bg-[#FEE2E2]'
-                        : 'bg-[#F0FDF4] border-[#86EFAC] text-[#166534] hover:bg-[#DCFCE7]'
-                    } ${isAdminSimpleView ? 'h-12 text-base' : 'h-10 text-sm'}`}
-                  >
-                    {delta > 0 ? `+₹${delta}` : `-₹${Math.abs(delta)}`}
-                  </button>
-                ))}
-              </div>
-
-              <div className="pt-2 flex items-center gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => setQuickPricePlant(null)}
-                  className={`flex-1 border border-[#D5C9B8] rounded-xl font-bold text-[#526356] cursor-pointer ${
-                    isAdminSimpleView ? 'h-13 text-base' : 'h-11 text-xs'
-                  }`}
-                >
-                  বাতিল
-                </button>
-                <button
-                  type="submit"
-                  className={`flex-1 bg-[#1B8354] hover:bg-[#146c44] text-white rounded-xl font-bold cursor-pointer ${
-                    isAdminSimpleView ? 'h-13 text-base' : 'h-11 text-xs'
-                  }`}
-                >
-                  দাম সেভ করুন
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* 5. IN-APP CONFIRMATION MODAL */}
-      {confirmDialog && confirmDialog.isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="w-full max-w-sm bg-white rounded-2xl p-5 shadow-2xl border border-[#E8E1D5] space-y-4">
-            <div className="flex items-start gap-3">
-              <div
-                className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 ${
-                  confirmDialog.isDanger
-                    ? 'bg-[#FEF2F2] text-[#B34728]'
-                    : 'bg-[#F0FDF4] text-[#1B8354]'
-                }`}
-              >
-                {confirmDialog.type === 'soft_delete' ? (
-                  <Trash2 className="w-5 h-5 text-[#B34728]" />
-                ) : confirmDialog.type === 'permanent_delete' ? (
-                  <AlertTriangle className="w-5 h-5 text-[#B34728]" />
-                ) : confirmDialog.type === 'empty_trash' ? (
-                  <Trash2 className="w-5 h-5 text-[#B34728]" />
-                ) : (
-                  <RefreshCw className="w-5 h-5 text-[#1B8354]" />
-                )}
-              </div>
-              <div className="min-w-0 flex-1">
-                <h3 className="font-serif-bn text-base font-bold text-[#142318] leading-snug">
-                  {confirmDialog.titleBn}
-                </h3>
-                <p className="text-xs text-[#526356] mt-1 leading-relaxed">
-                  {confirmDialog.messageBn}
-                </p>
-              </div>
-            </div>
-
-            {confirmDialog.plant && (
-              <div className="flex items-center gap-2.5 p-2.5 bg-[#FBF9F5] border border-[#E8E1D5] rounded-xl">
-                <img
-                  src={resolvePlantImageUrl(confirmDialog.plant.image, PUJA_IMAGE)}
-                  alt={confirmDialog.plant.nameBn}
-                  className="w-10 h-10 rounded-lg object-cover border border-[#DDD5C7]"
-                />
-                <div className="min-w-0">
-                  <p className="font-serif-bn text-xs font-bold text-[#142318] truncate">
-                    {confirmDialog.plant.nameBn}
-                  </p>
-                  <p className="text-[10px] text-[#785942] tabular-nums">
-                    মূল্য: ₹{confirmDialog.plant.options[0]?.price || 0} ·{' '}
-                    {confirmDialog.plant.category}
-                  </p>
-                </div>
-              </div>
-            )}
-
-            <div className="flex items-center gap-2 pt-1">
-              <button
-                type="button"
-                onClick={() => setConfirmDialog(null)}
-                className="flex-1 h-11 border border-[#D5C9B8] hover:bg-[#FAF8F5] text-xs font-bold text-[#526356] rounded-xl transition-colors cursor-pointer"
-              >
-                {confirmDialog.cancelBtnBn || 'বাতিল'}
-              </button>
-              <button
-                type="button"
-                onClick={confirmDialog.onConfirm}
-                className={`flex-1 h-11 text-white text-xs font-bold rounded-xl transition-colors cursor-pointer ${
-                  confirmDialog.isDanger
-                    ? 'bg-[#B34728] hover:bg-[#8F351D]'
-                    : 'bg-[#1B8354] hover:bg-[#146c44]'
-                }`}
-              >
-                {confirmDialog.confirmBtnBn}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 6. IN-APP TOAST NOTIFICATION BANNER WITH CLEAR STATUS & UNDO */}
-      {toast && (
-        <div
-          role="status"
-          aria-live="polite"
-          data-testid="admin-toast-notification"
-          className="fixed top-4 inset-x-4 z-50 max-w-lg mx-auto pointer-events-none"
-        >
-          <div
-            className={`pointer-events-auto p-3.5 sm:p-4 rounded-2xl shadow-2xl border flex items-start justify-between gap-3 transition-all ${
-              toast.type === 'error'
-                ? 'bg-[#2B1210] border-[#F87171]/60 text-white'
-                : toast.type === 'warning'
-                ? 'bg-[#281C0E] border-[#FBBF24]/60 text-white'
-                : toast.type === 'info'
-                ? 'bg-[#142318] border-[#A3E635]/50 text-white'
-                : 'bg-[#142318] border-[#34D399]/60 text-white'
-            }`}
-          >
-            <div className="flex items-start gap-3 min-w-0">
-              <div
-                className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
-                  toast.type === 'error'
-                    ? 'bg-[#DC2626] text-white'
-                    : toast.type === 'warning'
-                    ? 'bg-[#D97706] text-white'
-                    : 'bg-[#1B8354] text-white'
-                }`}
-              >
-                {toast.type === 'error' || toast.type === 'warning' ? (
-                  <AlertTriangle className="w-4 h-4" />
-                ) : (
-                  <CheckCircle2 className="w-4 h-4" />
-                )}
-              </div>
-              <div className="min-w-0 space-y-0.5">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span
-                    className={`text-[11px] font-extrabold tracking-wide uppercase px-1.5 py-0.5 rounded-md ${
-                      toast.type === 'error'
-                        ? 'bg-[#FEE2E2] text-[#991B1B]'
-                        : toast.type === 'warning'
-                        ? 'bg-[#FEF3C7] text-[#92400E]'
-                        : 'bg-[#DCFCE7] text-[#166534]'
-                    }`}
-                  >
-                    {toast.titleBn}
-                  </span>
-                  <span className="text-[10px] text-[#A8BDB0] font-mono tabular-nums">
-                    {toast.timestampBn}
-                  </span>
-                </div>
-                <p className="text-xs sm:text-sm font-bold leading-snug text-white">
-                  {toast.messageBn}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 shrink-0">
-              {toast.actionLabelBn && toast.onAction && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    toast.onAction?.();
-                    setToast(null);
-                  }}
-                  className="px-2.5 py-1.5 bg-[#A3E635] hover:bg-[#86cf24] text-[#142318] text-[11px] font-bold rounded-lg transition-colors cursor-pointer whitespace-nowrap"
-                >
-                  {toast.actionLabelBn}
-                </button>
-              )}
-              <button
-                type="button"
-                aria-label="টোস্ট বার্তা বন্ধ করুন"
-                onClick={() => setToast(null)}
-                className="text-[#A8BDB0] hover:text-white p-1 text-xs cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AdminModalsAndToast
+        quickPricePlant={quickPricePlant}
+        quickPriceValue={quickPriceValue}
+        setQuickPriceValue={setQuickPriceValue}
+        onCloseQuickPrice={() => setQuickPricePlant(null)}
+        onSubmitQuickPrice={handleSaveQuickPrice}
+        isAdminSimpleView={isAdminSimpleView}
+        confirmDialog={confirmDialog}
+        onCloseConfirmDialog={() => setConfirmDialog(null)}
+        toast={toast}
+        onDismissToast={() => setToast(null)}
+      />
 
       {/* 7. DIAGNOSTICS & AUDIT MODAL */}
       <AdminDiagnosticsModal
@@ -5605,78 +4395,12 @@ export function AdminPage({
         onSwitchTab={switchAdminTab}
       />
 
-      {/* 8. COMPACT 5-SLOT MOBILE BOTTOM BAR (Hidden on lg+ desktop where left sidebar is visible) */}
-      <nav
-        aria-label="Admin Mobile Bottom Navigation"
-        className="lg:hidden fixed bottom-0 inset-x-0 z-[9999] bg-white/95 backdrop-blur-md border-t border-[#E8E1D5] pt-1.5 pb-[max(0.75rem,env(safe-area-inset-bottom))] px-2 shadow-2xl"
-      >
-        <div className="max-w-lg mx-auto grid grid-cols-5 gap-1">
-          <button
-            type="button"
-            onClick={() => switchAdminSection('catalog')}
-            className={`flex flex-col items-center justify-center rounded-xl py-1.5 transition-colors cursor-pointer ${
-              activeSection === 'catalog' && mobileTab !== 'add'
-                ? 'bg-[#EBF5EF] text-[#1B8354] font-bold'
-                : 'text-[#526356] hover:text-[#142318]'
-            }`}
-          >
-            <Package className="w-4 h-4 mb-0.5" />
-            <span className="text-[10px] leading-tight">ক্যাটালগ</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handleStartAddPlant}
-            className={`flex flex-col items-center justify-center rounded-xl py-1.5 transition-colors cursor-pointer ${
-              mobileTab === 'add'
-                ? 'bg-[#EBF5EF] text-[#1B8354] font-bold'
-                : 'text-[#526356] hover:text-[#142318]'
-            }`}
-          >
-            <Plus className="w-4 h-4 mb-0.5" />
-            <span className="text-[10px] leading-tight">+ নতুন</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => switchAdminSection('bulk')}
-            className={`flex flex-col items-center justify-center rounded-xl py-1.5 transition-colors cursor-pointer ${
-              activeSection === 'bulk'
-                ? 'bg-[#EBF5EF] text-[#1B8354] font-bold'
-                : 'text-[#526356] hover:text-[#142318]'
-            }`}
-          >
-            <Percent className="w-4 h-4 mb-0.5" />
-            <span className="text-[10px] leading-tight">বাল্ক</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => switchAdminSection('recovery')}
-            className={`flex flex-col items-center justify-center rounded-xl py-1.5 transition-colors cursor-pointer ${
-              activeSection === 'recovery'
-                ? 'bg-[#EBF5EF] text-[#1B8354] font-bold'
-                : 'text-[#526356] hover:text-[#142318]'
-            }`}
-          >
-            <Trash2 className="w-4 h-4 mb-0.5" />
-            <span className="text-[10px] leading-tight">ট্র্যাশ</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => switchAdminSection('diagnostics')}
-            className={`flex flex-col items-center justify-center rounded-xl py-1.5 transition-colors cursor-pointer ${
-              activeSection === 'diagnostics'
-                ? 'bg-[#EBF5EF] text-[#1B8354] font-bold'
-                : 'text-[#526356] hover:text-[#142318]'
-            }`}
-          >
-            <Activity className="w-4 h-4 mb-0.5" />
-            <span className="text-[10px] leading-tight">ডায়াগনস্টিকস</span>
-          </button>
-        </div>
-      </nav>
+      <AdminMobileBottomNav
+        activeSection={activeSection}
+        mobileTab={mobileTab}
+        onSwitchSection={switchAdminSection}
+        onStartAddPlant={handleStartAddPlant}
+      />
     </div>
   );
 }

@@ -19,21 +19,24 @@ import {
   WhatsAppInquiryItem,
   AudienceTag,
 } from './types/nursery';
+import { NotFoundPage } from './components/NotFoundPage';
 import { getBengaliDateTime } from './utils/bengaliDateTime';
-import { auth, db, handleFirestoreError, OperationType } from './firebase';
-import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
+import type { User as FirebaseUser } from 'firebase/auth';
+import type { WriteBatch } from 'firebase/firestore';
+import type { OperationType } from './firebase';
+import {
+  loadFirebaseAuthSdk,
+  loadFirebaseCore,
+  loadFirestoreSdk,
+} from './firebaseLazy';
+import {
+  applySeoMetadataToDocument,
+  buildSeoMetaForState,
+} from './utils/seoMetadata';
 
 const AdminPage = lazy(() =>
   import('./components/AdminPage').then((m) => ({ default: m.AdminPage }))
 );
-import {
-  collection,
-  onSnapshot,
-  doc,
-  getDocs,
-  getDoc,
-  writeBatch,
-} from 'firebase/firestore';
 import {
   trackFirestoreRead,
   trackFirestoreWrite,
@@ -230,6 +233,14 @@ function AppContent() {
   const prevSelectedPlantIdRef = useRef<string | null>(selectedPlantId);
 
   // Dedicated Section Window Key: 'catalog' | 'offers' | 'care' | 'reviews' | 'location'
+  const [hasInvalidViewParam, setHasInvalidViewParam] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const view = new URLSearchParams(window.location.search).get('view');
+      return Boolean(view && !['catalog', 'offers', 'care', 'reviews', 'location'].includes(view));
+    }
+    return false;
+  });
+
   const [activeWindow, setActiveWindow] = useState<WindowViewKey>(() => {
     if (typeof window !== 'undefined') {
       const search = new URLSearchParams(window.location.search);
@@ -241,8 +252,8 @@ function AppContent() {
     return 'catalog';
   });
 
-  // Dedicated Page Routing: 'shop' | 'admin'
-  const [currentRoute, setCurrentRoute] = useState<'shop' | 'admin'>(() => {
+  // Dedicated Page Routing: 'shop' | 'admin' | 'not_found'
+  const [currentRoute, setCurrentRoute] = useState<'shop' | 'admin' | 'not_found'>(() => {
     if (typeof window !== 'undefined') {
       const path = window.location.pathname;
       const hash = window.location.hash;
@@ -254,6 +265,9 @@ function AppContent() {
         search.includes('admin=true')
       ) {
         return 'admin';
+      }
+      if (path !== '/' && path !== '/index.html') {
+        return 'not_found';
       }
     }
     return 'shop';
@@ -282,7 +296,7 @@ function AppContent() {
   });
 
   // Keep latest remote active plants, remote trash plants, and deleted seed IDs synchronized
-  const [currentAuthUser, setCurrentAuthUser] = useState<FirebaseUser | null>(() => auth.currentUser);
+  const [currentAuthUser, setCurrentAuthUser] = useState<FirebaseUser | null>(null);
   const remoteActivePlantsRef = useRef<BrahmyamanPlant[] | null>(null);
   const remoteTrashPlantsRef = useRef<BrahmyamanPlant[]>([]);
   const remotePlantsRef = useRef<BrahmyamanPlant[] | null>(null);
@@ -386,6 +400,8 @@ function AppContent() {
       }
     };
 
+    let syncTimerId: ReturnType<typeof setTimeout> | null = null;
+
     const maybeMigrateLegacyTrashedDocsFromPublicPlants = async (activeDocs: BrahmyamanPlant[]) => {
       if (!currentAuthUser?.emailVerified || legacyTrashMigrationInFlightRef.current) return;
       const legacyTrashed = activeDocs.filter((p) => p.status === 'deleted');
@@ -393,17 +409,18 @@ function AppContent() {
 
       legacyTrashMigrationInFlightRef.current = true;
       try {
+        const [{ db }, fs] = await Promise.all([loadFirebaseCore(), loadFirestoreSdk()]);
         // Move legacy soft-deleted docs out of public /plants into Admin-only /trash_plants atomically
         for (let i = 0; i < legacyTrashed.length; i += 200) {
           const chunk = legacyTrashed.slice(i, i + 200);
-          const batch = writeBatch(db);
+          const batch = fs.writeBatch(db);
           for (const item of chunk) {
             const sanitized = sanitizePlantForFirestore({
               ...item,
               status: 'deleted',
             });
-            batch.set(doc(db, 'trash_plants', item.id), sanitized);
-            batch.delete(doc(db, 'plants', item.id));
+            batch.set(fs.doc(db, 'trash_plants', item.id), sanitized);
+            batch.delete(fs.doc(db, 'plants', item.id));
           }
           await batch.commit();
           trackFirestoreWrite(chunk.length, 'plants');
@@ -417,110 +434,120 @@ function AppContent() {
     };
 
     if (currentRoute === 'admin') {
-      try {
-        unsubDeletedMeta = onSnapshot(
-          doc(db, 'catalog_meta', 'deleted_seeds'),
-          (docSnap) => {
-            trackFirestoreRead(1, 'catalog_meta', docSnap.metadata.fromCache);
-            const data = docSnap.exists() ? docSnap.data() : undefined;
-            const rawIds = Array.isArray(data?.deletedIds)
-              ? data.deletedIds.filter((id): id is string => typeof id === 'string' && id.trim().length > 0)
-              : [];
-            remoteDeletedIdsRef.current = rawIds;
-            hasReceivedRemoteDeletedMetaRef.current = true;
+      void Promise.all([loadFirebaseCore(), loadFirestoreSdk()])
+        .then(([{ db }, fs]) => {
+          if (isCancelled) return;
+          unsubDeletedMeta = fs.onSnapshot(
+            fs.doc(db, 'catalog_meta', 'deleted_seeds'),
+            (docSnap) => {
+              trackFirestoreRead(1, 'catalog_meta', docSnap.metadata.fromCache);
+              const data = docSnap.exists() ? docSnap.data() : undefined;
+              const rawIds = Array.isArray(data?.deletedIds)
+                ? data.deletedIds.filter((id): id is string => typeof id === 'string' && id.trim().length > 0)
+                : [];
+              remoteDeletedIdsRef.current = rawIds;
+              hasReceivedRemoteDeletedMetaRef.current = true;
 
-            if (remotePlantsRef.current !== null) {
-              applyAdminRemoteSync();
-              if (typeof data?.updatedAt === 'string' && data.updatedAt) {
-                safeSetLocalStorage(STORAGE_REMOTE_VERSION_KEY, data.updatedAt);
+              if (remotePlantsRef.current !== null) {
+                applyAdminRemoteSync();
+                if (typeof data?.updatedAt === 'string' && data.updatedAt) {
+                  safeSetLocalStorage(STORAGE_REMOTE_VERSION_KEY, data.updatedAt);
+                }
+                safeSetLocalStorage(STORAGE_CATALOG_SYNCED_AT_KEY, Date.now().toString());
+              } else if (docSnap.exists()) {
+                const synced = reconcileCrossDeviceCatalogSync({
+                  remotePlants: [],
+                  remotePlantsEmpty: true,
+                  remoteDeletedIds: rawIds,
+                  localDeletedIds: Array.from(deletedSeedIdsRef.current),
+                  staticSeedCatalog: BRAHMYAMAN_PLANTS,
+                  pinnedSeedIds: DEFAULT_SEED_ID_SET,
+                  expireTrash: purgeExpiredTrash,
+                });
+                const nextSet = new Set<string>(synced.mergedDeletedIds);
+                deletedSeedIdsRef.current = nextSet;
+                safeSetLocalStorage(
+                  STORAGE_PERMANENTLY_DELETED_KEY,
+                  JSON.stringify(synced.mergedDeletedIds)
+                );
+                if (typeof data?.updatedAt === 'string' && data.updatedAt) {
+                  safeSetLocalStorage(STORAGE_REMOTE_VERSION_KEY, data.updatedAt);
+                }
+                safeSetLocalStorage(STORAGE_CATALOG_SYNCED_AT_KEY, Date.now().toString());
+                setPlants((prev) => mergeCatalogWithDeletedFilter(prev, nextSet));
               }
-              safeSetLocalStorage(STORAGE_CATALOG_SYNCED_AT_KEY, Date.now().toString());
-            } else if (docSnap.exists()) {
-              const synced = reconcileCrossDeviceCatalogSync({
-                remotePlants: [],
-                remotePlantsEmpty: true,
-                remoteDeletedIds: rawIds,
-                localDeletedIds: Array.from(deletedSeedIdsRef.current),
-                staticSeedCatalog: BRAHMYAMAN_PLANTS,
-                pinnedSeedIds: DEFAULT_SEED_ID_SET,
-                expireTrash: purgeExpiredTrash,
-              });
-              const nextSet = new Set<string>(synced.mergedDeletedIds);
-              deletedSeedIdsRef.current = nextSet;
-              safeSetLocalStorage(
-                STORAGE_PERMANENTLY_DELETED_KEY,
-                JSON.stringify(synced.mergedDeletedIds)
-              );
-              if (typeof data?.updatedAt === 'string' && data.updatedAt) {
-                safeSetLocalStorage(STORAGE_REMOTE_VERSION_KEY, data.updatedAt);
-              }
-              safeSetLocalStorage(STORAGE_CATALOG_SYNCED_AT_KEY, Date.now().toString());
-              setPlants((prev) => mergeCatalogWithDeletedFilter(prev, nextSet));
+            },
+            () => {
+              // Quietly fallback to local persistence when offline
             }
-          },
-          () => {
-            // Quietly fallback to local persistence when offline
-          }
-        );
+          );
 
-        unsubPlants = onSnapshot(
-          collection(db, 'plants'),
-          (snapshot) => {
-            trackFirestoreRead(
-              snapshot.docChanges().length || snapshot.size || 1,
-              'plants',
-              snapshot.metadata.fromCache
-            );
-            const remoteActive: BrahmyamanPlant[] = [];
-            snapshot.forEach((docSnap) => {
-              remoteActive.push(docSnap.data() as BrahmyamanPlant);
-            });
-            remoteActivePlantsRef.current = remoteActive;
-            applyAdminRemoteSync();
-
-            if (currentAuthUser?.emailVerified && remoteActive.some((p) => p.status === 'deleted')) {
-              void maybeMigrateLegacyTrashedDocsFromPublicPlants(remoteActive);
-            }
-          },
-          () => {
-            // Quietly fallback to local persistence when offline
-          }
-        );
-
-        if (currentAuthUser?.emailVerified) {
-          unsubTrashPlants = onSnapshot(
-            collection(db, 'trash_plants'),
+          unsubPlants = fs.onSnapshot(
+            fs.collection(db, 'plants'),
             (snapshot) => {
               trackFirestoreRead(
                 snapshot.docChanges().length || snapshot.size || 1,
                 'plants',
                 snapshot.metadata.fromCache
               );
-              const remoteTrash: BrahmyamanPlant[] = [];
+              const remoteActive: BrahmyamanPlant[] = [];
               snapshot.forEach((docSnap) => {
-                remoteTrash.push({
-                  ...(docSnap.data() as BrahmyamanPlant),
-                  status: 'deleted',
-                });
+                remoteActive.push(docSnap.data() as BrahmyamanPlant);
               });
-              remoteTrashPlantsRef.current = remoteTrash;
+              remoteActivePlantsRef.current = remoteActive;
               applyAdminRemoteSync();
+
+              if (currentAuthUser?.emailVerified && remoteActive.some((p) => p.status === 'deleted')) {
+                void maybeMigrateLegacyTrashedDocsFromPublicPlants(remoteActive);
+              }
             },
             () => {
-              // Quietly ignore if user is not an authorized admin yet
+              // Quietly fallback to local persistence when offline
             }
           );
-        } else {
-          remoteTrashPlantsRef.current = [];
-        }
-      } catch {
-        // Quietly fallback to local storage
-      }
+
+          if (currentAuthUser?.emailVerified) {
+            unsubTrashPlants = fs.onSnapshot(
+              fs.collection(db, 'trash_plants'),
+              (snapshot) => {
+                trackFirestoreRead(
+                  snapshot.docChanges().length || snapshot.size || 1,
+                  'plants',
+                  snapshot.metadata.fromCache
+                );
+                const remoteTrash: BrahmyamanPlant[] = [];
+                snapshot.forEach((docSnap) => {
+                  remoteTrash.push({
+                    ...(docSnap.data() as BrahmyamanPlant),
+                    status: 'deleted',
+                  });
+                });
+                remoteTrashPlantsRef.current = remoteTrash;
+                applyAdminRemoteSync();
+              },
+              () => {
+                // Quietly ignore if user is not an authorized admin yet
+              }
+            );
+          } else {
+            remoteTrashPlantsRef.current = [];
+          }
+        })
+        .catch(() => {
+          // Quietly fallback to local storage
+        });
 
       return () => {
+        isCancelled = true;
         unsubPlants?.();
         unsubTrashPlants?.();
         unsubDeletedMeta?.();
+      };
+    }
+
+    if (currentRoute === 'not_found') {
+      return () => {
+        isCancelled = true;
       };
     }
 
@@ -533,8 +560,11 @@ function AppContent() {
           return;
         }
 
+        const [{ db }, fs] = await Promise.all([loadFirebaseCore(), loadFirestoreSdk()]);
+        if (isCancelled) return;
+
         // Step 1: Read ONLY catalog_meta/deleted_seeds (1 single read!)
-        const metaSnap = await getDoc(doc(db, 'catalog_meta', 'deleted_seeds'));
+        const metaSnap = await fs.getDoc(fs.doc(db, 'catalog_meta', 'deleted_seeds'));
         if (isCancelled) return;
         trackFirestoreRead(1, 'catalog_meta', metaSnap.metadata.fromCache);
 
@@ -574,7 +604,7 @@ function AppContent() {
         }
 
         // Step 2: Catalog changed or first visit -> fetch plants collection once
-        const plantsSnap = await getDocs(collection(db, 'plants'));
+        const plantsSnap = await fs.getDocs(fs.collection(db, 'plants'));
         if (isCancelled) return;
         trackFirestoreRead(
           plantsSnap.size || 1,
@@ -617,11 +647,16 @@ function AppContent() {
       }
     };
 
-    syncPublicStorefrontCatalog(true);
+    // Defer remote Firebase hydration until after initial storefront paint so LCP renders instantaneously
+    syncTimerId = setTimeout(() => {
+      if (!isCancelled) {
+        void syncPublicStorefrontCatalog(true);
+      }
+    }, 150);
 
     const handleVisibilityOrFocus = () => {
       if (document.visibilityState === 'visible') {
-        syncPublicStorefrontCatalog(false);
+        void syncPublicStorefrontCatalog(false);
       }
     };
 
@@ -635,7 +670,7 @@ function AppContent() {
             setPlants(nextPlants);
           }
         } catch {}
-        syncPublicStorefrontCatalog(true);
+        void syncPublicStorefrontCatalog(true);
       }
     };
 
@@ -644,7 +679,7 @@ function AppContent() {
       if (typeof BroadcastChannel !== 'undefined') {
         channel = new BroadcastChannel(CATALOG_SYNC_CHANNEL);
         channel.onmessage = () => {
-          syncPublicStorefrontCatalog(true);
+          void syncPublicStorefrontCatalog(true);
         };
       }
     } catch {}
@@ -655,6 +690,7 @@ function AppContent() {
 
     return () => {
       isCancelled = true;
+      if (syncTimerId !== null) clearTimeout(syncTimerId);
       window.removeEventListener('focus', handleVisibilityOrFocus);
       document.removeEventListener('visibilitychange', handleVisibilityOrFocus);
       window.removeEventListener('storage', handleStorageSync);
@@ -682,6 +718,8 @@ function AppContent() {
 
   // Route navigation helper with history sync
   const navigateTo = (route: 'shop' | 'admin') => {
+    setHasInvalidViewParam(false);
+    setSelectedPlantId(null);
     setCurrentRoute(route);
     if (typeof window !== 'undefined') {
       if (route === 'admin') {
@@ -695,6 +733,8 @@ function AppContent() {
 
   // Window Navigator (Separate window for Catalog, Offers, Care, Reviews, Location)
   const handleNavigateWindow = (windowKey: WindowViewKey) => {
+    setHasInvalidViewParam(false);
+    setCurrentRoute('shop');
     setSelectedPlantId(null);
     setActiveWindow(windowKey);
     if (typeof window !== 'undefined') {
@@ -706,6 +746,8 @@ function AppContent() {
 
   // Dedicated Item Window Actions
   const handleOpenPlantDetail = (plant: BrahmyamanPlant) => {
+    setHasInvalidViewParam(false);
+    setCurrentRoute('shop');
     if (!selectedPlantId && typeof window !== 'undefined') {
       catalogScrollYRef.current = window.scrollY;
     }
@@ -717,6 +759,8 @@ function AppContent() {
   };
 
   const handleClosePlantDetail = () => {
+    setHasInvalidViewParam(false);
+    setCurrentRoute('shop');
     setSelectedPlantId(null);
     if (typeof window !== 'undefined') {
       const url = activeWindow === 'catalog' ? '/' : `/?view=${activeWindow}`;
@@ -747,9 +791,18 @@ function AppContent() {
         hash === '#admin' ||
         search.includes('admin=true')
       ) {
+        setHasInvalidViewParam(false);
         setCurrentRoute('admin');
         return;
       }
+
+      if (path !== '/' && path !== '/index.html') {
+        setHasInvalidViewParam(false);
+        setSelectedPlantId(null);
+        setCurrentRoute('not_found');
+        return;
+      }
+
       setCurrentRoute('shop');
 
       const plantParam = params.get('plant');
@@ -764,9 +817,15 @@ function AppContent() {
         setSelectedPlantId(null);
       }
 
-      const viewParam = params.get('view') as WindowViewKey;
-      if (['catalog', 'offers', 'care', 'reviews', 'location'].includes(viewParam)) {
-        setActiveWindow(viewParam);
+      const rawView = params.get('view');
+      const viewParam = rawView as WindowViewKey;
+      if (rawView && !['catalog', 'offers', 'care', 'reviews', 'location'].includes(rawView)) {
+        setHasInvalidViewParam(true);
+      } else {
+        setHasInvalidViewParam(false);
+        if (['catalog', 'offers', 'care', 'reviews', 'location'].includes(viewParam)) {
+          setActiveWindow(viewParam);
+        }
       }
     };
 
@@ -879,7 +938,7 @@ function AppContent() {
   // Helper to commit a plant set/delete AND catalog_meta/deleted_seeds atomically in 1 WriteBatch
   const commitPlantWithCatalogMetaBatch = async (
     nextDeletedIds: string[],
-    applyPlantOp: (batch: ReturnType<typeof writeBatch>) => void
+    applyPlantOp: (batch: WriteBatch, db: Awaited<ReturnType<typeof loadFirebaseCore>>['db'], fs: Awaited<ReturnType<typeof loadFirestoreSdk>>) => void
   ): Promise<boolean> => {
     const prevSet = new Set(deletedSeedIdsRef.current);
     const storageSnapshot = captureLocalStorageSnapshot([
@@ -901,9 +960,10 @@ function AppContent() {
     safeSetLocalStorage(STORAGE_CATALOG_SYNCED_AT_KEY, Date.now().toString());
 
     try {
-      const batch = writeBatch(db);
-      applyPlantOp(batch);
-      batch.set(doc(db, 'catalog_meta', 'deleted_seeds'), {
+      const [{ db }, fs] = await Promise.all([loadFirebaseCore(), loadFirestoreSdk()]);
+      const batch = fs.writeBatch(db);
+      applyPlantOp(batch, db, fs);
+      batch.set(fs.doc(db, 'catalog_meta', 'deleted_seeds'), {
         deletedIds: reconciled.firestoreDeletedIds,
         updatedAt: versionIso,
       });
@@ -914,6 +974,25 @@ function AppContent() {
       deletedSeedIdsRef.current = prevSet;
       restoreLocalStorageSnapshot(storageSnapshot);
       throw err;
+    }
+  };
+
+  const reportLazyFirestoreError = async (
+    error: unknown,
+    op: 'create' | 'update' | 'delete' | 'write',
+    path: string
+  ) => {
+    try {
+      const { handleFirestoreError, OperationType } = await loadFirebaseCore();
+      const map: Record<string, OperationType> = {
+        create: OperationType.CREATE,
+        update: OperationType.UPDATE,
+        delete: OperationType.DELETE,
+        write: OperationType.WRITE,
+      };
+      handleFirestoreError(error, map[op], path);
+    } catch {
+      console.error('Firestore Error:', path, error);
     }
   };
 
@@ -939,10 +1018,10 @@ function AppContent() {
       const sanitized = sanitizePlantForFirestore(activeNewPlant);
       const nextDeleted = Array.from(deletedSeedIdsRef.current).filter((id) => id !== activeNewPlant.id);
       const wasInTrash = prevRemoteTrash.some((p) => p.id === activeNewPlant.id);
-      await commitPlantWithCatalogMetaBatch(nextDeleted, (batch) => {
-        batch.set(doc(db, 'plants', activeNewPlant.id), sanitized);
+      await commitPlantWithCatalogMetaBatch(nextDeleted, (batch, db, fs) => {
+        batch.set(fs.doc(db, 'plants', activeNewPlant.id), sanitized);
         if (wasInTrash) {
-          batch.delete(doc(db, 'trash_plants', activeNewPlant.id));
+          batch.delete(fs.doc(db, 'trash_plants', activeNewPlant.id));
         }
       });
       trackFirestoreWrite(1, 'plants');
@@ -954,7 +1033,7 @@ function AppContent() {
       remoteTrashPlantsRef.current = prevRemoteTrash;
       setPlants(prevPlants);
       restoreLocalStorageSnapshot(catalogStorageSnapshot);
-      handleFirestoreError(e, OperationType.CREATE, `plants/${activeNewPlant.id}`);
+      await reportLazyFirestoreError(e, 'create', `plants/${activeNewPlant.id}`);
       return false;
     }
   };
@@ -987,8 +1066,8 @@ function AppContent() {
     safeSetLocalStorage(STORAGE_CATALOG_KEY, JSON.stringify(nextPlants));
     try {
       const sanitized = sanitizePlantForFirestore(normalizedPlant);
-      await commitPlantWithCatalogMetaBatch(Array.from(deletedSeedIdsRef.current), (batch) => {
-        batch.set(doc(db, targetCollection, normalizedPlant.id), sanitized, { merge: true });
+      await commitPlantWithCatalogMetaBatch(Array.from(deletedSeedIdsRef.current), (batch, db, fs) => {
+        batch.set(fs.doc(db, targetCollection, normalizedPlant.id), sanitized, { merge: true });
       });
       trackFirestoreWrite(1, 'plants');
       trackFirestoreWrite(1, 'catalog_meta');
@@ -999,7 +1078,7 @@ function AppContent() {
       remoteTrashPlantsRef.current = prevRemoteTrash;
       setPlants(prevPlants);
       restoreLocalStorageSnapshot(catalogStorageSnapshot);
-      handleFirestoreError(e, OperationType.UPDATE, `${targetCollection}/${normalizedPlant.id}`);
+      await reportLazyFirestoreError(e, 'update', `${targetCollection}/${normalizedPlant.id}`);
       return false;
     }
   };
@@ -1042,11 +1121,11 @@ function AppContent() {
       const entries = Array.from(normalizedMap.values());
       for (let start = 0; start < entries.length; start += 450) {
         const chunk = entries.slice(start, start + 450);
-        await commitPlantWithCatalogMetaBatch(Array.from(deletedSeedIdsRef.current), (batch) => {
+        await commitPlantWithCatalogMetaBatch(Array.from(deletedSeedIdsRef.current), (batch, db, fs) => {
           for (const item of chunk) {
             const targetCol = item.status === 'deleted' ? 'trash_plants' : 'plants';
             const sanitized = sanitizePlantForFirestore(item);
-            batch.set(doc(db, targetCol, item.id), sanitized, { merge: true });
+            batch.set(fs.doc(db, targetCol, item.id), sanitized, { merge: true });
           }
         });
         trackFirestoreWrite(chunk.length, 'plants');
@@ -1059,7 +1138,7 @@ function AppContent() {
       remoteTrashPlantsRef.current = prevRemoteTrash;
       setPlants(prevPlants);
       restoreLocalStorageSnapshot(catalogStorageSnapshot);
-      handleFirestoreError(e, OperationType.UPDATE, 'plants/batch-update');
+      await reportLazyFirestoreError(e, 'update', 'plants/batch-update');
       return false;
     }
   };
@@ -1094,9 +1173,9 @@ function AppContent() {
 
     try {
       const sanitized = sanitizePlantForFirestore(targetPlant);
-      await commitPlantWithCatalogMetaBatch(Array.from(deletedSeedIdsRef.current), (batch) => {
-        batch.set(doc(db, 'trash_plants', plantId), sanitized);
-        batch.delete(doc(db, 'plants', plantId));
+      await commitPlantWithCatalogMetaBatch(Array.from(deletedSeedIdsRef.current), (batch, db, fs) => {
+        batch.set(fs.doc(db, 'trash_plants', plantId), sanitized);
+        batch.delete(fs.doc(db, 'plants', plantId));
       });
       trackFirestoreWrite(1, 'plants');
       trackFirestoreDelete(1, 'plants');
@@ -1108,7 +1187,7 @@ function AppContent() {
       remoteTrashPlantsRef.current = prevRemoteTrash;
       setPlants(prevPlants);
       restoreLocalStorageSnapshot(catalogStorageSnapshot);
-      handleFirestoreError(e, OperationType.UPDATE, `trash_plants/${plantId}`);
+      await reportLazyFirestoreError(e, 'update', `trash_plants/${plantId}`);
       return false;
     }
   };
@@ -1148,9 +1227,9 @@ function AppContent() {
     try {
       const sanitized = sanitizePlantForFirestore(targetPlant);
       const updatedDeleted = Array.from(deletedSeedIdsRef.current).filter((id) => id !== plantId);
-      await commitPlantWithCatalogMetaBatch(updatedDeleted, (batch) => {
-        batch.set(doc(db, 'plants', plantId), sanitized);
-        batch.delete(doc(db, 'trash_plants', plantId));
+      await commitPlantWithCatalogMetaBatch(updatedDeleted, (batch, db, fs) => {
+        batch.set(fs.doc(db, 'plants', plantId), sanitized);
+        batch.delete(fs.doc(db, 'trash_plants', plantId));
       });
       trackFirestoreWrite(1, 'plants');
       trackFirestoreDelete(1, 'plants');
@@ -1163,7 +1242,7 @@ function AppContent() {
       remoteTrashPlantsRef.current = prevRemoteTrash;
       setPlants(prevPlants);
       restoreLocalStorageSnapshot(catalogStorageSnapshot);
-      handleFirestoreError(e, OperationType.UPDATE, `plants/${plantId}`);
+      await reportLazyFirestoreError(e, 'update', `plants/${plantId}`);
       return false;
     }
   };
@@ -1177,10 +1256,10 @@ function AppContent() {
       const nextDeleted = new Set(deletedSeedIdsRef.current);
       nextDeleted.add(plantId);
       const existsInPublicPlants = prevRemoteActive?.some((p) => p.id === plantId) ?? false;
-      await commitPlantWithCatalogMetaBatch(Array.from(nextDeleted), (batch) => {
-        batch.delete(doc(db, 'trash_plants', plantId));
+      await commitPlantWithCatalogMetaBatch(Array.from(nextDeleted), (batch, db, fs) => {
+        batch.delete(fs.doc(db, 'trash_plants', plantId));
         if (existsInPublicPlants) {
-          batch.delete(doc(db, 'plants', plantId));
+          batch.delete(fs.doc(db, 'plants', plantId));
         }
       });
       trackFirestoreDelete(1, 'plants');
@@ -1197,7 +1276,7 @@ function AppContent() {
       safeSetLocalStorage(STORAGE_CATALOG_KEY, JSON.stringify(nextPlants));
       return true;
     } catch (e) {
-      handleFirestoreError(e, OperationType.DELETE, `trash_plants/${plantId}`);
+      await reportLazyFirestoreError(e, 'delete', `trash_plants/${plantId}`);
       return false;
     }
   };
@@ -1215,11 +1294,12 @@ function AppContent() {
     const trashedIds = Array.from(new Set([...trashCollectionIds, ...localStateTrashIds]));
     if (trashedIds.length === 0 && legacyActiveTrashIds.length === 0) return true;
 
+    const ops = await createCatalogBatchOps();
     const result = await executeReliableTrashEmpty({
       trashedIds,
       legacyActiveTrashIds,
       prevDeletedSeedIds: Array.from(deletedSeedIdsRef.current),
-      ops: createCatalogBatchOps(),
+      ops,
       pinnedSeedIds: DEFAULT_SEED_ID_SET,
       journalStore: createLocalStorageJournalStore(),
     });
@@ -1247,30 +1327,36 @@ function AppContent() {
     return result.ok;
   };
 
-  const createCatalogBatchOps = (): CatalogBatchOps => ({
-    createBatch: () => {
-      const batch = writeBatch(db);
-      return {
-        setPlant: (id, data) => batch.set(doc(db, 'plants', id), data),
-        deletePlant: (id) => batch.delete(doc(db, 'plants', id)),
-        setTrashPlant: (id, data) => batch.set(doc(db, 'trash_plants', id), data),
-        deleteTrashPlant: (id) => batch.delete(doc(db, 'trash_plants', id)),
-        setDeletedSeedsMeta: (deletedIds, updatedAtIso) => {
-          const reconciled = reconcileDeletedPlantIds(deletedIds, {
-            pinnedSeedIds: DEFAULT_SEED_ID_SET,
-          });
-          batch.set(doc(db, 'catalog_meta', 'deleted_seeds'), {
-            deletedIds: reconciled.firestoreDeletedIds,
-            updatedAt: updatedAtIso,
-          });
-        },
-        commit: () => batch.commit(),
-      };
-    },
-    onWriteTracked: (count) => trackFirestoreWrite(count, 'plants'),
-    onDeleteTracked: (count) => trackFirestoreDelete(count, 'plants'),
-    onError: (err, path) => handleFirestoreError(err, OperationType.WRITE, path),
-  });
+  const createCatalogBatchOps = async (): Promise<CatalogBatchOps> => {
+    const [{ db, handleFirestoreError, OperationType }, fs] = await Promise.all([
+      loadFirebaseCore(),
+      loadFirestoreSdk(),
+    ]);
+    return {
+      createBatch: () => {
+        const batch = fs.writeBatch(db);
+        return {
+          setPlant: (id, data) => batch.set(fs.doc(db, 'plants', id), data),
+          deletePlant: (id) => batch.delete(fs.doc(db, 'plants', id)),
+          setTrashPlant: (id, data) => batch.set(fs.doc(db, 'trash_plants', id), data),
+          deleteTrashPlant: (id) => batch.delete(fs.doc(db, 'trash_plants', id)),
+          setDeletedSeedsMeta: (deletedIds, updatedAtIso) => {
+            const reconciled = reconcileDeletedPlantIds(deletedIds, {
+              pinnedSeedIds: DEFAULT_SEED_ID_SET,
+            });
+            batch.set(fs.doc(db, 'catalog_meta', 'deleted_seeds'), {
+              deletedIds: reconciled.firestoreDeletedIds,
+              updatedAt: updatedAtIso,
+            });
+          },
+          commit: () => batch.commit(),
+        };
+      },
+      onWriteTracked: (count) => trackFirestoreWrite(count, 'plants'),
+      onDeleteTracked: (count) => trackFirestoreDelete(count, 'plants'),
+      onError: (err, path) => handleFirestoreError(err, OperationType.WRITE, path),
+    };
+  };
 
   // Automatic browser-startup detection & idempotent recovery of incomplete multi-batch operations
   const handleStartupCatalogRecovery = async (): Promise<boolean> => {
@@ -1281,9 +1367,10 @@ function AppContent() {
       return true;
     }
 
+    const [{ auth }, ops] = await Promise.all([loadFirebaseCore(), createCatalogBatchOps()]);
     const res = await runStartupCatalogRecovery({
       isAdminAuthenticated: Boolean(auth.currentUser),
-      ops: createCatalogBatchOps(),
+      ops,
       journalStore,
       pinnedSeedIds: DEFAULT_SEED_ID_SET,
     });
@@ -1306,6 +1393,7 @@ function AppContent() {
 
   useEffect(() => {
     let isCancelled = false;
+    let unsubAuth: (() => void) | undefined;
     const journalStore = createLocalStorageJournalStore();
 
     const checkAndRecover = async (hasUser: boolean) => {
@@ -1315,9 +1403,10 @@ function AppContent() {
         return;
       }
 
+      const ops = await createCatalogBatchOps();
       const res = await runStartupCatalogRecovery({
         isAdminAuthenticated: hasUser,
-        ops: createCatalogBatchOps(),
+        ops,
         journalStore,
         pinnedSeedIds: DEFAULT_SEED_ID_SET,
       });
@@ -1338,23 +1427,42 @@ function AppContent() {
       }
     };
 
-    checkAndRecover(Boolean(auth.currentUser));
-    const unsubAuth = onAuthStateChanged(auth, (user) => {
-      if (!isCancelled) {
-        setCurrentAuthUser(user);
-      }
-      checkAndRecover(Boolean(user));
-    });
+    const bootAuthListener = () => {
+      void Promise.all([loadFirebaseCore(), loadFirebaseAuthSdk()])
+        .then(([{ auth }, { onAuthStateChanged }]) => {
+          if (isCancelled) return;
+          void checkAndRecover(Boolean(auth.currentUser));
+          unsubAuth = onAuthStateChanged(auth, (user) => {
+            if (!isCancelled) {
+              setCurrentAuthUser(user);
+            }
+            void checkAndRecover(Boolean(user));
+          });
+        })
+        .catch(() => {});
+    };
+
+    let delayTimer: ReturnType<typeof setTimeout> | null = null;
+    if (currentRoute === 'admin' || getIncompleteCatalogOperationJournal(journalStore)) {
+      bootAuthListener();
+    } else {
+      delayTimer = setTimeout(bootAuthListener, 250);
+    }
 
     return () => {
       isCancelled = true;
-      unsubAuth();
+      if (delayTimer !== null) clearTimeout(delayTimer);
+      unsubAuth?.();
     };
-  }, []);
+  }, [currentRoute]);
 
   const handleResetCatalog = async (): Promise<boolean> => {
     try {
-      const batchOps = createCatalogBatchOps();
+      const [{ db }, fs, batchOps] = await Promise.all([
+        loadFirebaseCore(),
+        loadFirestoreSdk(),
+        createCatalogBatchOps(),
+      ]);
       const priorRecovery = await recoverIncompleteCatalogOperation({
         ops: batchOps,
         pinnedSeedIds: DEFAULT_SEED_ID_SET,
@@ -1365,8 +1473,8 @@ function AppContent() {
       setStartupRecoveryStatus(null);
 
       const [activeSnap, trashSnap] = await Promise.all([
-        getDocs(collection(db, 'plants')),
-        getDocs(collection(db, 'trash_plants')),
+        fs.getDocs(fs.collection(db, 'plants')),
+        fs.getDocs(fs.collection(db, 'trash_plants')),
       ]);
       trackFirestoreRead(
         (activeSnap.size || 1) + (trashSnap.size || 0),
@@ -1432,7 +1540,7 @@ function AppContent() {
       broadcastCatalogUpdate();
       return true;
     } catch (e) {
-      handleFirestoreError(e, OperationType.DELETE, 'plants');
+      await reportLazyFirestoreError(e, 'delete', 'plants');
       return false;
     }
   };
@@ -1442,7 +1550,7 @@ function AppContent() {
     restoredPlants: BrahmyamanPlant[],
     restoredDeletedIds?: string[]
   ): Promise<boolean> => {
-    const batchOps = createCatalogBatchOps();
+    const batchOps = await createCatalogBatchOps();
     const priorRecovery = await recoverIncompleteCatalogOperation({
       ops: batchOps,
       pinnedSeedIds: DEFAULT_SEED_ID_SET,
@@ -1524,6 +1632,29 @@ function AppContent() {
       null
     : null;
 
+  const isMissingPlant = Boolean(selectedPlantId && !selectedPlant);
+  const isNotFoundView =
+    currentRoute === 'not_found' || hasInvalidViewParam || isMissingPlant;
+
+  // Dynamic SEO title, meta description, OG tags, canonical URL, and Product JSON-LD
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const seoRoute: 'shop' | 'admin' | 'not_found' =
+      currentRoute === 'admin'
+        ? 'admin'
+        : isNotFoundView
+        ? 'not_found'
+        : 'shop';
+    const meta = buildSeoMetaForState({
+      currentRoute: seoRoute,
+      activeWindow,
+      selectedPlant,
+      lang,
+      origin: window.location.origin,
+    });
+    applySeoMetadataToDocument(meta, lang);
+  }, [currentRoute, isNotFoundView, activeWindow, selectedPlant, lang]);
+
   // If user is on the dedicated admin page route (/admin or #admin)
   if (currentRoute === 'admin') {
     return (
@@ -1554,6 +1685,68 @@ function AppContent() {
           onRetryStartupRecovery={handleStartupCatalogRecovery}
         />
       </Suspense>
+    );
+  }
+
+  if (isNotFoundView) {
+    return (
+      <>
+        <div className="min-h-screen flex flex-col bg-[#F4F7F1] text-[#122619]">
+          <Header
+            lang={lang}
+            plants={activePlants}
+            searchQuery={searchQuery}
+            onSearchChange={(q) => {
+              setSearchQuery(q);
+              if (q.trim()) {
+                handleNavigateWindow('catalog');
+              }
+            }}
+            onToggleLang={handleToggleLang}
+            inquiryCount={totalItemCount}
+            onOpenInquiryBag={() => setIsCartModalOpen(true)}
+            onSelectAudience={handleSelectAudience}
+            onSelectPlant={handleOpenPlantDetail}
+            onAddToInquiry={handleAddToInquiry}
+            activeWindow="catalog"
+            onNavigateWindow={handleNavigateWindow}
+          />
+          <main className="flex-1">
+            <NotFoundPage
+              lang={lang}
+              missingPlantId={isMissingPlant ? selectedPlantId : null}
+              onBackToCatalog={() => {
+                setHasInvalidViewParam(false);
+                setSelectedPlantId(null);
+                setCurrentRoute('shop');
+                setActiveWindow('catalog');
+                if (typeof window !== 'undefined') {
+                  window.history.pushState(null, '', '/');
+                }
+              }}
+            />
+          </main>
+          <Footer
+            lang={lang}
+            onSelectAudience={(aud) => {
+              handleSelectAudience(aud);
+              handleNavigateWindow('catalog');
+            }}
+            onOpenAdmin={() => navigateTo('admin')}
+            onNavigateWindow={handleNavigateWindow}
+          />
+        </div>
+        <WhatsAppCartModal
+          isOpen={isCartModalOpen}
+          items={inquiryItems}
+          plants={activePlants}
+          lang={lang}
+          onClose={() => setIsCartModalOpen(false)}
+          onUpdateQty={handleUpdateQty}
+          onRemoveItem={handleRemoveItem}
+          onClearAll={handleClearAll}
+        />
+      </>
     );
   }
 
@@ -1611,9 +1804,7 @@ function AppContent() {
 
       {/* PRIMARY DEDICATED SECTIONS / WINDOWS (Preserved mounted for zero-animation exact scroll restoration) */}
       <div
-        className={`min-h-screen flex flex-col bg-[#F4F7F1] text-[#122619] ${
-          totalItemCount > 0 ? 'pb-16 sm:pb-0' : ''
-        } ${selectedPlant ? 'hidden' : ''}`}
+        className={`min-h-screen flex flex-col bg-[#F4F7F1] text-[#122619] ${selectedPlant ? 'hidden' : ''}`}
       >
         <Header
           lang={lang}
@@ -1664,7 +1855,7 @@ function AppContent() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
               <div className="bg-white rounded-3xl border border-[#D5DFD1] p-6 sm:p-8 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#B34728] font-sans-bn mb-1.5">
+                  <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#B34728] font-sans-bn mb-1.5">
                     কালশুলি নার্সারির বিশেষ মরশুমি সুবিধা
                   </p>
                   <h1 className="font-serif-bn text-2xl sm:text-4xl font-bold text-[#142318]">
@@ -1710,7 +1901,7 @@ function AppContent() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
               <div className="bg-white rounded-3xl border border-[#D5DFD1] p-6 sm:p-8 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#1B8354] font-sans-bn mb-1.5">
+                  <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#1B8354] font-sans-bn mb-1.5">
                     কালশুলির অভিজ্ঞ মালীদের পরামর্শ
                   </p>
                   <h1 className="font-serif-bn text-2xl sm:text-4xl font-bold text-[#142318]">
@@ -1740,7 +1931,7 @@ function AppContent() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
               <div className="bg-white rounded-3xl border border-[#D5DFD1] p-6 sm:p-8 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#B45309] font-sans-bn mb-1.5">
+                  <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#B45309] font-sans-bn mb-1.5">
                     গ্রাহকদের সন্তুষ্টি
                   </p>
                   <h1 className="font-serif-bn text-2xl sm:text-4xl font-bold text-[#142318]">
@@ -1770,7 +1961,7 @@ function AppContent() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
               <div className="bg-white rounded-3xl border border-[#D5DFD1] p-6 sm:p-8 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#785942] font-sans-bn mb-1.5">
+                  <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#785942] font-sans-bn mb-1.5">
                     সরাসরি পরিদর্শন
                   </p>
                   <h1 className="font-serif-bn text-2xl sm:text-4xl font-bold text-[#142318]">
@@ -1805,9 +1996,9 @@ function AppContent() {
         onNavigateWindow={handleNavigateWindow}
       />
 
-      {/* Sticky Floating Order Bag Summary Bar (Active when items are selected) */}
+      {/* Desktop Floating Order Bag Summary Bar (Active when items are selected; hidden on mobile so it never covers hero text) */}
       {totalItemCount > 0 && !isCartModalOpen && !selectedPlant && (
-        <div className="fixed bottom-3 left-3 right-3 sm:left-auto sm:right-6 sm:bottom-6 z-30 pointer-events-none">
+        <div className="hidden md:block fixed right-6 bottom-6 z-30 pointer-events-none">
           <div className="max-w-md ml-auto bg-[#122619] text-white rounded-2xl shadow-2xl border border-[#2C4733] px-4 py-3 flex items-center justify-between gap-4 pointer-events-auto font-sans-bn animate-bag-pop">
             <div className="min-w-0">
               <p className="text-xs font-bold text-white flex items-center gap-1.5">
@@ -1816,7 +2007,7 @@ function AppContent() {
                 <span aria-hidden="true">·</span>
                 <span className="font-mono-num tabular-nums text-[#FFD8C2]">₹{totalEstimatePrice}</span>
               </p>
-              <p className="text-[10px] text-[#A8BDB0] truncate mt-0.5">
+              <p className="text-xs text-[#A8BDB0] truncate mt-0.5">
                 {totalEstimatePrice >= 250
                   ? 'খাতড়া/সিমলাপাল রুট ডেলিভারির জন্য যোগ্য ✓'
                   : `আর ₹${250 - totalEstimatePrice} হলে দূরবর্তী রুট ডেলিভারি উপযোগী`}
@@ -1834,8 +2025,9 @@ function AppContent() {
           </div>
         </div>
       )}
+      </div>
 
-      {/* WhatsApp Order Inquiry Builder Modal */}
+      {/* WhatsApp Order Inquiry Builder Cart Drawer (Rendered outside hidden catalog container so it opens on plant detail views too) */}
       <WhatsAppCartModal
         isOpen={isCartModalOpen}
         items={inquiryItems}
@@ -1846,7 +2038,6 @@ function AppContent() {
         onRemoveItem={handleRemoveItem}
         onClearAll={handleClearAll}
       />
-      </div>
     </>
   );
 }

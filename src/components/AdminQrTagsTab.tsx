@@ -140,7 +140,7 @@ export function AdminQrTagsTab({
               <h2 className="font-serif-bn text-base sm:text-lg font-bold text-[#142318]">
                 প্রিন্টেবল QR কোড প্ল্যান্ট ট্যাগ জেনারেটর
               </h2>
-              <p className="text-[11px] text-[#526356]">
+              <p className="text-xs text-[#526356]">
                 নার্সারির টব বা চারার গায়ে লাগানোর জন্য ১-ক্লিকে প্রতিটি গাছের নাম, দাম (₹), পরিচর্যা ও স্ক্যানযোগ্য QR কোড তৈরি করুন
               </p>
             </div>
@@ -177,7 +177,7 @@ export function AdminQrTagsTab({
             <button
               type="button"
               onClick={onClearPreselectedPlant}
-              className="px-2.5 py-1 bg-white rounded-lg text-[11px] font-bold text-[#142318] cursor-pointer"
+              className="px-2.5 py-1 bg-white rounded-lg text-xs font-bold text-[#142318] cursor-pointer"
             >
               সব চারার ট্যাগ দেখুন
             </button>
@@ -291,12 +291,12 @@ export function AdminQrTagsTab({
               <div className="flex items-center justify-between pb-2 border-b border-dashed border-[#D5C9B8]">
                 <div>
                   <p className="font-serif-bn text-xs font-extrabold text-[#142318]">
-                    ব্রহ্মময়ী নার্সারি
+                    ভ্রাম্যমাণ নার্সারি
                   </p>
-                  <p className="text-[10px] text-[#526356]">সুস্থ ও শিকড়যুক্ত চারা</p>
+                  <p className="text-xs text-[#526356]">সুস্থ ও শিকড়যুক্ত চারা</p>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className="px-2 py-0.5 rounded bg-[#EBF5EF] text-[#14532D] text-[10px] font-bold">
+                  <span className="px-2 py-0.5 rounded bg-[#EBF5EF] text-[#14532D] text-xs font-bold">
                     {plant.category}
                   </span>
                   {isSelected ? (
@@ -312,14 +312,14 @@ export function AdminQrTagsTab({
                   <h3 className="font-serif-bn text-base font-extrabold text-[#142318] leading-snug truncate">
                     {plant.nameBn}
                   </h3>
-                  <p className="text-[11px] text-[#526356] truncate">
+                  <p className="text-xs text-[#526356] truncate">
                     {plant.nameEn}
                     {plant.colorBn ? ` · ${plant.colorBn}` : ''}
                   </p>
                   <div className="inline-block px-2.5 py-0.5 rounded-lg bg-[#FFF8F0] border border-[#EADBCC] font-mono text-base font-extrabold text-[#B34728]">
                     ₹{price}
                   </div>
-                  <p className="text-[10px] text-[#374151] leading-snug">
+                  <p className="text-xs text-[#374151] leading-snug">
                     রোদ: {plant.sunlightBn || 'পর্যাপ্ত রোদ'} · জল:{' '}
                     {plant.wateringBn || 'পরিমিত'}
                   </p>
@@ -330,14 +330,16 @@ export function AdminQrTagsTab({
                     src={qrDataUrl}
                     alt={`QR ${plant.nameBn}`}
                     className="w-22 h-22 rounded-lg border border-[#D5C9B8] bg-white p-1"
+                    loading="lazy"
+                    decoding="async"
                   />
-                  <span className="text-[9px] font-bold text-[#14532D] mt-0.5">
+                  <span className="text-xs font-bold text-[#14532D] mt-0.5">
                     স্ক্যান করে দেখুন
                   </span>
                 </div>
               </div>
 
-              <div className="pt-1.5 border-t border-[#EFEAE0] flex items-center justify-between text-[10px] text-[#526356] font-mono">
+              <div className="pt-1.5 border-t border-[#EFEAE0] flex items-center justify-between text-xs text-[#526356] font-mono">
                 <span>হোয়াটসঅ্যাপ: +91 86094 17672</span>
                 <span>ID: {plant.id.slice(0, 12)}</span>
               </div>

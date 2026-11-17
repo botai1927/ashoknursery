@@ -1,30 +1,30 @@
 import { BrahmyamanPlant, PlantCareTip } from "../types/nursery";
 import { getAshokePhotoUrl } from "./ashokePhotos";
 
-import heroImg from "../assets/images/hero_brahmyaman_nursery_1794627514151.jpg";
-import pujaOrigImg from "../assets/images/puja_plants_hibiscus_1794627514451.jpg";
-import fruitOrigImg from "../assets/images/fruit_grafts_saplings_1794627514463.jpg";
-import rooftopOrigImg from "../assets/images/rooftop_bougainvillea_rose_1794627515749.jpg";
-import potsOrigImg from "../assets/images/terracotta_pots_compost_1794627515802.jpg";
+import heroImg from "../assets/images/hero_brahmyaman_nursery_1794627514151.webp";
+import pujaOrigImg from "../assets/images/puja_plants_hibiscus_1794627514451.webp";
+import fruitOrigImg from "../assets/images/fruit_grafts_saplings_1794627514463.webp";
+import rooftopOrigImg from "../assets/images/rooftop_bougainvillea_rose_1794627515749.webp";
+import potsOrigImg from "../assets/images/terracotta_pots_compost_1794627515802.webp";
 
-import mangoOrigImg from "../assets/images/plant_mango_amrapali_1794628168576.jpg";
-import dalimOrigImg from "../assets/images/plant_pomegranate_dalim_1794628170246.jpg";
-import belOrigImg from "../assets/images/plant_bel_bilwapatra_1794628166466.jpg";
-import shiuliOrigImg from "../assets/images/plant_shiuli_parijat_1794628167184.jpg";
-import aparajitaOrigImg from "../assets/images/plant_neel_aparajita_1794628167282.jpg";
-import tulsiOrigImg from "../assets/images/plant_krishna_tulsi_1794628165686.jpg";
-import lemonOrigImg from "../assets/images/plant_kagzi_lemon_1794628168792.jpg";
-import guavaOrigImg from "../assets/images/plant_guava_lucknow_1794628171221.jpg";
-import kashmiriRoseOrigImg from "../assets/images/plant_kashmiri_rose_1794628170606.jpg";
-import adeniumOrigImg from "../assets/images/plant_adenium_desert_rose_1794628171551.jpg";
-import lotusOrigImg from "../assets/images/plant_lotus_padma_1794633597303.jpg";
-import bananaOrigImg from "../assets/images/plant_banana_g9_1794633596588.jpg";
-import marigoldOrigImg from "../assets/images/plant_marigold_ganda_1794633615666.jpg";
-import stholopaddmoOrigImg from "../assets/images/plant_stholopaddmo_rose_1794633615030.jpg";
-import luckyBambooOrigImg from "../assets/images/plant_lucky_bamboo_1794633632995.jpg";
-import chandramallikaOrigImg from "../assets/images/plant_chandramallika_mum_1794633634519.jpg";
-import rubberOrigImg from "../assets/images/plant_rubber_burgundy_1794625408145.jpg";
-import snakeOrigImg from "../assets/images/plant_snake_laurentii_1794625409134.jpg";
+import mangoOrigImg from "../assets/images/plant_mango_amrapali_1794628168576.webp";
+import dalimOrigImg from "../assets/images/plant_pomegranate_dalim_1794628170246.webp";
+import belOrigImg from "../assets/images/plant_bel_bilwapatra_1794628166466.webp";
+import shiuliOrigImg from "../assets/images/plant_shiuli_parijat_1794628167184.webp";
+import aparajitaOrigImg from "../assets/images/plant_neel_aparajita_1794628167282.webp";
+import tulsiOrigImg from "../assets/images/plant_krishna_tulsi_1794628165686.webp";
+import lemonOrigImg from "../assets/images/plant_kagzi_lemon_1794628168792.webp";
+import guavaOrigImg from "../assets/images/plant_guava_lucknow_1794628171221.webp";
+import kashmiriRoseOrigImg from "../assets/images/plant_kashmiri_rose_1794628170606.webp";
+import adeniumOrigImg from "../assets/images/plant_adenium_desert_rose_1794628171551.webp";
+import lotusOrigImg from "../assets/images/plant_lotus_padma_1794633597303.webp";
+import bananaOrigImg from "../assets/images/plant_banana_g9_1794633596588.webp";
+import marigoldOrigImg from "../assets/images/plant_marigold_ganda_1794633615666.webp";
+import stholopaddmoOrigImg from "../assets/images/plant_stholopaddmo_rose_1794633615030.webp";
+import luckyBambooOrigImg from "../assets/images/plant_lucky_bamboo_1794633632995.webp";
+import chandramallikaOrigImg from "../assets/images/plant_chandramallika_mum_1794633634519.webp";
+import rubberOrigImg from "../assets/images/plant_rubber_burgundy_1794625408145.webp";
+import snakeOrigImg from "../assets/images/plant_snake_laurentii_1794625409134.webp";
 
 export const HERO_IMAGE = heroImg;
 export const POTS_IMAGE = potsOrigImg;
@@ -55,7 +55,7 @@ export { getAshokePhotoUrl };
 
 export const NURSERY_CONTACT = {
   phone: "+918609417672",
-  phoneRaw: "+918609417672",
+  phoneRaw: "918609417672",
   phoneDisplay: "+91 86094 17672",
   whatsappNumber: "918609417672",
   mapUrl: "https://maps.app.goo.gl/zLQBxPHZKqK9ofLJ8",
@@ -110,7 +110,7 @@ export const SEASONAL_HIGHLIGHTS: SeasonalHighlight[] = [
   {
     id: "season-lotus",
     plantId: "ashoke-17",
-    titleBn: "পবিত্র গোলাপি পদ্ম কন্দ ও চারা",
+    titleBn: "পবিত্র জলজ পদ্ম কন্দ (গোলাপি/সাদা/লাল)",
     titleEn: "Sacred Water Lotus Sapling",
     tagBn: "জলজ পবিত্র ফুল",
     tagEn: "Sacred Aquatic Lotus",
@@ -155,8 +155,8 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     options: [
       {
         id: "opt-mango-1",
-        labelBn: "গ্রো ব্যাগ কলম চারা",
-        labelEn: "Grafted Polybag Sapling",
+        labelBn: "গ্রো ব্যাগ কলম (১.৫–২ ফুট · ৮–১২ মাস)",
+        labelEn: "Grafted Polybag Sapling (1.5–2 ft)",
         price: 120,
         containerType: "পলি গ্রো ব্যাগ"
       },
@@ -191,8 +191,8 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     options: [
       {
         id: "opt-dalim-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag Sapling",
+        labelBn: "গ্রো ব্যাগ কলম (১.৫ ফুট · ৬–৮ মাস)",
+        labelEn: "Grow Bag Graft (1.5 ft)",
         price: 90,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -220,8 +220,8 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     options: [
       {
         id: "opt-bel-1",
-        labelBn: "গ্রো ব্যাগ চারা",
-        labelEn: "Polybag Sapling",
+        labelBn: "গ্রো ব্যাগ চারা (১.৫ ফুট · ৬ মাস)",
+        labelEn: "Polybag Sapling (1.5 ft)",
         price: 60,
         containerType: "পলি গ্রো ব্যাগ"
       },
@@ -256,8 +256,8 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     options: [
       {
         id: "opt-shiuli-1",
-        labelBn: "গ্রো ব্যাগ চারা",
-        labelEn: "Polybag Sapling",
+        labelBn: "গ্রো ব্যাগ চারা (১.৫ ফুট · ৬ মাস)",
+        labelEn: "Polybag Sapling (1.5 ft)",
         price: 50,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -285,8 +285,8 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     options: [
       {
         id: "opt-daru-1",
-        labelBn: "গ্রো ব্যাগ চারা",
-        labelEn: "Grow Bag Sapling",
+        labelBn: "গ্রো ব্যাগ চারা (১–১.৫ ফুট · ৬ মাস)",
+        labelEn: "Grow Bag Sapling (1–1.5 ft)",
         price: 80,
         containerType: "পলি গ্রো ব্যাগ"
       },
@@ -301,8 +301,8 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-88",
-    nameBn: "ক্যামেলিয়ান ফুল গাছ",
-    nameEn: "Camellia Flower Plant",
+    nameBn: "ক্যামেলিয়া ফুল গাছ",
+    nameEn: "Camellia Flower Plant (Red & Pink)",
     botanicalName: "Camellia japonica",
     category: "ছাদ ও বারান্দার ফুল",
     audience: ["rooftop","family"],
@@ -314,16 +314,23 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ ক্যামেলিয়ান ফুল গাছ চারা।",
-    descriptionEn: "Fresh, well-rooted Camellia Flower Plant sapling grown at Kalsuli nursery.",
+    descriptionBn: "শীত ও বসন্তের অভিজাত বহুপাপড়ি ক্যামেলিয়া ফুল—হালকা ছায়ায় ও পরিমিত আর্দ্রতায় টবে দারুণ সুন্দর গোলাপি ও লাল ফুল ফোটে।",
+    descriptionEn: "Classic winter-spring Camellia japonica shrub with glossy evergreen leaves and layered pink or crimson blooms.",
     image: getAshokePhotoUrl(101),
     options: [
       {
         id: "opt-88-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
-        price: 150,
+        labelBn: "ছোট গ্রো ব্যাগ (৮–১০ ইঞ্চি · ৫ মাস)",
+        labelEn: "Small Grow Bag (8–10 in)",
+        price: 80,
         containerType: "পলি গ্রো ব্যাগ"
+      },
+      {
+        id: "opt-88-2",
+        labelBn: "মাঝারি গ্রো ব্যাগ (১–১.৫ ফুট · কুঁড়িসহ)",
+        labelEn: "Medium Grow Bag with Buds (1–1.5 ft)",
+        price: 150,
+        containerType: "মাঝারি গ্রো ব্যাগ"
       }
     ]
   },
@@ -342,14 +349,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "হালকা কোকোপিট, বালি ও ভার্মিকম্পোস্ট মিশ্রণ",
     soilTipEn: "Well-draining cocopeat, sand & vermicompost mix",
-    descriptionBn: "ঘরের ভেতর বা বারান্দার হালকা ছায়ায় সহজে বেড়ে ওঠা সতেজ ঝাউ গাছ চারা।",
-    descriptionEn: "Healthy, low-maintenance indoor/balcony Jhau Tree / Cypress Pine sapling.",
+    descriptionBn: "সুন্দর ছুঁচালো সবুজ ডালপালার চিরসবুজ ঝাউ গাছ—বাড়ির গেট, সীমানা ও বড় টবে ছাঁটাই করে নান্দনিক রূপ দেওয়া যায়।",
+    descriptionEn: "Graceful evergreen cypress-pine tree suited for boundary hedges, entryways, and sculpted outdoor pots.",
     image: getAshokePhotoUrl(100),
     options: [
       {
         id: "opt-87-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (১.৫–২ ফুট · ৬ মাস)",
+        labelEn: "Grow Bag (1.5–2 ft)",
         price: 40,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -370,14 +377,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "হালকা কোকোপিট, বালি ও ভার্মিকম্পোস্ট মিশ্রণ",
     soilTipEn: "Well-draining cocopeat, sand & vermicompost mix",
-    descriptionBn: "ঘরের ভেতর বা বারান্দার হালকা ছায়ায় সহজে বেড়ে ওঠা সতেজ ভিক্টোরিয়া চারা।",
-    descriptionEn: "Healthy, low-maintenance indoor/balcony Victoria Agave / Decorative Agave sapling.",
+    descriptionBn: "শক্ত খাঁজকাটা সবুজ-সাদা বর্ডার পাতার দুর্লভ ভিক্টোরিয়া অ্যাগেভ—অত্যন্ত কম জলে কড়া রোদ বা বারান্দায় বছরের পর বছর টিকে থাকে।",
+    descriptionEn: "Architectural rosette Victoria agave with crisp white leaf margins; thrives on minimal watering.",
     image: getAshokePhotoUrl(99),
     options: [
       {
         id: "opt-86-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (৬–৮ ইঞ্চি · ৮ মাস)",
+        labelEn: "Grow Bag (6–8 in)",
         price: 80,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -385,7 +392,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-85",
-    nameBn: "সাকুলেন্ট  ট্রী",
+    nameBn: "সাকুলেন্ট ট্রি (জেড বনসাই)",
     nameEn: "Succulent Tree / Jade Bonsai",
     botanicalName: "Crassula ovata",
     category: "গৃহস্থ ও ঔষধি গাছ",
@@ -398,14 +405,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "ঘরের ভেতর বা বারান্দার হালকা ছায়ায় সহজে বেড়ে ওঠা সতেজ সাকুলেন্ট  ট্রী চারা।",
-    descriptionEn: "Healthy, low-maintenance indoor/balcony Succulent Tree / Jade Bonsai sapling.",
+    descriptionBn: "চকচকে রসালো ডালপালার জেড প্ল্যান্ট (ক্রাসুলা) যা সহজেই ছোট বনসাইয়ের রূপ নেয়—পড়ার টেবিল বা উজ্জ্বল বারান্দার জন্য আদর্শ।",
+    descriptionEn: "Thick-trunked jade succulent tree ready for bonsai shaping; low-water indoor and balcony favorite.",
     image: getAshokePhotoUrl(98),
     options: [
       {
         id: "opt-85-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "টব উপযোগী চারা (৭–৯ ইঞ্চি · ৮ মাস)",
+        labelEn: "Potted Bonsai Start (7–9 in)",
         price: 120,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -426,14 +433,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ সালভিয়া চারা।",
-    descriptionEn: "Fresh, well-rooted Salvia Flower Plant sapling grown at Kalsuli nursery.",
+    descriptionBn: "শীর্ষে স্তূপাকার উজ্জ্বল রক্তলাল ফুলের সালভিয়া—শীতের বাগানে টানা দুই-তিন মাস রঙিন শয্যা ও বর্ডার তৈরি করে।",
+    descriptionEn: "Vibrant scarlet Salvia spikes ideal for winter flower beds, window boxes, and colorful borders.",
     image: getAshokePhotoUrl(97),
     options: [
       {
         id: "opt-84-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "মৌসুমী চারা (৫–৭ ইঞ্চি · ৩০–৪৫ দিন)",
+        labelEn: "Seasonal Sapling (5–7 in)",
         price: 20,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -454,14 +461,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ সাদা পুনা ভ্যারাইটি জবা চারা।",
-    descriptionEn: "Fresh, well-rooted White Pune Hybrid Hibiscus sapling grown at Kalsuli nursery.",
+    descriptionBn: "দুধে সাদা বড় পাপড়ি ও দীর্ঘস্থায়ী ফুলের দুষ্প্রাপ্য পুনে ভ্যারাইটি সাদা জবা—নিত্য পূজায় ও ১০ ইঞ্চি টবে সারাবছর প্রচুর কুঁড়ি আসে।",
+    descriptionEn: "Rare pure-white Pune cultivar hibiscus producing large crisp blooms year-round in sunny 10-inch pots.",
     image: getAshokePhotoUrl(96),
     options: [
       {
         id: "opt-83-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "কলম চারা (১–১.৫ ফুট · ৬ মাস)",
+        labelEn: "Grafted Sapling (1–1.5 ft)",
         price: 120,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -488,8 +495,8 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     options: [
       {
         id: "opt-73-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "টিস্যু-কালচার চারা (১–১.৫ ফুট · ৩–৪ মাস)",
+        labelEn: "Tissue-Culture Sapling (1–1.5 ft)",
         price: 50,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -510,14 +517,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "বাঁকুড়ার মাটি ও আবহাওয়ায় দ্রুত ফলনশীল সুপুষ্ট এলাচ কলমের চারা।",
-    descriptionEn: "Fast-fruiting grafted Large Cardamom Sapling sapling acclimated to Bankura.",
+    descriptionBn: "সুগন্ধি মসলাদার বড় এলাচের ঝোপালো চারা—বাড়ির ছায়াযুক্ত স্যাঁতসেঁতে বাগান বা বড় টবে সহজেই বেড়ে ওঠে।",
+    descriptionEn: "Fragrant large cardamom clump sapling suited for partially shaded home gardens and moist loamy corners.",
     image: getAshokePhotoUrl(40),
     options: [
       {
         id: "opt-30-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "ঝোপালো চারা (১–১.২ ফুট · ৫ মাস)",
+        labelEn: "Clump Sapling (1–1.2 ft)",
         price: 50,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -538,14 +545,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "বাঁকুড়ার মাটি ও আবহাওয়ায় দ্রুত ফলনশীল সুপুষ্ট কাগজি লেবু কলমের চারা।",
-    descriptionEn: "Fast-fruiting grafted Kagzi Lime / Baromasi Lemon sapling acclimated to Bankura.",
+    descriptionBn: "পাতলা খোসা ও তীব্র সুগন্ধি রসে ভরা বারোমাসি কাগজি পাতিলেবুর গুটি কলম—অনেক গাছে মুকুল ও কচি লেবু ধরেই থাকে।",
+    descriptionEn: "Aromatic thin-skinned Kagzi lime air-layered graft already acclimated to fruit all year in rooftop drums.",
     image: getAshokePhotoUrl(25),
     options: [
       {
         id: "opt-2-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গুটি কলম চারা (১.৫–২ ফুট · ৬–৮ মাস)",
+        labelEn: "Air-Layered Graft (1.5–2 ft)",
         price: 90,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -553,7 +560,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-69",
-    nameBn: "কেজি টেন জাম",
+    nameBn: "কেজি-১০ (KG-10) জাম কলম",
     nameEn: "KG-10 Hybrid Black Plum (Jam)",
     botanicalName: "Syzygium cumini (KG-10)",
     category: "ছাদবাগানের ফল ও কলম",
@@ -566,14 +573,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "বাঁকুড়ার মাটি ও আবহাওয়ায় দ্রুত ফলনশীল সুপুষ্ট কেজি টেন জাম কলমের চারা।",
-    descriptionEn: "Fast-fruiting grafted KG-10 Hybrid Black Plum (Jam) sapling acclimated to Bankura.",
+    descriptionBn: "অল্প উচ্চতায় বড় আকৃতির মিষ্টি রসালো কালো জাম ধরানো হাইব্রিড কেজি-১০ কলম—ছাদবাগানের ড্রাম বা বাড়ির উঠোনের সেরা জাত।",
+    descriptionEn: "Early-fruiting KG-10 hybrid black jamun graft yielding large, pulpy sweet fruits even at low canopy height.",
     image: getAshokePhotoUrl(82),
     options: [
       {
         id: "opt-69-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "কলম চারা (১.৫–২ ফুট · ৮–১০ মাস)",
+        labelEn: "Grafted Sapling (1.5–2 ft)",
         price: 150,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -594,14 +601,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "বাঁকুড়ার মাটি ও আবহাওয়ায় দ্রুত ফলনশীল সুপুষ্ট চায়না কলা কলমের চারা।",
-    descriptionEn: "Fast-fruiting grafted China Dwarf Banana sapling acclimated to Bankura.",
+    descriptionBn: "খাঁটি খাটো উচ্চতার চায়না ডোয়ার্ফ কলা—কম জায়গায় ছাদবাগানের বড় ড্রামে বা আঙিনায় সহজেই মোচা ও সুমিষ্ট কলার কাঁদি আসে।",
+    descriptionEn: "Compact China dwarf banana that stays under 6 ft, bearing sweet bunches in home yards and large drums.",
     image: getAshokePhotoUrl(87),
     options: [
       {
         id: "opt-74-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "চারা (১.২–১.৫ ফুট · ৪ মাস)",
+        labelEn: "Established Sapling (1.2–1.5 ft)",
         price: 80,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -622,14 +629,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "বাঁকুড়ার মাটি ও আবহাওয়ায় দ্রুত ফলনশীল সুপুষ্ট নারিকেল গাছ কলমের চারা।",
-    descriptionEn: "Fast-fruiting grafted Hazari Dwarf Coconut Tree sapling acclimated to Bankura.",
+    descriptionBn: "আদি খাটো জাতের হাজারি ডাব ও নারিকেল চারা—অপেক্ষাকৃত কম উচ্চতায় ৩–৪ বছরেই থোকা থোকা মিষ্টি জলের ডাব ধরতে শুরু করে।",
+    descriptionEn: "Compact Hazari dwarf coconut sapling bred for sweet tender water and earlier fruiting in home orchards.",
     image: getAshokePhotoUrl(90),
     options: [
       {
         id: "opt-77-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "পরিপুষ্ট চারা (২.৫–৩ ফুট · ১২ মাস)",
+        labelEn: "Matured Sapling (2.5–3 ft)",
         price: 350,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -650,14 +657,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "বাঁকুড়ার মাটি ও আবহাওয়ায় দ্রুত ফলনশীল সুপুষ্ট পিংক কাঁঠাল কলমের চারা।",
-    descriptionEn: "Fast-fruiting grafted Pink Jackfruit Graft sapling acclimated to Bankura.",
+    descriptionBn: "ভেতরের কোয়া উজ্জ্বল গোলাপি ও অত্যন্ত সুমিষ্ট—ভিয়েতনামী-হাইব্রিড পিংক কাঁঠালের কলম চারা যা বাঁকুড়ার উষ্ণ আবহাওয়ায় দারুণ ফলন দেয়।",
+    descriptionEn: "Exotic pink-fleshed jackfruit graft prized for honey-sweet crispy bulbs and strong heat tolerance.",
     image: getAshokePhotoUrl(74),
     options: [
       {
         id: "opt-62-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "কলম চারা (১.৫–২ ফুট · ৯–১২ মাস)",
+        labelEn: "Grafted Sapling (1.5–2 ft)",
         price: 100,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -678,14 +685,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "বাঁকুড়ার মাটি ও আবহাওয়ায় দ্রুত ফলনশীল সুপুষ্ট পেঁপে গাছ কলমের চারা।",
-    descriptionEn: "Fast-fruiting grafted Hybrid Red Lady Papaya sapling acclimated to Bankura.",
+    descriptionBn: "রেড লেডি জাতের দ্বিলিঙ্গ পেঁপে চারা—প্রতিটি গাছেই নিচে থেকে উপরের দিকে ৫০–৬০টি পাকা লাল ও মিষ্টি পেঁপে ধরে।",
+    descriptionEn: "High-yielding bisexual Red Lady papaya seedling bearing thick, sweet orange-red fruits from waist height.",
     image: getAshokePhotoUrl(75),
     options: [
       {
         id: "opt-63-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "চারা (৮–১০ ইঞ্চি · ৪৫–৬০ দিন)",
+        labelEn: "Nursery Seedling (8–10 in)",
         price: 40,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -706,14 +713,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "বাঁকুড়ার মাটি ও আবহাওয়ায় দ্রুত ফলনশীল সুপুষ্ট পেয়ারা (থাই) কলমের চারা।",
-    descriptionEn: "Fast-fruiting grafted Thai Sweet Guava Graft sapling acclimated to Bankura.",
+    descriptionBn: "ভেতরে কচকচে কম বীজের মিষ্টি থাই-৭ পেয়ারার গুটি কলম—১০–১২ ইঞ্চি টবেই বছরভর প্রচুর বড় সাইজের পেয়ারা ফলে।",
+    descriptionEn: "Crisp, low-seed Thai-7 guava graft renowned for continuous fruiting in sunny 12-inch rooftop pots.",
     image: getAshokePhotoUrl(3),
     options: [
       {
         id: "opt-3-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "কলম চারা (১.৫–২ ফুট · ৮ মাস)",
+        labelEn: "Grafted Sapling (1.5–2 ft)",
         price: 120,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -734,14 +741,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "বাঁকুড়ার মাটি ও আবহাওয়ায় দ্রুত ফলনশীল সুপুষ্ট বাতাবি লেবু কলমের চারা।",
-    descriptionEn: "Fast-fruiting grafted Batabi Pomelo / Grapefruit sapling acclimated to Bankura.",
+    descriptionBn: "গোলাপি শাঁসযুক্ত মিষ্টি রসালো বাতাবি লেবুর (জাম্বুরা) কলম—শরতের পূজা ও পারিবারিক ফলের বাগানে দারুণ ফলনশীল।",
+    descriptionEn: "Sweet pink-fleshed Batabi pomelo graft adapted to Bankura laterite soil with heavy seasonal yields.",
     image: getAshokePhotoUrl(62),
     options: [
       {
         id: "opt-51-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গুটি কলম (১.৫–২ ফুট · ৮ মাস)",
+        labelEn: "Air-Layer Sapling (1.5–2 ft)",
         price: 50,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -749,7 +756,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-78",
-    nameBn: "Golapi stholopaddmo",
+    nameBn: "গোলাপি স্থলপদ্ম (হাইব্রিড ডাবল)",
     nameEn: "Pink Confederate Rose / Stholopaddmo",
     botanicalName: "Hibiscus mutabilis",
     category: "পূজার ফুল ও পবিত্র গাছ",
@@ -762,14 +769,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ Golapi stholopaddmo চারা।",
-    descriptionEn: "Fresh, well-rooted Pink Confederate Rose / Stholopaddmo sapling grown at Kalsuli nursery.",
+    descriptionBn: "সকালে হালকা গোলাপি ফুটে বেলা গড়াতে গাঢ় গোলাপি রঙ ধারণ করা ঘন পাপড়ির স্থলপদ্ম—লক্ষ্মী ও দুর্গাপূজার অন্যতম শ্রেষ্ঠ ফুল।",
+    descriptionEn: "Double-petal pink Confederate Rose shifting shades through the day; cherished for morning puja altars.",
     image: getAshokePhotoUrl(91),
     options: [
       {
         id: "opt-78-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "ডাল কলম (১–১.৫ ফুট · ৫ মাস)",
+        labelEn: "Rooted Cutting (1–1.5 ft)",
         price: 80,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -790,14 +797,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ অস্ট্রেলিয়ান জবা চারা।",
-    descriptionEn: "Fresh, well-rooted Australian Giant Hibiscus sapling grown at Kalsuli nursery.",
+    descriptionBn: "ভাতের থালার মতো বিশাল ব্যাসের উজ্জ্বল কমলা-লাল অস্ট্রেলিয়ান জবা—একটি ফুল ফুটে থাকলে পুরো ছাদবাগানের শোভা বাড়িয়ে দেয়।",
+    descriptionEn: "Giant platter-sized Australian hybrid hibiscus in fiery orange-crimson hues for sunny balconies.",
     image: getAshokePhotoUrl(21),
     options: [
       {
         id: "opt-20-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "কলম চারা (১–১.৫ ফুট · ৬ মাস)",
+        labelEn: "Grafted Sapling (1–1.5 ft)",
         price: 90,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -818,16 +825,23 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে তৈরি সুপুষ্ট ও রোগমুক্ত স্বাস্থ্যকর চারা।",
-    descriptionEn: "Fresh, healthy nursery sapling acclimated to Bankura soil and climate.",
+    descriptionBn: "মোটা আকর্ষণীয় কডেক্স ও সূক্ষ্ম পাতার মরু গোলাপ (অ্যাডেনিয়াম)—তীব্র বাঁকুড়ার রোদ পছন্দ করে, কম জলেই টবে উজ্জ্বল গোলাপি-লাল ফুল ফোটে।",
+    descriptionEn: "Sculptural thick-caudex Desert Rose flowering profusely in harsh summer sun with minimal watering.",
     image: getAshokePhotoUrl(63),
     options: [
       {
         id: "opt-52-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
-        price: 30,
+        labelBn: "মাঝারি কডেক্স (৭–৯ ইঞ্চি · ৮ মাস)",
+        labelEn: "Caudex Grow Bag (7–9 in · 8 mo)",
+        price: 80,
         containerType: "পলি গ্রো ব্যাগ"
+      },
+      {
+        id: "opt-52-2",
+        labelBn: "বড় গ্রাফটেড কডেক্স (১ ফুট+)",
+        labelEn: "Large Grafted Caudex (1 ft+)",
+        price: 150,
+        containerType: "মাঝারি গ্রো ব্যাগ"
       }
     ]
   },
@@ -846,43 +860,15 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ আজ,কাল,পরশু ফুলগাছ চারা।",
-    descriptionEn: "Fresh, well-rooted Yesterday Today Tomorrow (Brunfelsia) sapling grown at Kalsuli nursery.",
+    descriptionBn: "একই গাছে প্রথম দিন গাঢ় বেগুনি, পরদিন হালকা নীল ও তৃতীয় দিন দুধে সাদা হয়ে সুবাস ছড়ানো আশ্চর্য \"আজ-কাল-পরশু\" ফুলগাছ।",
+    descriptionEn: "Fragrant tricolor Brunfelsia opening deep violet, fading to lavender, then pure white over three days.",
     image: getAshokePhotoUrl(85),
     options: [
       {
         id: "opt-72-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (১–১.২ ফুট · ৫ মাস)",
+        labelEn: "Grow Bag (1–1.2 ft)",
         price: 70,
-        containerType: "পলি গ্রো ব্যাগ"
-      }
-    ]
-  },
-  {
-    id: "ashoke-55",
-    nameBn: "কেমেলিয়ান ফুল",
-    nameEn: "Camellia Flower Bush",
-    botanicalName: "Camellia japonica",
-    category: "ছাদ ও বারান্দার ফুল",
-    audience: ["rooftop","family"],
-    badgeBn: "শীতকালীন অভিজাত ফুল",
-    colorBn: "গোলাপি",
-    sunlightBn: "পূর্ণ রোদ ও পর্যাপ্ত আলো",
-    sunlightEn: "Full Sun & Good Light",
-    wateringBn: "মাটি শুকোলে পরিমিত জল দিন",
-    wateringEn: "Water moderately when topsoil dries",
-    soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
-    soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ কেমেলিয়ান ফুল চারা।",
-    descriptionEn: "Fresh, well-rooted Camellia Flower Bush sapling grown at Kalsuli nursery.",
-    image: getAshokePhotoUrl(66),
-    options: [
-      {
-        id: "opt-55-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
-        price: 80,
         containerType: "পলি গ্রো ব্যাগ"
       }
     ]
@@ -902,14 +888,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ গজনিয়া ফুল চারা।",
-    descriptionEn: "Fresh, well-rooted Gazania Sunshine Flower sapling grown at Kalsuli nursery.",
+    descriptionBn: "সূর্য উঠলেই প্রজাপতির পাখার মতো মেলে ধরা উজ্জ্বল হলুদ-কমলা গজনিয়া—শীত ও বসন্তে ঝুলন্ত টব ও রোদেলা কিনারায় দারুণ মানায়।",
+    descriptionEn: "Sun-loving golden-orange Gazania blooms opening bright with morning sunlight in window boxes.",
     image: getAshokePhotoUrl(52),
     options: [
       {
         id: "opt-42-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "মৌসুমী চারা (৫–৭ ইঞ্চি · ৩০ দিন)",
+        labelEn: "Seasonal Sapling (5–7 in)",
         price: 20,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -930,14 +916,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ গজনীয়া ফুল চারা।",
-    descriptionEn: "Fresh, well-rooted White Sunshine Gazania sapling grown at Kalsuli nursery.",
+    descriptionBn: "হলুদ বিন্দু ও দুধে সাদা পাপড়ির সতেজ শ্বেত গজনিয়া—অল্প যত্নেই এক টবে একসাথে অনেকগুলো ডেইজি-সদৃশ ফুল ফোটে।",
+    descriptionEn: "Crisp white daisy-like Gazania blooms with golden centers, ideal for sunny terrace borders.",
     image: getAshokePhotoUrl(50),
     options: [
       {
         id: "opt-40-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "মৌসুমী চারা (৫–৭ ইঞ্চি · ৩০ দিন)",
+        labelEn: "Seasonal Sapling (5–7 in)",
         price: 20,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -958,14 +944,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ গন্ধরাজ ফুল চারা।",
-    descriptionEn: "Fresh, well-rooted Gandharaj / Cape Jasmine sapling grown at Kalsuli nursery.",
+    descriptionBn: "সারা উঠোন মাতিয়ে তোলা তীব্র মিষ্টি সুগন্ধি কেপ জেসমিন (গন্ধরাজ)—গ্রীষ্ম ও বর্ষায় পুরু পাপড়ির শ্বেতশুভ্র ফুল ফোটে।",
+    descriptionEn: "Intensely fragrant creamy-white Cape Jasmine prized across Bengali households for summer blooms.",
     image: getAshokePhotoUrl(65),
     options: [
       {
         id: "opt-54-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গুটি কলম (১–১.৫ ফুট · ৬ মাস)",
+        labelEn: "Layering Sapling (1–1.5 ft)",
         price: 60,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -986,14 +972,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ গাঁদা ফুলের চারা চারা।",
-    descriptionEn: "Fresh, well-rooted Marigold Seedling sapling grown at Kalsuli nursery.",
+    descriptionBn: "পূজার মালা ও উৎসব সাজানোর জন্য ঘন কমলা-জাফরান রঙের ইনকা জাতের গাঁদা—প্রতি গাছে বড় আকারের থোকা ফুল আসে।",
+    descriptionEn: "Plump saffron-orange Inca marigold seedlings grown for vibrant festive garlands and daily puja.",
     image: getAshokePhotoUrl(29),
     options: [
       {
         id: "opt-6-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "মৌসুমী চারা (৫–৭ ইঞ্চি · ৩০ দিন)",
+        labelEn: "Seasonal Seedling (5–7 in)",
         price: 15,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1001,7 +987,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-19",
-    nameBn: "গোলাপ",
+    nameBn: "লাল দেশি গোলাপ",
     nameEn: "Native Fragrant Rose",
     botanicalName: "Rosa indica",
     category: "ছাদ ও বারান্দার ফুল",
@@ -1014,14 +1000,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ গোলাপ চারা।",
-    descriptionEn: "Fresh, well-rooted Native Fragrant Rose sapling grown at Kalsuli nursery.",
+    descriptionBn: "প্রবল মিষ্টি সুগন্ধ ও গাঢ় রক্তলাল রঙের খাঁটি বাংলা দেশি গোলাপ—পুজোর অর্ঘ্য ও রোদেলা বারান্দায় সারা বছর নিয়মিত ফুল দেয়।",
+    descriptionEn: "Traditional fragrant crimson Bengali garden rose blooming reliably year-round with rich perfume.",
     image: getAshokePhotoUrl(20),
     options: [
       {
         id: "opt-19-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (১০–১৪ ইঞ্চি · ৫ মাস)",
+        labelEn: "Grow Bag (10–14 in)",
         price: 60,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1029,7 +1015,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-32",
-    nameBn: "গোলাপ",
+    nameBn: "গোলাপি-লাল বর্ডার গোলাপ",
     nameEn: "Pink-Edged Fragrant Rose",
     botanicalName: "Rosa x hybrida",
     category: "ছাদ ও বারান্দার ফুল",
@@ -1048,8 +1034,8 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     options: [
       {
         id: "opt-32-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "কলম চারা (১০–১৪ ইঞ্চি · ৬ মাস)",
+        labelEn: "Grafted Sapling (10–14 in)",
         price: 80,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1057,7 +1043,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-48",
-    nameBn: "গোলাপ ফুল",
+    nameBn: "ক্রিম-হলুদ হাইব্রিড গোলাপ",
     nameEn: "Cream Yellow & Pink Rose",
     botanicalName: "Rosa x hybrida (Yellow)",
     category: "ছাদ ও বারান্দার ফুল",
@@ -1070,14 +1056,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ গোলাপ ফুল চারা।",
-    descriptionEn: "Fresh, well-rooted Cream Yellow & Pink Rose sapling grown at Kalsuli nursery.",
+    descriptionBn: "ক্রিম-হলুদ পাপড়ির ধারে হালকা গোলাপি আভাযুক্ত হাইব্রিড টি রোজ—বড় ও দীর্ঘস্থায়ী কুঁড়ির জন্য ছাদবাগানে অত্যন্ত জনপ্রিয়।",
+    descriptionEn: "Creamy-yellow Hybrid Tea rose flushed with soft pink petal edges, holding blooms fresh for days.",
     image: getAshokePhotoUrl(60),
     options: [
       {
         id: "opt-48-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "কলম চারা (১০–১৪ ইঞ্চি · ৬ মাস)",
+        labelEn: "Grafted Sapling (10–14 in)",
         price: 80,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1085,7 +1071,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-45",
-    nameBn: "গোলাপ ফুল",
+    nameBn: "হালকা গোলাপি ফ্লোরিবুন্ডা গোলাপ",
     nameEn: "Pink Garden Rose",
     botanicalName: "Rosa x hybrida (Pink)",
     category: "ছাদ ও বারান্দার ফুল",
@@ -1098,14 +1084,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ গোলাপ ফুল চারা।",
-    descriptionEn: "Fresh, well-rooted Pink Garden Rose sapling grown at Kalsuli nursery.",
+    descriptionBn: "একই ডালে গুচ্ছ আকারে ফোটা মিষ্টি হালকা গোলাপি ফ্লোরিবুন্ডা গোলাপ—কম ছাঁটাইয়েও প্রতি মাসে থোকা ভরে কুঁড়ি ধরে।",
+    descriptionEn: "Cluster-flowering soft pink floribunda rose yielding multiple blossoms per stem on balconies.",
     image: getAshokePhotoUrl(55),
     options: [
       {
         id: "opt-45-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (১০–১৪ ইঞ্চি · ৫ মাস)",
+        labelEn: "Grow Bag (10–14 in)",
         price: 60,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1113,7 +1099,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-46",
-    nameBn: "গোলাপ ফুল",
+    nameBn: "মখমলি কালচে-মেরুন গোলাপ",
     nameEn: "Velvet Deep Maroon Rose",
     botanicalName: "Rosa x hybrida (Crimson)",
     category: "ছাদ ও বারান্দার ফুল",
@@ -1126,14 +1112,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ গোলাপ ফুল চারা।",
-    descriptionEn: "Fresh, well-rooted Velvet Deep Maroon Rose sapling grown at Kalsuli nursery.",
+    descriptionBn: "ব্ল্যাক-ব্যাকারা ধাঁচের গাঢ় মখমলি মেরুন-লাল গোলাপ—গভীর রঙ ও পুরু পাপড়ির কারণে বাগানীদের সবচেয়ে পছন্দের সংগ্রহ।",
+    descriptionEn: "Velvety deep burgundy-maroon exhibition rose prized for thick petals and dramatic dark hues.",
     image: getAshokePhotoUrl(56),
     options: [
       {
         id: "opt-46-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "কলম চারা (১০–১৪ ইঞ্চি · ৬ মাস)",
+        labelEn: "Grafted Sapling (10–14 in)",
         price: 80,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1141,7 +1127,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-37",
-    nameBn: "গোলাপ ফুল",
+    nameBn: "কমলা-হলুদ কোরাল গোলাপ",
     nameEn: "Red & Yellow Bicolor Rose",
     botanicalName: "Rosa x hybrida (Coral)",
     category: "ছাদ ও বারান্দার ফুল",
@@ -1154,14 +1140,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ গোলাপ ফুল চারা।",
-    descriptionEn: "Fresh, well-rooted Red & Yellow Bicolor Rose sapling grown at Kalsuli nursery.",
+    descriptionBn: "আগুনে কমলা ও সোনা-হলুদের মেলবন্ধনে তৈরি উজ্জ্বল কোরাল গোলাপ—তীব্র বাঁকুড়ার রোদেও পাপড়ির রং অটুট থাকে।",
+    descriptionEn: "Fiery coral-orange and gold bicolor rose holding vibrant petal contrast under bright sunshine.",
     image: getAshokePhotoUrl(47),
     options: [
       {
         id: "opt-37-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "কলম চারা (১০–১৪ ইঞ্চি · ৬ মাস)",
+        labelEn: "Grafted Sapling (10–14 in)",
         price: 80,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1169,7 +1155,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-39",
-    nameBn: "গোলাপ ফুল",
+    nameBn: "সোনালী হলুদ গোলাপ",
     nameEn: "Golden Yellow Garden Rose",
     botanicalName: "Rosa x hybrida (Golden)",
     category: "ছাদ ও বারান্দার ফুল",
@@ -1182,14 +1168,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ গোলাপ ফুল চারা।",
-    descriptionEn: "Fresh, well-rooted Golden Yellow Garden Rose sapling grown at Kalsuli nursery.",
+    descriptionBn: "উজ্জ্বল লেবু-সোনালী রঙের দীর্ঘকাণ্ড গোলাপ—শীতের সকালে ও বসন্তে প্রতিটি শাখায় সুগঠিত বড় আকারের হলুদ ফুল ফোটে।",
+    descriptionEn: "Sunlit golden-yellow hybrid garden rose producing well-formed classic buds on sturdy stems.",
     image: getAshokePhotoUrl(49),
     options: [
       {
         id: "opt-39-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (১০–১৪ ইঞ্চি · ৫ মাস)",
+        labelEn: "Grow Bag (10–14 in)",
         price: 60,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1197,7 +1183,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-44",
-    nameBn: "গোলাপ ফুল",
+    nameBn: "লাল-সোনালী শেড হাইব্রিড গোলাপ",
     nameEn: "Crimson & Gold Rose",
     botanicalName: "Rosa x hybrida (Tea)",
     category: "ছাদ ও বারান্দার ফুল",
@@ -1210,14 +1196,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ গোলাপ ফুল চারা।",
-    descriptionEn: "Fresh, well-rooted Crimson & Gold Rose sapling grown at Kalsuli nursery.",
+    descriptionBn: "ভেতরের দিকে সোনালী আর বাইরের পাপড়িতে টুকটুকে লাল ছোঁয়ার কলম গোলাপ—১২ ইঞ্চি টবে ঝোপালো হয়ে প্রচুর ফুল দেয়।",
+    descriptionEn: "Grafted dual-shade crimson and gold tea rose thriving in 12-inch sunny terrace planters.",
     image: getAshokePhotoUrl(54),
     options: [
       {
         id: "opt-44-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "কলম চারা (১০–১৪ ইঞ্চি · ৬ মাস)",
+        labelEn: "Grafted Sapling (10–14 in)",
         price: 80,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1238,14 +1224,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ গোলাপ বাই কালার চারা।",
-    descriptionEn: "Fresh, well-rooted Pink & White Edged Bicolor Rose sapling grown at Kalsuli nursery.",
+    descriptionBn: "প্রতিটি সাদা পাপড়ির কিনারায় চওড়া গোলাপি আলপনা আঁকা বাই-কালার গোলাপ—প্রদর্শনী ও গিফটিংয়ের জন্য অনন্য।",
+    descriptionEn: "Showstopping bicolor rose with crisp white centers framed by vivid rose-pink margins.",
     image: getAshokePhotoUrl(93),
     options: [
       {
         id: "opt-80-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "কলম চারা (১০–১৪ ইঞ্চি · ৬ মাস)",
+        labelEn: "Grafted Sapling (10–14 in)",
         price: 80,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1266,14 +1252,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ গোলাপি থাই স্থল পদ্ম চারা।",
-    descriptionEn: "Fresh, well-rooted Thai Pink Confederate Rose sapling grown at Kalsuli nursery.",
+    descriptionBn: "উন্নত থাই জাতের ঝাঁকড়া স্থলপদ্ম—দেশি গাছের চেয়ে ছোট আকৃতিতেই ১০ ইঞ্চি টবে প্রতিদিন প্রচুর বড় গোলাপি ফুল দেয়।",
+    descriptionEn: "Compact Thai dwarf Confederate Rose cultivar flowering generously at lower height in pots.",
     image: getAshokePhotoUrl(83),
     options: [
       {
         id: "opt-70-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (১–১.৫ ফুট · ৬ মাস)",
+        labelEn: "Grow Bag (1–1.5 ft)",
         price: 70,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1294,14 +1280,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ ঘন্টা জবা চারা।",
-    descriptionEn: "Fresh, well-rooted Ghanta Jaba / Coral Pendant Hibiscus sapling grown at Kalsuli nursery.",
+    descriptionBn: "সূক্ষ্ম লণ্ঠনের মতো নিচের দিকে ঝুলে থাকা জালি-পাপড়ির ঘণ্টা জবা—বাগানের কিনারায় বা হ্যাঙ্গিং ঝোপে অপূর্ব দেখায়।",
+    descriptionEn: "Pendulous coral-red lantern hibiscus with intricately fringed petals swaying gracefully in the breeze.",
     image: getAshokePhotoUrl(70),
     options: [
       {
         id: "opt-4-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (১–১.৫ ফুট · ৫ মাস)",
+        labelEn: "Grow Bag (1–1.5 ft)",
         price: 60,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1322,14 +1308,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ চন্দ্রমল্লিকা ( সবুজ ) চারা।",
-    descriptionEn: "Fresh, well-rooted Green Chrysanthemum (Chandramallika) sapling grown at Kalsuli nursery.",
+    descriptionBn: "বিরল পেস্তা-সবুজ রঙের বোতাম-আকৃতির চন্দ্রমল্লিকা—টবে একসাথে ২০–৩০টি গোল থোকা ফুটে দীর্ঘদিন তাজা থাকে।",
+    descriptionEn: "Rare pistachio-green pompom chrysanthemum yielding long-lasting clusters throughout winter.",
     image: getAshokePhotoUrl(68),
     options: [
       {
         id: "opt-57-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "মৌসুমী চারা (৫–৭ ইঞ্চি · ৪৫ দিন)",
+        labelEn: "Seasonal Sapling (5–7 in)",
         price: 20,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1350,14 +1336,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ চন্দ্রমল্লিকা ফুল চারা।",
-    descriptionEn: "Fresh, well-rooted Deep Red Chrysanthemum (Chandramallika) sapling grown at Kalsuli nursery.",
+    descriptionBn: "গাঢ় রক্তিম-মেরুন রঙের বহুপাপড়ি ডেকোরেটিভ চন্দ্রমল্লিকা—একটি গাছেই শতাধিক ফুল ফোটার ক্ষমতা রাখে।",
+    descriptionEn: "Rich deep-crimson decorative chrysanthemum bred for dense, show-quality winter mounds.",
     image: getAshokePhotoUrl(53),
     options: [
       {
         id: "opt-43-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "মৌসুমী চারা (৫–৭ ইঞ্চি · ৪৫ দিন)",
+        labelEn: "Seasonal Sapling (5–7 in)",
         price: 20,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1365,7 +1351,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-22",
-    nameBn: "জবা",
+    nameBn: "হলুদ ডাবল থোকা জবা",
     nameEn: "Yellow Double Petal Hibiscus",
     botanicalName: "Hibiscus rosa-sinensis (Yellow Double)",
     category: "পূজার ফুল ও পবিত্র গাছ",
@@ -1378,14 +1364,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ জবা চারা।",
-    descriptionEn: "Fresh, well-rooted Yellow Double Petal Hibiscus sapling grown at Kalsuli nursery.",
+    descriptionBn: "গোলাপের মতো ঘন স্তরবিশিষ্ট হলুদ থোকা জবা—অল্প জায়গাতেও প্রতিদিন উজ্জ্বল সোনালী-হলুদ ফুলে ডাল ভরে ওঠে।",
+    descriptionEn: "Multi-layered golden-yellow double hibiscus adding bright sunshine contrast to balcony collections.",
     image: getAshokePhotoUrl(30),
     options: [
       {
         id: "opt-22-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (১–১.৫ ফুট · ৬ মাস)",
+        labelEn: "Grow Bag (1–1.5 ft)",
         price: 80,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1393,7 +1379,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-33",
-    nameBn: "জবা",
+    nameBn: "সাদা-গোলাপি নয়নতারা জবা",
     nameEn: "White & Pink Center Hibiscus",
     botanicalName: "Hibiscus rosa-sinensis (Bicolor)",
     category: "পূজার ফুল ও পবিত্র গাছ",
@@ -1406,14 +1392,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ জবা চারা।",
-    descriptionEn: "Fresh, well-rooted White & Pink Center Hibiscus sapling grown at Kalsuli nursery.",
+    descriptionBn: "সাদা পাপড়ির কেন্দ্রে গভীর লাল-গোলাপি চোখওয়ালা পবিত্র জবা—গৃহপূজায় ও বারান্দায় চিরসবুজ ঝোপ তৈরি করে।",
+    descriptionEn: "Crisp white hibiscus accented with a bright magenta eye; prolific bloomer for daily Puja.",
     image: getAshokePhotoUrl(43),
     options: [
       {
         id: "opt-33-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (১–১.৫ ফুট · ৫ মাস)",
+        labelEn: "Grow Bag (1–1.5 ft)",
         price: 60,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1421,7 +1407,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-24",
-    nameBn: "জবা",
+    nameBn: "পিচ-কমলা ডাবল থোকা জবা",
     nameEn: "Peach-Orange Double Hibiscus",
     botanicalName: "Hibiscus rosa-sinensis (Peach Double)",
     category: "পূজার ফুল ও পবিত্র গাছ",
@@ -1434,14 +1420,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ জবা চারা।",
-    descriptionEn: "Fresh, well-rooted Peach-Orange Double Hibiscus sapling grown at Kalsuli nursery.",
+    descriptionBn: "আগুনে কমলা ও নরম পিচ রঙের কোঁকড়ানো ডাবল পাপড়ির থোকা জবা—বর্ষা ও গরমে টানা ফুল দেয়।",
+    descriptionEn: "Lush double-petaled peach-orange hibiscus flourishing across heat and monsoon seasons.",
     image: getAshokePhotoUrl(34),
     options: [
       {
         id: "opt-24-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (১–১.৫ ফুট · ৬ মাস)",
+        labelEn: "Grow Bag (1–1.5 ft)",
         price: 80,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1449,7 +1435,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-35",
-    nameBn: "জবা",
+    nameBn: "পঞ্চমুখী ডাবল রক্তজবা",
     nameEn: "Double Petal Red Hibiscus",
     botanicalName: "Hibiscus rosa-sinensis (Red Double)",
     category: "পূজার ফুল ও পবিত্র গাছ",
@@ -1462,14 +1448,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ জবা চারা।",
-    descriptionEn: "Fresh, well-rooted Double Petal Red Hibiscus sapling grown at Kalsuli nursery.",
+    descriptionBn: "গভীর লাল রঙের বহুপাপড়ি পঞ্চমুখী রক্তজবা—কালীপূজা ও নিত্যপূজার অর্ঘ্যের জন্য আদর্শ ও শক্তিশালী শিকড়ের চারা।",
+    descriptionEn: "Classic double crimson Panchamukhi Rakta Jaba revered across Bengal for Kali and Shakti worship.",
     image: getAshokePhotoUrl(45),
     options: [
       {
         id: "opt-35-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (১–১.৫ ফুট · ৬ মাস)",
+        labelEn: "Grow Bag (1–1.5 ft)",
         price: 80,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1477,7 +1463,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-81",
-    nameBn: "জবা  ,  পুনা ভ্যারাইটি",
+    nameBn: "পুনে ভ্যারাইটি কোরাল জবা",
     nameEn: "Coral Fringed Pune Hibiscus",
     botanicalName: "Hibiscus rosa-sinensis (Pune)",
     category: "পূজার ফুল ও পবিত্র গাছ",
@@ -1490,14 +1476,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ জবা  ,  পুনা ভ্যারাইটি চারা।",
-    descriptionEn: "Fresh, well-rooted Coral Fringed Pune Hibiscus sapling grown at Kalsuli nursery.",
+    descriptionBn: "সাদা-গোলাপি মিশ্রণ ও কুঁচি দেওয়া ধারওয়ালা অরিজিনাল পুনে জবা—ছোট গাছেই একসাথে ৮–১০টি বড় কুঁড়ি নিয়ে আসে।",
+    descriptionEn: "Genuine Pune cultivar hibiscus featuring ruffled pink-and-white blooms on compact potted shrubs.",
     image: getAshokePhotoUrl(94),
     options: [
       {
         id: "opt-81-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (১–১.৫ ফুট · ৬ মাস)",
+        labelEn: "Grow Bag (1–1.5 ft)",
         price: 70,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1518,14 +1504,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ জবা (লাল) চারা।",
-    descriptionEn: "Fresh, well-rooted Sacred Red Hibiscus (Rakta Jaba) sapling grown at Kalsuli nursery.",
+    descriptionBn: "বাংলার ঘরে ঘরে প্রতিদিন দেবতার অর্ঘ্যে অপরিহার্য খাঁটি একপাপড়ি দেশি রক্তজবা—রোগবালাই খুব কম ও দীর্ঘজীবী।",
+    descriptionEn: "Hardiest native five-petal sacred red hibiscus built for effortless year-round Puja flowers.",
     image: getAshokePhotoUrl(27),
     options: [
       {
         id: "opt-5-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (১–১.৫ ফুট · ৫ মাস)",
+        labelEn: "Grow Bag (1–1.5 ft)",
         price: 50,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1533,7 +1519,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-82",
-    nameBn: "জবা অস্ট্রেলিয়ান",
+    nameBn: "হলুদ-লাল বিশাল অস্ট্রেলিয়ান জবা",
     nameEn: "Giant Australian Hibiscus",
     botanicalName: "Hibiscus rosa-sinensis (Australian Giant)",
     category: "পূজার ফুল ও পবিত্র গাছ",
@@ -1546,14 +1532,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ জবা অস্ট্রেলিয়ান চারা।",
-    descriptionEn: "Fresh, well-rooted Giant Australian Hibiscus sapling grown at Kalsuli nursery.",
+    descriptionBn: "বাইরে সোনালী হলুদ ও ভেতরে সিঁদুরে লাল কেন্দ্রযুক্ত ৭ ইঞ্চি ব্যাসের অস্ট্রেলিয়ান জবা—এক ফুলেই সবার নজর কাড়ে।",
+    descriptionEn: "Spectacular yellow-and-crimson Australian hybrid hibiscus opening blooms up to 7 inches wide.",
     image: getAshokePhotoUrl(95),
     options: [
       {
         id: "opt-82-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "কলম চারা (১.২–১.৫ ফুট · ৬ মাস)",
+        labelEn: "Grafted Sapling (1.2–1.5 ft)",
         price: 120,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1561,7 +1547,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-38",
-    nameBn: "জবা ফুল",
+    nameBn: "পিচ-অ্যাপ্রিকট বড় জবা",
     nameEn: "Peach Apricot Hibiscus",
     botanicalName: "Hibiscus rosa-sinensis (Apricot)",
     category: "পূজার ফুল ও পবিত্র গাছ",
@@ -1574,14 +1560,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ জবা ফুল চারা।",
-    descriptionEn: "Fresh, well-rooted Peach Apricot Hibiscus sapling grown at Kalsuli nursery.",
+    descriptionBn: "কেন্দ্রভাগে লাল টুকটুকে বিন্দু ও কোমল অ্যাপ্রিকট পাপড়ির ঝলমলে হাইব্রিড জবা—টবের মাটিতে দ্রুত বাড়ে।",
+    descriptionEn: "Velvety apricot-peach hibiscus with a ruby throat, thriving rapidly in well-drained pot soil.",
     image: getAshokePhotoUrl(48),
     options: [
       {
         id: "opt-38-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (১–১.৫ ফুট · ৬ মাস)",
+        labelEn: "Grow Bag (1–1.5 ft)",
         price: 90,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1602,14 +1588,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ টিকোমা গৌরি চারা।",
-    descriptionEn: "Fresh, well-rooted Tecoma Gauri / Yellow Elder sapling grown at Kalsuli nursery.",
+    descriptionBn: "বছরের ১০ মাসই থোকা থোকা উজ্জ্বল সোনালী ঘণ্টা ফুলে ভরে থাকা টিকোমা গৌরী—প্রজাপতি ও মৌমাছিকে বাগানে ডেকে আনে।",
+    descriptionEn: "Vigorous Yellow Elder shrub producing golden trumpet clusters nearly year-round with minimal care.",
     image: getAshokePhotoUrl(41),
     options: [
       {
         id: "opt-31-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (১.২–১.৫ ফুট · ৫ মাস)",
+        labelEn: "Grow Bag (1.2–1.5 ft)",
         price: 60,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1630,14 +1616,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ টিকোমা ফুল চারা।",
-    descriptionEn: "Fresh, well-rooted Orange Tecoma Capensis sapling grown at Kalsuli nursery.",
+    descriptionBn: "উজ্জ্বল কমলা-লাল নলাকার ফুলের কেপ হানিসাকল টিকোমা—বাড়ির বারান্দা, গ্রিল বা সীমানা বেড়ায় রোদ পেলেই অজস্র ফুল ফোটে।",
+    descriptionEn: "Bright fiery-orange Cape Honeysuckle bush ideal for sunny railings, borders, and terrace pots.",
     image: getAshokePhotoUrl(88),
     options: [
       {
         id: "opt-75-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (১–১.৫ ফুট · ৫ মাস)",
+        labelEn: "Grow Bag (1–1.5 ft)",
         price: 70,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1658,14 +1644,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ থাই রঙ্গন চারা।",
-    descriptionEn: "Fresh, well-rooted Thai Dwarf Ixora (Rangan) sapling grown at Kalsuli nursery.",
+    descriptionBn: "বামন আকৃতির ঘন পাতার থাই রঙ্গন—কয়েক মাস বয়স থেকেই ছোট গাছে লাল বলের মতো গুচ্ছ ফুলের সমারোহ দেখা যায়।",
+    descriptionEn: "Compact Thai dwarf Ixora exploding into dense crimson pompom clusters even in small containers.",
     image: getAshokePhotoUrl(31),
     options: [
       {
         id: "opt-12-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (৮–১২ ইঞ্চি · ৫ মাস)",
+        labelEn: "Grow Bag (8–12 in)",
         price: 60,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1686,14 +1672,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ দেশী স্থল পদ্ম চারা।",
-    descriptionEn: "Fresh, well-rooted Native Indian Stholopaddmo sapling grown at Kalsuli nursery.",
+    descriptionBn: "বাংলার ঐতিহ্যবাহী বড় ঝোপের দেশী স্থলপদ্ম—ভোরবেলা দুধে সাদা হয়ে ফোটে এবং বিকাল হতে হতে গাঢ় গোলাপি রঙ ধারণ করে।",
+    descriptionEn: "Heirloom Bengali Confederate Rose shifting organically from pure white at dawn to rose pink by dusk.",
     image: getAshokePhotoUrl(73),
     options: [
       {
         id: "opt-61-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (১.২–১.৫ ফুট · ৫ মাস)",
+        labelEn: "Grow Bag (1.2–1.5 ft)",
         price: 50,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1714,126 +1700,43 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ নীল কন্ঠ ফুল চারা।",
-    descriptionEn: "Fresh, well-rooted Blue Aparajita / Neel Kantha sapling grown at Kalsuli nursery.",
+    descriptionBn: "গাঢ় নীল ডাবল/সিঙ্গেল নীলকণ্ঠ অপরাজিতা লতা—মহাদেব ও মা দুর্গার পূজার পাশাপাশি ভেষজ নীল চা তৈরিতেও ব্যবহৃত হয়।",
+    descriptionEn: "Cobalt-blue sacred Aparajita climber valued both for Durga/Shiva Puja and antioxidant herbal blue tea.",
     image: getAshokePhotoUrl(46),
     options: [
       {
         id: "opt-36-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (১–১.৫ ফুট · ৪ মাস)",
+        labelEn: "Grow Bag (1–1.5 ft)",
         price: 80,
         containerType: "পলি গ্রো ব্যাগ"
       }
     ]
   },
   {
-    id: "ashoke-28",
-    nameBn: "পদ্ম ফুল",
-    nameEn: "Sacred Water Lotus",
-    botanicalName: "Nelumbo nucifera",
-    category: "পূজার ফুল ও পবিত্র গাছ",
-    audience: ["puja","family"],
-    badgeBn: "জলজ পদ্ম কন্দ",
-    colorBn: "গোলাপি",
-    sunlightBn: "দিনে ৫-৬ ঘণ্টা পূর্ণ রোদ",
-    sunlightEn: "5-6 Hours Full Sunlight",
-    wateringBn: "পাত্রে সবসময় ৩-৪ ইঞ্চি পরিষ্কার জল রাখুন",
-    wateringEn: "Maintain 3-4 inches standing clean water",
-    soilTipBn: "পুকুরের এঁটেল মাটি ও সামান্য গোবর সার",
-    soilTipEn: "Heavy clay/pond mud with aged cow manure",
-    descriptionBn: "বাঁকুড়ার রোদে জলের পাত্র বা গামলায় প্রচুর ফুল ফোটা পদ্ম ফুল।",
-    descriptionEn: "Healthy aquatic Sacred Water Lotus ready to bloom abundantly in sunny water tubs.",
-    image: getAshokePhotoUrl(38),
-    options: [
-      {
-        id: "opt-28-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
-        price: 350,
-        containerType: "পলি গ্রো ব্যাগ"
-      }
-    ]
-  },
-  {
-    id: "ashoke-26",
-    nameBn: "পদ্ম ফুল",
-    nameEn: "Sacred White Water Lotus",
-    botanicalName: "Nelumbo nucifera (Alba)",
-    category: "পূজার ফুল ও পবিত্র গাছ",
-    audience: ["puja","family"],
-    badgeBn: "মা সরস্বতীর শ্বেতপদ্ম",
-    colorBn: "স্নিগ্ধ সাদা",
-    sunlightBn: "দিনে ৫-৬ ঘণ্টা পূর্ণ রোদ",
-    sunlightEn: "5-6 Hours Full Sunlight",
-    wateringBn: "পাত্রে সবসময় ৩-৪ ইঞ্চি পরিষ্কার জল রাখুন",
-    wateringEn: "Maintain 3-4 inches standing clean water",
-    soilTipBn: "পুকুরের এঁটেল মাটি ও সামান্য গোবর সার",
-    soilTipEn: "Heavy clay/pond mud with aged cow manure",
-    descriptionBn: "বাঁকুড়ার রোদে জলের পাত্র বা গামলায় প্রচুর ফুল ফোটা পদ্ম ফুল।",
-    descriptionEn: "Healthy aquatic Sacred White Water Lotus ready to bloom abundantly in sunny water tubs.",
-    image: getAshokePhotoUrl(36),
-    options: [
-      {
-        id: "opt-26-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
-        price: 350,
-        containerType: "পলি গ্রো ব্যাগ"
-      }
-    ]
-  },
-  {
-    id: "ashoke-29",
-    nameBn: "পদ্ম ফুল",
-    nameEn: "Royal Pink Lotus",
-    botanicalName: "Nelumbo nucifera (Rosea)",
-    category: "পূজার ফুল ও পবিত্র গাছ",
-    audience: ["puja","family"],
-    badgeBn: "বড় জাতের পদ্ম",
-    colorBn: "হালকা গোলাপি-সাদা",
-    sunlightBn: "দিনে ৫-৬ ঘণ্টা পূর্ণ রোদ",
-    sunlightEn: "5-6 Hours Full Sunlight",
-    wateringBn: "পাত্রে সবসময় ৩-৪ ইঞ্চি পরিষ্কার জল রাখুন",
-    wateringEn: "Maintain 3-4 inches standing clean water",
-    soilTipBn: "পুকুরের এঁটেল মাটি ও সামান্য গোবর সার",
-    soilTipEn: "Heavy clay/pond mud with aged cow manure",
-    descriptionBn: "বাঁকুড়ার রোদে জলের পাত্র বা গামলায় প্রচুর ফুল ফোটা পদ্ম ফুল।",
-    descriptionEn: "Healthy aquatic Royal Pink Lotus ready to bloom abundantly in sunny water tubs.",
-    image: getAshokePhotoUrl(39),
-    options: [
-      {
-        id: "opt-29-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
-        price: 350,
-        containerType: "পলি গ্রো ব্যাগ"
-      }
-    ]
-  },
-  {
     id: "ashoke-17",
-    nameBn: "পবিত্র গোলাপি পদ্ম কন্দ ও চারা",
-    nameEn: "Pink Sacred Lotus Tuber Sapling",
+    nameBn: "পবিত্র জলজ পদ্ম কন্দ ও চারা (গোলাপি / সাদা / লাল)",
+    nameEn: "Sacred Water Lotus Tuber Sapling (Pink / White / Red)",
     botanicalName: "Nelumbo nucifera",
     category: "পূজার ফুল ও পবিত্র গাছ",
     audience: ["puja","family"],
     badgeBn: "জলজ পবিত্র পদ্মের চারা",
-    colorBn: "গোলাপি",
+    colorBn: "গোলাপি, সাদা ও লাল জাত",
     sunlightBn: "দিনে ৫-৬ ঘণ্টা পূর্ণ রোদ",
     sunlightEn: "5-6 Hours Full Sunlight",
     wateringBn: "পাত্রে সবসময় ৩-৪ ইঞ্চি পরিষ্কার জল রাখুন",
     wateringEn: "Maintain 3-4 inches standing clean water",
     soilTipBn: "পুকুরের এঁটেল মাটি ও সামান্য গোবর সার",
     soilTipEn: "Heavy clay/pond mud with aged cow manure",
-    descriptionBn: "শিকড়সহ সতেজ পদ্ম কন্দ ও পাতা—বাড়িতে নিয়ে জলে সরাসরি রোদে রাখলেই ফুল ফুটবে।",
-    descriptionEn: "Established pink sacred lotus tuber sapling with intact roots, ready to bloom in standing water under sunlight.",
+    descriptionBn: "পুকুরের এঁটেল মাটিসহ প্রস্তুত শিকড়যুক্ত তাজা জলজ পদ্ম কন্দ ও চারা—বাড়িতে নিয়ে বড় গামলা বা টবে ৩–৪ ইঞ্চি জলে রোদে রাখলেই ৪৫–৬০ দিনে পবিত্র ফুল ফুটবে। গোলাপি, শ্বেত ও লাল তিন রঙের জাতই পাওয়া যায়।",
+    descriptionEn: "Established aquatic sacred lotus rhizome & leaf sapling (available in Pink, White & Red); simply submerge in a sunny clay-filled tub for blooms within 45–60 days.",
     image: lotusOrigImg,
+    images: [lotusOrigImg, getAshokePhotoUrl(36), getAshokePhotoUrl(38)],
     options: [
       {
         id: "opt-17-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "জলজ কন্দ চারা (গোলাপি / সাদা / লাল · ৪৫–৬০ দিনে ফুল)",
+        labelEn: "Aquatic Tuber Sapling (Pink / White / Red)",
         price: 350,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1854,14 +1757,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ পুনা জবা চারা।",
-    descriptionEn: "Fresh, well-rooted Pune Hybrid Hibiscus sapling grown at Kalsuli nursery.",
+    descriptionBn: "আকর্ষণীয় হালকা গোলাপি রঙের বড় একপাপড়ি পুনে জবা—পাপড়ির মাঝখানে গাঢ় মেরুন চোখ থাকায় গাছটি দেখতে অত্যন্ত মনোমুগ্ধকর।",
+    descriptionEn: "Soft rose-pink Pune hibiscus marked with a deep crimson center, thriving in sunny terrace pots.",
     image: getAshokePhotoUrl(22),
     options: [
       {
         id: "opt-21-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (১–১.৫ ফুট · ৬ মাস)",
+        labelEn: "Grow Bag (1–1.5 ft)",
         price: 60,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1869,7 +1772,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-76",
-    nameBn: "পুনা ভ্যারাইটি",
+    nameBn: "লাল-হলুদ বর্ডার পুনে জবা",
     nameEn: "Exotic Pune Hibiscus",
     botanicalName: "Hibiscus rosa-sinensis (Pune Red)",
     category: "পূজার ফুল ও পবিত্র গাছ",
@@ -1882,14 +1785,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ পুনা ভ্যারাইটি চারা।",
-    descriptionEn: "Fresh, well-rooted Exotic Pune Hibiscus sapling grown at Kalsuli nursery.",
+    descriptionBn: "টকটকে লাল পাপড়ির ধারে সোনালী-হলুদ নকশা করা স্পেশাল পুনে হাইব্রিড জবা—আধুনিক ছাদবাগানের জন্য অত্যন্ত আকর্ষণীয় সংযোজন।",
+    descriptionEn: "Striking crimson Pune hibiscus rimmed with golden-yellow edges; standout collector variety.",
     image: getAshokePhotoUrl(89),
     options: [
       {
         id: "opt-76-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (১–১.৫ ফুট · ৬ মাস)",
+        labelEn: "Grow Bag (1–1.5 ft)",
         price: 80,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1910,14 +1813,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ প্যাশিয়ন ফুল চারা।",
-    descriptionEn: "Fresh, well-rooted Crimson Passion Flower (Krishna Kamal) sapling grown at Kalsuli nursery.",
+    descriptionBn: "রক্তলাল কিরণাকৃতি পাপড়ির বিস্ময়কর কৃষ্ণকমল (প্যাশন ফ্লাওয়ার) লতা—অল্প সময়ে গ্রিল বা মাচায় চড়ে পবিত্র ও অনন্য ফুল ফোটায়।",
+    descriptionEn: "Dramatic scarlet Krishna Kamal passion vine climbing trellises rapidly with intricate star-shaped blooms.",
     image: getAshokePhotoUrl(67),
     options: [
       {
         id: "opt-56-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "লতানো চারা (১–১.৫ ফুট · ৪ মাস)",
+        labelEn: "Climbing Sapling (1–1.5 ft)",
         price: 50,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1925,7 +1828,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-79",
-    nameBn: "বাই কালার গোলাপ",
+    nameBn: "মেরুন-সোনালী ডোরা গোলাপ",
     nameEn: "Deep Maroon & Gold Flecked Rose",
     botanicalName: "Rosa x hybrida (Two-tone)",
     category: "ছাদ ও বারান্দার ফুল",
@@ -1938,14 +1841,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ বাই কালার গোলাপ চারা।",
-    descriptionEn: "Fresh, well-rooted Deep Maroon & Gold Flecked Rose sapling grown at Kalsuli nursery.",
+    descriptionBn: "গভীর মেরুন পাপড়ির ওপর সোনালী হলুদ রঙের প্রাকৃতিক ডোরা আঁকা টাইগার-স্টাইলের বিরল বাই-কালার গোলাপ।",
+    descriptionEn: "Striped burgundy and gold designer hybrid rose; every bloom displays unique painter-like streaks.",
     image: getAshokePhotoUrl(92),
     options: [
       {
         id: "opt-79-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "কলম চারা (১০–১৪ ইঞ্চি · ৬ মাস)",
+        labelEn: "Grafted Sapling (10–14 in)",
         price: 80,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1953,7 +1856,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-58",
-    nameBn: "বাইকালার গোলাপ",
+    nameBn: "লাল-সাদা ডোরাকাটা আব্রাকাডাব্রা গোলাপ",
     nameEn: "Abracadabra Red & White Striped Rose",
     botanicalName: "Rosa x hybrida (Circus)",
     category: "ছাদ ও বারান্দার ফুল",
@@ -1966,14 +1869,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ বাইকালার গোলাপ চারা।",
-    descriptionEn: "Fresh, well-rooted Abracadabra Red & White Striped Rose sapling grown at Kalsuli nursery.",
+    descriptionBn: "লাল ও দুধে-সাদা রঙের স্পষ্ট স্ট্রাইপযুক্ত \"আব্রাকাডাব্রা\" গোলাপ—দীর্ঘদিন গাছে টাটকা থাকে ও ছাদবাগানে নজর কাড়ে।",
+    descriptionEn: "Famous candy-striped crimson and ivory rose variety prized by rose enthusiasts.",
     image: getAshokePhotoUrl(69),
     options: [
       {
         id: "opt-58-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "কলম চারা (১০–১৪ ইঞ্চি · ৬ মাস)",
+        labelEn: "Grafted Sapling (10–14 in)",
         price: 80,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -1994,14 +1897,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ বোগেনভিলিয়া (গোলাপি) চারা।",
-    descriptionEn: "Fresh, well-rooted Pink Bougainvillea (Baganbilas) sapling grown at Kalsuli nursery.",
+    descriptionBn: "বাঁকুড়ার তীব্র গরমে সবচেয়ে কম জলে ফুলে ফুলে ঢেকে যাওয়া গোলাপি বাগানবিলাস—টব বা গেটের ওপর লতায় বা বনসাই রূপে মানানসই।",
+    descriptionEn: "Heat-loving magenta-pink Bougainvillea erupting in papery bract clouds with minimal water.",
     image: getAshokePhotoUrl(23),
     options: [
       {
         id: "opt-7-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "শিকড়যুক্ত চারা (১–১.৫ ফুট · ৬ মাস)",
+        labelEn: "Rooted Sapling (1–1.5 ft)",
         price: 90,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -2028,8 +1931,8 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     options: [
       {
         id: "opt-27-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "লতানো চারা (১.২–১.৫ ফুট · ৫ মাস)",
+        labelEn: "Vine Sapling (1.2–1.5 ft)",
         price: 80,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -2050,14 +1953,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ মধু - মালতী চারা।",
-    descriptionEn: "Fresh, well-rooted Madhu Malati / Rangoon Creeper sapling grown at Kalsuli nursery.",
+    descriptionBn: "বিকাল থেকে রাত পর্যন্ত মধুর মতো সুবাস ছড়ানো সাদা-গোলাপি-লাল তিন রঙের মধুমালতী লতা—সদর দরজা ও ব্যালকনির প্রিয় লতা।",
+    descriptionEn: "Sweetly scented Rangoon Creeper whose clusters shift from white to pink to ruby red.",
     image: getAshokePhotoUrl(32),
     options: [
       {
         id: "opt-23-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "লতানো চারা (১–১.৫ ফুট · ৫ মাস)",
+        labelEn: "Creeper Sapling (1–1.5 ft)",
         price: 60,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -2078,14 +1981,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ মালটিভিলা ফুল চারা।",
-    descriptionEn: "Fresh, well-rooted Mandevilla Climbing Vine sapling grown at Kalsuli nursery.",
+    descriptionBn: "চকচকে গাঢ় সবুজ পাতার ফাঁকে বড় বড় গোলাপি ঘণ্টাকৃতি ম্যান্ডেভিলা লতা—ব্যালকনির গ্রিলে সারাবছর ঝলমলে ফুল দেয়।",
+    descriptionEn: "Glossy evergreen Mandevilla climber blooming with bold trumpet-pink flowers across spring and summer.",
     image: getAshokePhotoUrl(81),
     options: [
       {
         id: "opt-68-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "টবের লতা চারা (১–১.৫ ফুট · ৬ মাস)",
+        labelEn: "Potted Vine (1–1.5 ft)",
         price: 120,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -2106,14 +2009,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ মাল্টিভিলা ( হলুদ ) চারা।",
-    descriptionEn: "Fresh, well-rooted Yellow Mandevilla / Allamanda sapling grown at Kalsuli nursery.",
+    descriptionBn: "টকটকে উজ্জ্বল হলুদ মাইকের মতো বড় অ্যালমান্ডা (হলুদ ম্যান্ডেভিলা)—গ্রীষ্ম ও বর্ষায় একটানা বাগান আলো করে রাখে।",
+    descriptionEn: "Sunny yellow golden-trumpet Allamanda bush blooming heavily through monsoon and summer warmth.",
     image: getAshokePhotoUrl(59),
     options: [
       {
         id: "opt-49-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (১–১.৫ ফুট · ৫ মাস)",
+        labelEn: "Grow Bag (1–1.5 ft)",
         price: 70,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -2134,14 +2037,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ মুসান্ডা ফুল চারা।",
-    descriptionEn: "Fresh, well-rooted Mussaenda / Bangkok Rose sapling grown at Kalsuli nursery.",
+    descriptionBn: "সাদা ও গোলাপি মখমলি পাতার মতো বড় ব্রেক্টওয়ালা মুসান্ডা (ব্যাংকক রোজ)—একটি ফোটা গুচ্ছ বহু সপ্তাহ রঙিন হয়ে থাকে।",
+    descriptionEn: "Velvety rose-and-cream bracted Mussaenda bush holding color steady through monsoon humidity.",
     image: getAshokePhotoUrl(64),
     options: [
       {
         id: "opt-53-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "কলম চারা (১–১.৫ ফুট · ৬ মাস)",
+        labelEn: "Grafted Sapling (1–1.5 ft)",
         price: 90,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -2162,43 +2065,15 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ রঙ্গন ফুল চারা।",
-    descriptionEn: "Fresh, well-rooted Native Red Ixora / Rangan sapling grown at Kalsuli nursery.",
+    descriptionBn: "বাঁকুড়ার মাটির উপযোগী খাঁটি লাল দেশি রঙ্গন—কঠিন রোদেও অনায়াসে ঘন লাল ফুলের থোকা উপহার দেয়।",
+    descriptionEn: "Hardy native red Ixora shrub thriving effortlessly in sunny Bengal courtyards and temple yards.",
     image: getAshokePhotoUrl(57),
     options: [
       {
         id: "opt-47-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (১–১.২ ফুট · ৫ মাস)",
+        labelEn: "Grow Bag (1–1.2 ft)",
         price: 50,
-        containerType: "পলি গ্রো ব্যাগ"
-      }
-    ]
-  },
-  {
-    id: "ashoke-34",
-    nameBn: "লাল পদ্ম ফুল",
-    nameEn: "Sacred Red Lotus",
-    botanicalName: "Nelumbo nucifera (Rubra)",
-    category: "পূজার ফুল ও পবিত্র গাছ",
-    audience: ["puja","family"],
-    badgeBn: "পুজোয় শ্রেষ্ঠ লাল পদ্ম",
-    colorBn: "রক্ত লাল",
-    sunlightBn: "দিনে ৫-৬ ঘণ্টা পূর্ণ রোদ",
-    sunlightEn: "5-6 Hours Full Sunlight",
-    wateringBn: "পাত্রে সবসময় ৩-৪ ইঞ্চি পরিষ্কার জল রাখুন",
-    wateringEn: "Maintain 3-4 inches standing clean water",
-    soilTipBn: "পুকুরের এঁটেল মাটি ও সামান্য গোবর সার",
-    soilTipEn: "Heavy clay/pond mud with aged cow manure",
-    descriptionBn: "বাঁকুড়ার রোদে জলের পাত্র বা গামলায় প্রচুর ফুল ফোটা লাল পদ্ম ফুল।",
-    descriptionEn: "Healthy aquatic Sacred Red Lotus ready to bloom abundantly in sunny water tubs.",
-    image: getAshokePhotoUrl(44),
-    options: [
-      {
-        id: "opt-34-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
-        price: 350,
         containerType: "পলি গ্রো ব্যাগ"
       }
     ]
@@ -2224,8 +2099,8 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     options: [
       {
         id: "opt-25-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (১.২–১.৫ ফুট · ৬ মাস)",
+        labelEn: "Grow Bag (1.2–1.5 ft)",
         price: 160,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -2246,14 +2121,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ সাদা গোলাপ চারা।",
-    descriptionEn: "Fresh, well-rooted White Fragrant Rose sapling grown at Kalsuli nursery.",
+    descriptionBn: "খাঁটি বরফ-সাদা সুগন্ধি হাইব্রিড গোলাপ—প্রতিটি ফুল ধীরে ধীরে ফুটে ওঠে ও শান্ত, পবিত্র শোভা ছড়ায়।",
+    descriptionEn: "Pure snow-white fragrant rose with crisp, slow-opening buds ideal for sunlit pots.",
     image: getAshokePhotoUrl(76),
     options: [
       {
         id: "opt-64-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "কলম চারা (১০–১৪ ইঞ্চি · ৬ মাস)",
+        labelEn: "Grafted Sapling (10–14 in)",
         price: 80,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -2280,8 +2155,8 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     options: [
       {
         id: "opt-41-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (১.২–১.৫ ফুট · ৬ মাস)",
+        labelEn: "Grow Bag (1.2–1.5 ft)",
         price: 80,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -2302,14 +2177,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ হলুদ গাঁদা ফুল চারা।",
-    descriptionEn: "Fresh, well-rooted Yellow French Marigold sapling grown at Kalsuli nursery.",
+    descriptionBn: "হালকা ঝালর কাটা পাপড়ির সোনালী হলুদ ফ্রেঞ্চ গাঁদা—পূজার অর্ঘ্যে ও ছাদবাগানের পোকা তাড়ানোর সাথী গাছ হিসেবে চমৎকার।",
+    descriptionEn: "Sunny golden-yellow French marigold seedlings ideal for garlands and natural garden pest control.",
     image: getAshokePhotoUrl(71),
     options: [
       {
         id: "opt-59-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "মৌসুমী চারা (৫–৭ ইঞ্চি · ৩০ দিন)",
+        labelEn: "Seasonal Seedling (5–7 in)",
         price: 15,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -2317,7 +2192,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-66",
-    nameBn: "Rabish পাম",
+    nameBn: "র‍্যাফিস পাম (Rhapis Palm)",
     nameEn: "Rhapis Palm / Broadleaf Lady Palm",
     botanicalName: "Rhapis excelsa",
     category: "গৃহস্থ ও ঔষধি গাছ",
@@ -2336,8 +2211,8 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     options: [
       {
         id: "opt-66-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "বড় গ্রো ব্যাগ (১.৫–২ ফুট · ১ বছর)",
+        labelEn: "Large Polybag (1.5–2 ft · 1 yr)",
         price: 350,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -2345,7 +2220,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-50",
-    nameBn: "পাতা বাহার",
+    nameBn: "রঙিন পাতাবাহার (ক্রোটন-মাল্টিকালার)",
     nameEn: "Colorful Caladium / Croton",
     botanicalName: "Codiaeum variegatum",
     category: "গৃহস্থ ও ঔষধি গাছ",
@@ -2358,14 +2233,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "হালকা কোকোপিট, বালি ও ভার্মিকম্পোস্ট মিশ্রণ",
     soilTipEn: "Well-draining cocopeat, sand & vermicompost mix",
-    descriptionBn: "ঘরের ভেতর বা বারান্দার হালকা ছায়ায় সহজে বেড়ে ওঠা সতেজ পাতা বাহার চারা।",
-    descriptionEn: "Healthy, low-maintenance indoor/balcony Colorful Caladium / Croton sapling.",
+    descriptionBn: "সবুজের ওপর লাল, হলুদ ও কমলার দারুণ ছোপযুক্ত চওড়া পাতার বাহারি ক্রোটন—বাড়ির প্রবেশদ্বার ও সিঁড়িতে উজ্জ্বল রঙ আনে।",
+    descriptionEn: "Bold multi-colored broadleaf croton adding tropical crimson and amber tones to verandas.",
     image: getAshokePhotoUrl(80),
     options: [
       {
         id: "opt-50-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (১–১.৫ ফুট · ৬ মাস)",
+        labelEn: "Grow Bag (1–1.5 ft)",
         price: 150,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -2373,7 +2248,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-60",
-    nameBn: "পাতাবাহার",
+    nameBn: "পেট্রা ভ্যারাইটি পাতাবাহার",
     nameEn: "Variegated Croton Foliage",
     botanicalName: "Codiaeum variegatum (Petra)",
     category: "গৃহস্থ ও ঔষধি গাছ",
@@ -2386,14 +2261,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "হালকা কোকোপিট, বালি ও ভার্মিকম্পোস্ট মিশ্রণ",
     soilTipEn: "Well-draining cocopeat, sand & vermicompost mix",
-    descriptionBn: "ঘরের ভেতর বা বারান্দার হালকা ছায়ায় সহজে বেড়ে ওঠা সতেজ পাতাবাহার চারা।",
-    descriptionEn: "Healthy, low-maintenance indoor/balcony Variegated Croton Foliage sapling.",
+    descriptionBn: "হলুদ ও গাঢ় লাল শিরাযুক্ত শক্ত ও চকচকে পাতার \"পেট্রা\" ক্রোটন—ফুল না ফুটলেও সারাবছর পাতার রঙেই বাগান জমজমাট থাকে।",
+    descriptionEn: "Striking Petra croton with thick veined leaves glowing in yellow, scarlet, and emerald green.",
     image: getAshokePhotoUrl(72),
     options: [
       {
         id: "opt-60-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (১–১.৫ ফুট · ৬ মাস)",
+        labelEn: "Grow Bag (1–1.5 ft)",
         price: 150,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -2414,14 +2289,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "হালকা কোকোপিট, বালি ও ভার্মিকম্পোস্ট মিশ্রণ",
     soilTipEn: "Well-draining cocopeat, sand & vermicompost mix",
-    descriptionBn: "ঘরের ভেতর বা বারান্দার হালকা ছায়ায় সহজে বেড়ে ওঠা সতেজ পাতাবাহার (ক্রোটন) চারা।",
-    descriptionEn: "Healthy, low-maintenance indoor/balcony Croton Gold Dust sapling.",
+    descriptionBn: "গাঢ় সবুজ পাতার গায়ে সোনালী রেণু ছড়ানো গোল্ড-ডাস্ট ক্রোটন—হালকা ছায়া ও বারান্দার এক কোণে দারুণ ঝোপালো হয়।",
+    descriptionEn: "Gold-Dust croton speckled with luminous golden dots; hardy indoor-veranda foliage shrub.",
     image: getAshokePhotoUrl(10),
     options: [
       {
         id: "opt-10-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (১০–১২ ইঞ্চি · ৫ মাস)",
+        labelEn: "Grow Bag (10–12 in)",
         price: 70,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -2429,7 +2304,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-67",
-    nameBn: "ব্রাজিলিয়ান লাকি বেম্বো",
+    nameBn: "ব্রাজিলিয়ান লাকি ব্যাম্বু",
     nameEn: "Brazilian Lucky Bamboo",
     botanicalName: "Dracaena sanderiana (Brazilian)",
     category: "গৃহস্থ ও ঔষধি গাছ",
@@ -2442,14 +2317,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "হালকা কোকোপিট, বালি ও ভার্মিকম্পোস্ট মিশ্রণ",
     soilTipEn: "Well-draining cocopeat, sand & vermicompost mix",
-    descriptionBn: "ঘরের ভেতর বা বারান্দার হালকা ছায়ায় সহজে বেড়ে ওঠা সতেজ ব্রাজিলিয়ান লাকি বেম্বো চারা।",
-    descriptionEn: "Healthy, low-maintenance indoor/balcony Brazilian Lucky Bamboo sapling.",
+    descriptionBn: "প্রকৃত ব্রাজিলিয়ান ড্রেসিনা কাঠের লগ থেকে বেরোনো নতুন সবুজ পাতা—অল্প আলোতে জলের পাত্রেই বসার ঘরে দারুণ সৌন্দর্য আনে।",
+    descriptionEn: "Authentic rooted Brazilian Lucky Wood trunk sprouting fresh foliage in shallow indoor water trays.",
     image: getAshokePhotoUrl(79),
     options: [
       {
         id: "opt-67-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "প্রস্তুত কাঠের লগ (৬–৮ ইঞ্চি · শিকড়সহ)",
+        labelEn: "Rooted Wood Log (6–8 in)",
         price: 550,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -2470,14 +2345,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "হালকা কোকোপিট, বালি ও ভার্মিকম্পোস্ট মিশ্রণ",
     soilTipEn: "Well-draining cocopeat, sand & vermicompost mix",
-    descriptionBn: "ঘরের ভেতর বা বারান্দার হালকা ছায়ায় সহজে বেড়ে ওঠা সতেজ মানি প্ল্যান্ট চারা।",
-    descriptionEn: "Healthy, low-maintenance indoor/balcony Golden Pothos / Money Plant sapling.",
+    descriptionBn: "সবুজ পাতায় সোনালী ছোপওয়ালা মানি প্ল্যান্ট (গোল্ডেন পথোস)—মাটি বা জলের বোতল দুই জায়গাতেই দ্রুত লতিয়ে ঘরের বাতাস শুদ্ধ করে।",
+    descriptionEn: "Fast-trailing Golden Pothos ivy thriving effortlessly in water jars or hanging balcony pots.",
     image: getAshokePhotoUrl(8),
     options: [
       {
         id: "opt-8-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "লতা চারা (৮–১০ ইঞ্চি · শিকড়সহ)",
+        labelEn: "Rooted Vine (8–10 in)",
         price: 40,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -2498,14 +2373,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "হালকা কোকোপিট, বালি ও ভার্মিকম্পোস্ট মিশ্রণ",
     soilTipEn: "Well-draining cocopeat, sand & vermicompost mix",
-    descriptionBn: "ঘরের ভেতর বা বারান্দার হালকা ছায়ায় সহজে বেড়ে ওঠা সতেজ রাবার গাছ চারা।",
-    descriptionEn: "Healthy, low-maintenance indoor/balcony Burgundy Rubber Tree sapling.",
+    descriptionBn: "মোটা, চকচকে কালচে-খয়েরি (বার্গান্ডি) পাতার ইনডোর রাবার প্ল্যান্ট—বসার ঘর ও অফিসের কোণকে দেয় আধুনিক আভিজাত্য।",
+    descriptionEn: "Glossy deep-burgundy Ficus Elastica rubber plant bringing architectural elegance to living rooms.",
     image: getAshokePhotoUrl(84),
     options: [
       {
         id: "opt-71-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (১–১.৫ ফুট · ৬ মাস)",
+        labelEn: "Grow Bag (1–1.5 ft)",
         price: 70,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -2513,7 +2388,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-65",
-    nameBn: "লাকিবেম্বো",
+    nameBn: "লাকি ব্যাম্বু (৩ স্তর)",
     nameEn: "Lucky Bamboo 3-Tier",
     botanicalName: "Dracaena braunii",
     category: "গৃহস্থ ও ঔষধি গাছ",
@@ -2526,14 +2401,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Keep roots submerged in clean fresh water",
     soilTipBn: "হালকা কোকোপিট, বালি ও ভার্মিকম্পোস্ট মিশ্রণ",
     soilTipEn: "Well-draining cocopeat, sand & vermicompost mix",
-    descriptionBn: "ঘরের ভেতর বা বারান্দার হালকা ছায়ায় সহজে বেড়ে ওঠা সতেজ লাকিবেম্বো চারা।",
-    descriptionEn: "Healthy, low-maintenance indoor/balcony Lucky Bamboo 3-Tier sapling.",
+    descriptionBn: "সুন্দর ৩-স্তরের গোছানো জলজ লাকি ব্যাম্বু—সপ্তাহে একবার পরিষ্কার জল পাল্টে দিলেই বসার ঘরের টেবিলে বছরের পর বছর সবুজ থাকে।",
+    descriptionEn: "Symmetrical 3-tier Lucky Bamboo arrangement symbolizing harmony; thrives in fresh tap water indoors.",
     image: getAshokePhotoUrl(77),
     options: [
       {
         id: "opt-65-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "৩-স্তরের ক্যান (৮–১০ ইঞ্চি)",
+        labelEn: "3-Tier Arrangement (8–10 in)",
         price: 450,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -2554,14 +2429,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water sparingly once or twice a week",
     soilTipBn: "হালকা কোকোপিট, বালি ও ভার্মিকম্পোস্ট মিশ্রণ",
     soilTipEn: "Well-draining cocopeat, sand & vermicompost mix",
-    descriptionBn: "ঘরের ভেতর বা বারান্দার হালকা ছায়ায় সহজে বেড়ে ওঠা সতেজ স্নেক প্ল্যান্ট চারা।",
-    descriptionEn: "Healthy, low-maintenance indoor/balcony Snake Plant / Sansevieria sapling.",
+    descriptionBn: "হলুদ বর্ডারযুক্ত খাড়া তলোয়ারের মতো স্নেক প্ল্যান্ট (সানসেভেরিয়া)—রাতের বেলা অক্সিজেন ছাড়ে এবং ঘরের দূষিত বাতাস শুষে নেয়।",
+    descriptionEn: "Resilient Laurentii Snake Plant releasing oxygen at night while needing watering only once a week.",
     image: snakeOrigImg,
     options: [
       {
         id: "opt-9-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "শিকড়যুক্ত চারা (৮–১২ ইঞ্চি · ৬ মাস)",
+        labelEn: "Rooted Clump (8–12 in)",
         price: 140,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -2582,14 +2457,14 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে তৈরি সুপুষ্ট ও রোগমুক্ত স্বাস্থ্যকর চারা।",
-    descriptionEn: "Fresh, healthy nursery sapling acclimated to Bankura soil and climate.",
+    descriptionBn: "সবল কাণ্ডের দেশি খাঁটি টমেটো চারা—১০–১২ ইঞ্চি টব বা সবজি ক্ষেতে রোপণ করলে ৫৫–৭০ দিনেই থোকায় থোকায় লাল টমেটো ধরে।",
+    descriptionEn: "Vigorous native country tomato seedlings yielding juicy, tangy harvests within 55–70 days.",
     image: getAshokePhotoUrl(11),
     options: [
       {
         id: "opt-11-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "সবজি চারা (৫–৬ ইঞ্চি · ২৫–৩০ দিন)",
+        labelEn: "Vegetable Seedling (5–6 in)",
         price: 5,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -2616,8 +2491,8 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     options: [
       {
         id: "opt-14-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "রসালো চারা (৬–১০ ইঞ্চি · ৪–৬ মাস)",
+        labelEn: "Rooted Clump (6–10 in)",
         price: 50,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -2644,8 +2519,8 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     options: [
       {
         id: "opt-13-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "পবিত্র চারা (৮–১০ ইঞ্চি · ৩–৪ মাস)",
+        labelEn: "Polybag Sapling (8–10 in)",
         price: 30,
         containerType: "পলি গ্রো ব্যাগ"
       }
@@ -2672,8 +2547,8 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     options: [
       {
         id: "opt-15-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
+        labelBn: "গ্রো ব্যাগ (১–১.৫ ফুট · ৬ মাস)",
+        labelEn: "Grow Bag (1–1.5 ft)",
         price: 70,
         containerType: "পলি গ্রো ব্যাগ"
       }

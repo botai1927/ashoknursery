@@ -193,7 +193,7 @@ export function LiveSearchBox({
           onKeyDown={handleKeyDown}
           placeholder={placeholder || defaultPlaceholder}
           aria-label={lang === 'bn' ? 'চারাগাছ অনুসন্ধান' : 'Search plant catalog'}
-          className={`w-full ${inputSizeClass} bg-white border border-[#CEDAC9] rounded-xl text-[#142318] placeholder:text-[#7D9182] focus:outline-none focus:ring-2 focus:ring-[#1B8354] focus:border-[#1B8354] font-sans-bn transition-shadow`}
+          className={`w-full ${inputSizeClass} bg-white border border-[#CEDAC9] rounded-xl text-[#142318] placeholder:text-[#7D9182] focus:outline-2 focus:outline-[#1B8354] focus:outline-offset-1 focus:ring-2 focus:ring-[#1B8354] focus:border-[#1B8354] font-sans-bn transition-shadow`}
         />
         {value && (
           <button
@@ -223,11 +223,11 @@ export function LiveSearchBox({
           {!value.trim() ? (
             <div className="p-3.5">
               <div className="flex items-center justify-between gap-2 mb-2">
-                <p className="text-[11px] font-semibold text-[#526857] flex items-center gap-1.5">
+                <p className="text-xs font-semibold text-[#526857] flex items-center gap-1.5">
                   <Sprout className="w-3.5 h-3.5 text-[#1B8354]" />
                   <span>{lang === 'bn' ? 'জনপ্রিয় চারা খুঁজুন:' : 'Popular searches:'}</span>
                 </p>
-                <span className="text-[10px] font-mono-num text-[#526857]">
+                <span className="text-xs font-mono-num text-[#526857]">
                   {plants.length} {lang === 'bn' ? 'টি চারা' : 'plants'}
                 </span>
               </div>
@@ -254,7 +254,7 @@ export function LiveSearchBox({
                   ? `"${value}" নামের কোনো চারা পাওয়া যায়নি`
                   : `No saplings found for "${value}"`}
               </p>
-              <p className="text-[11px] text-[#526356] mt-0.5">
+              <p className="text-xs text-[#526356] mt-0.5">
                 {lang === 'bn'
                   ? 'আম, লেবু, গোলাপ, জবা বা তুলসী লিখে দেখুন'
                   : 'Try mango, lemon, rose, hibiscus, or tulsi'}
@@ -262,7 +262,7 @@ export function LiveSearchBox({
             </div>
           ) : (
             <div>
-              <div className="px-3.5 py-2 bg-[#EBF1E8] border-b border-[#DFE7DC] flex items-center justify-between text-[11px] text-[#4C6252]">
+              <div className="px-3.5 py-2 bg-[#EBF1E8] border-b border-[#DFE7DC] flex items-center justify-between text-xs text-[#4C6252]">
                 <span className="font-semibold">
                   {lang === 'bn'
                     ? `সম্ভাব্য গাছের নাম (${totalMatches}টি মিল)`
@@ -306,6 +306,8 @@ export function LiveSearchBox({
                             src={resolvePlantImageUrl(plant.image, PUJA_IMAGE)}
                             alt={plant.nameBn}
                             className="w-full h-full object-cover"
+                            loading="lazy"
+                            decoding="async"
                             referrerPolicy="no-referrer"
                             onError={(e) => {
                               const target = e.currentTarget as HTMLImageElement;
@@ -321,12 +323,12 @@ export function LiveSearchBox({
                               query={value}
                             />
                             {plant.colorBn && (
-                              <span className="ml-1.5 text-[11px] font-sans-bn font-normal text-[#526857]">
+                              <span className="ml-1.5 text-xs font-sans-bn font-normal text-[#526857]">
                                 ({plant.colorBn})
                               </span>
                             )}
                           </p>
-                          <div className="flex items-center gap-1.5 text-[11px] text-[#526356] truncate">
+                          <div className="flex items-center gap-1.5 text-xs text-[#526356] truncate">
                             <span className="truncate">
                               <HighlightedText
                                 text={lang === 'bn' ? plant.nameEn : plant.nameBn}
@@ -354,7 +356,7 @@ export function LiveSearchBox({
                           type="button"
                           onMouseDown={(e) => e.preventDefault()}
                           onClick={(e) => handleQuickAdd(e, plant)}
-                          className={`px-2.5 py-1.5 rounded-lg text-[11px] font-semibold inline-flex items-center gap-1 shrink-0 transition-colors cursor-pointer ${
+                          className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1 shrink-0 transition-colors cursor-pointer ${
                             isAdded
                               ? 'bg-[#142318] text-white'
                               : 'bg-[#1B8354]/12 text-[#1B8354] hover:bg-[#1B8354] hover:text-white'

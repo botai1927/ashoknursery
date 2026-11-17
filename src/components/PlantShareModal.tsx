@@ -187,7 +187,7 @@ export function PlantShareModal({
                   ? 'ছবি ও চারাগাছের তথ্য শেয়ার করুন'
                   : 'Share Photo & Plant Details'}
               </h3>
-              <p className="text-[11px] text-[#4C6252] truncate">
+              <p className="text-xs text-[#4C6252] truncate">
                 {lang === 'bn'
                   ? 'বন্ধু, পরিবার বা বাগান গ্রুপে WhatsApp-এ পাঠান'
                   : 'Send photo & complete details on WhatsApp'}
@@ -214,6 +214,8 @@ export function PlantShareModal({
                 src={activePhotoSrc}
                 alt={plant.nameBn}
                 className="max-h-full max-w-full object-contain"
+                loading="lazy"
+                decoding="async"
                 referrerPolicy="no-referrer"
                 onError={(e) => {
                   const target = e.currentTarget as HTMLImageElement;
@@ -225,20 +227,20 @@ export function PlantShareModal({
             </div>
 
             <div className="min-w-0 flex-1">
-              <p className="text-[10px] font-bold text-[#1B8354] truncate">
+              <p className="text-xs font-bold text-[#1B8354] truncate">
                 {plant.category}
               </p>
               <h4 className="font-serif-bn font-bold text-base text-[#142318] truncate">
                 {lang === 'bn' ? plant.nameBn : plant.nameEn}
               </h4>
-              <p className="text-[11px] text-[#526857] italic truncate">
+              <p className="text-xs text-[#526857] italic truncate">
                 {plant.botanicalName}
               </p>
               <div className="mt-1 flex items-center gap-2">
                 <span className="text-sm font-bold text-[#B34728] font-mono-num tabular-nums">
                   ₹{activeOption.price}
                 </span>
-                <span className="text-[11px] text-[#4C6252] truncate">
+                <span className="text-xs text-[#4C6252] truncate">
                   · {lang === 'bn' ? activeOption.labelBn : activeOption.labelEn}
                 </span>
               </div>
@@ -348,12 +350,12 @@ export function PlantShareModal({
 
           {/* Message Preview */}
           <div className="space-y-1.5">
-            <span className="block text-[11px] font-bold text-[#4C6252]">
+            <span className="block text-xs font-bold text-[#4C6252]">
               {lang === 'bn'
                 ? 'WhatsApp-এ যা পাঠানো হবে (প্রিভিউ):'
                 : 'Message preview for WhatsApp:'}
             </span>
-            <pre className="p-3 rounded-2xl bg-white border border-[#D5DFD1] text-[11px] leading-relaxed text-[#2D4033] whitespace-pre-wrap font-sans-bn max-h-40 overflow-y-auto">
+            <pre className="p-3 rounded-2xl bg-white border border-[#D5DFD1] text-xs leading-relaxed text-[#2D4033] whitespace-pre-wrap font-sans-bn max-h-40 overflow-y-auto">
               {shareBundle.text}
             </pre>
           </div>

@@ -1,16 +1,11 @@
 import {
-  Sparkles,
   Bot,
   ShieldCheck,
-  AlertTriangle,
   CheckCircle,
   Database,
   Loader2,
   Wrench,
-  Search,
   Activity,
-  ArrowRight,
-  ExternalLink,
 } from 'lucide-react';
 import type { BrahmyamanPlant } from '../types/nursery';
 import { PUJA_IMAGE } from '../data/brahmyamanCatalog';
@@ -118,7 +113,7 @@ export function AdminDiagnosticsTab({
                 : 'bg-[#FAF8F5] hover:bg-[#F3ECE2] border-[#E8E1D5] text-[#142318]'
             }`}
           >
-            <p className={`text-[11px] font-bold ${diagnosticsTab === 'rootcause' ? 'text-[#A3E635]' : 'text-[#785942]'}`}>
+            <p className={`text-xs font-bold ${diagnosticsTab === 'rootcause' ? 'text-[#A3E635]' : 'text-[#785942]'}`}>
               সমস্যা ও মূল কারণ
             </p>
             <p className={`text-xl font-bold font-mono tabular-nums ${rootCauseDiagnostics.length > 0 && diagnosticsTab !== 'rootcause' ? 'text-[#B34728]' : ''}`}>
@@ -135,7 +130,7 @@ export function AdminDiagnosticsTab({
                 : 'bg-[#FAF8F5] hover:bg-[#F3ECE2] border-[#E8E1D5] text-[#142318]'
             }`}
           >
-            <p className={`text-[11px] font-bold ${diagnosticsTab === 'duplicates' ? 'text-[#A3E635]' : 'text-[#785942]'}`}>
+            <p className={`text-xs font-bold ${diagnosticsTab === 'duplicates' ? 'text-[#A3E635]' : 'text-[#785942]'}`}>
               ডুপ্লিকেট গ্রুপ
             </p>
             <p className="text-xl font-bold font-mono tabular-nums">
@@ -152,7 +147,7 @@ export function AdminDiagnosticsTab({
                 : 'bg-[#FAF8F5] hover:bg-[#F3ECE2] border-[#E8E1D5] text-[#142318]'
             }`}
           >
-            <p className={`text-[11px] font-bold ${diagnosticsTab === 'bugs' ? 'text-[#A3E635]' : 'text-[#785942]'}`}>
+            <p className={`text-xs font-bold ${diagnosticsTab === 'bugs' ? 'text-[#A3E635]' : 'text-[#785942]'}`}>
               অটো ফিক্স স্ট্যাটাস
             </p>
             <p className="text-xl font-bold font-mono tabular-nums text-[#1B8354]">
@@ -169,7 +164,7 @@ export function AdminDiagnosticsTab({
                 : 'bg-[#FAF8F5] hover:bg-[#F3ECE2] border-[#E8E1D5] text-[#142318]'
             }`}
           >
-            <p className={`text-[11px] font-bold ${diagnosticsTab === 'health' ? 'text-[#A3E635]' : 'text-[#785942]'}`}>
+            <p className={`text-xs font-bold ${diagnosticsTab === 'health' ? 'text-[#A3E635]' : 'text-[#785942]'}`}>
               ডাটাবেস হেলথ
             </p>
             <p className="text-xl font-bold font-mono tabular-nums text-[#1B8354]">
@@ -245,7 +240,7 @@ export function AdminDiagnosticsTab({
                       {issue.titleBn}
                     </h4>
                     <span
-                      className={`text-[11px] font-bold px-2 py-0.5 rounded-md shrink-0 ${
+                      className={`text-xs font-bold px-2 py-0.5 rounded-md shrink-0 ${
                         issue.severity === 'high'
                           ? 'bg-[#FEE2E2] text-[#B34728]'
                           : issue.severity === 'medium'
@@ -348,6 +343,8 @@ export function AdminDiagnosticsTab({
                       src={resolvePlantImageUrl(group.url, PUJA_IMAGE)}
                       alt="duplicate"
                       className="w-14 h-14 rounded-xl object-cover border border-[#DDD5C7]"
+                      loading="lazy"
+                      decoding="async"
                     />
                     <div className="min-w-0 flex-1">
                       <p className="font-serif-bn text-sm font-bold text-[#B34728]">
@@ -369,7 +366,7 @@ export function AdminDiagnosticsTab({
                           <p className="font-bold text-[#142318] truncate">
                             {p.nameBn} {p.colorBn ? `(${p.colorBn})` : ''}
                           </p>
-                          <p className="text-[11px] text-[#785942] font-mono">
+                          <p className="text-xs text-[#785942] font-mono">
                             মূল্য: ₹{p.options[0]?.price || 0} · বিভাগ: {p.category}
                           </p>
                         </div>
@@ -377,14 +374,14 @@ export function AdminDiagnosticsTab({
                           <button
                             type="button"
                             onClick={() => onStartEditPlant(p)}
-                            className="px-2.5 py-1 bg-[#1B8354] hover:bg-[#146c44] text-white text-[11px] font-bold rounded-lg cursor-pointer"
+                            className="px-2.5 py-1 bg-[#1B8354] hover:bg-[#146c44] text-white text-xs font-bold rounded-lg cursor-pointer"
                           >
                             এডিট
                           </button>
                           <button
                             type="button"
                             onClick={() => onSoftDelete(p)}
-                            className="px-2.5 py-1 bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#B34728] text-[11px] font-bold rounded-lg cursor-pointer"
+                            className="px-2.5 py-1 bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#B34728] text-xs font-bold rounded-lg cursor-pointer"
                           >
                             ট্র্যাশে পাঠান
                           </button>

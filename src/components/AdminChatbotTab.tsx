@@ -95,7 +95,7 @@ export function AdminChatbotTab({
             <button
               type="button"
               onClick={() => onSwitchTab('api')}
-              className={`text-[11px] font-semibold cursor-pointer hover:underline tabular-nums ${
+              className={`text-xs font-semibold cursor-pointer hover:underline tabular-nums ${
                 aiStatus.activeSlotCooldownSec > 0 ? 'text-[#B34728]' : 'text-[#1B8354]'
               }`}
             >
@@ -111,7 +111,7 @@ export function AdminChatbotTab({
             aria-label="Select Gemini AI Model"
             value={modelType}
             onChange={(e) => setModelType(e.target.value as AiModelChoice)}
-            className="h-8 px-2 bg-white border border-[#D5C9B8] rounded-lg font-bold text-[#142318] text-[11px]"
+            className="h-8 px-2 bg-white border border-[#D5C9B8] rounded-lg font-bold text-[#142318] text-xs"
           >
             <option value="auto">Auto (Gemini Cascade)</option>
             <option value="flash25">Gemini 2.5 Flash</option>
@@ -119,7 +119,7 @@ export function AdminChatbotTab({
             <option value="hydrogen">Gemini 4 Hydrogen</option>
           </select>
 
-          <label className="flex items-center gap-1 cursor-pointer text-[11px] text-[#526356] pl-1">
+          <label className="flex items-center gap-1 cursor-pointer text-xs text-[#526356] pl-1">
             <input
               type="checkbox"
               checked={useSearchGrounding}
@@ -240,7 +240,7 @@ export function AdminChatbotTab({
 
               {msg.sources && msg.sources.length > 0 && (
                 <div className="mt-2 pt-2 border-t border-[#E8E1D5] space-y-1">
-                  <p className="text-[10px] font-bold text-[#785942]">তথ্যসূত্র:</p>
+                  <p className="text-xs font-bold text-[#785942]">তথ্যসূত্র:</p>
                   <div className="flex flex-wrap gap-1">
                     {msg.sources.slice(0, 3).map((src, i) => (
                       <a
@@ -248,7 +248,7 @@ export function AdminChatbotTab({
                         href={src.uri}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white border border-[#D5C9B8] text-[10px] text-[#1B8354]"
+                        className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white border border-[#D5C9B8] text-xs text-[#1B8354]"
                       >
                         <span className="truncate max-w-[140px]">{src.title || 'Source'}</span>
                         <ExternalLink className="w-2.5 h-2.5" />
@@ -258,7 +258,7 @@ export function AdminChatbotTab({
                 </div>
               )}
 
-              <span className="block text-[9px] text-right mt-1 opacity-60 tabular-nums">
+              <span className="block text-xs text-right mt-1 opacity-60 tabular-nums">
                 {msg.timestamp}
               </span>
             </div>
@@ -283,7 +283,7 @@ export function AdminChatbotTab({
             if (e.key === 'Enter') onSendMessage();
           }}
           placeholder="চারার দাম, নতুন জাত বা রোগবালাই নিয়ে লিখুন..."
-          className="flex-1 h-11 px-3.5 border border-[#D5C9B8] rounded-xl text-base sm:text-sm text-[#142318] focus:outline-none focus:border-[#1B8354]"
+          className="flex-1 h-11 px-3.5 border border-[#D5C9B8] rounded-xl text-base sm:text-sm text-[#142318] focus:outline-2 focus:outline-[#1B8354] focus:outline-offset-1 focus:border-[#1B8354]"
         />
         <button
           type="button"

@@ -2,10 +2,10 @@
 
 @theme {
   --font-serif-bn: "Noto Serif Bengali", serif;
-  --font-sans-bn: "Hind Siliguri", "Plus Jakarta Sans", sans-serif;
+  --font-sans-bn: "Hind Siliguri", system-ui, sans-serif;
   --font-display: "Noto Serif Bengali", serif;
-  --font-sans: "Hind Siliguri", "Plus Jakarta Sans", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-sans: "Hind Siliguri", system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 @layer base {

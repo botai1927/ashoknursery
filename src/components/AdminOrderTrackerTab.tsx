@@ -153,7 +153,7 @@ export function AdminOrderTrackerTab({
               >
                 অর্ডার ও ইনকোয়ারি ট্র্যাকার (WhatsApp Order &amp; Demand Log)
               </h2>
-              <p className="text-[11px] text-[#526356]">
+              <p className="text-xs text-[#526356]">
                 ওয়েবসাইট থেকে কাস্টমাররা কোন গাছ বেশি অর্ডার বা হোয়াটসঅ্যাপে শেয়ার করছেন তার লাইভ তালিকা
               </p>
             </div>
@@ -162,25 +162,25 @@ export function AdminOrderTrackerTab({
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
           <div className="p-3 bg-[#FAF8F5] border border-[#E8E1D5] rounded-xl">
-            <p className="text-[11px] font-bold text-[#785942]">মোট WhatsApp অর্ডার</p>
+            <p className="text-xs font-bold text-[#785942]">মোট WhatsApp অর্ডার</p>
             <p className="font-mono tabular-nums text-xl font-extrabold text-[#1B8354] mt-0.5">
               {summary.orderCount} টি
             </p>
           </div>
           <div className="p-3 bg-[#FAF8F5] border border-[#E8E1D5] rounded-xl">
-            <p className="text-[11px] font-bold text-[#785942]">মোট চারার চাহিদা</p>
+            <p className="text-xs font-bold text-[#785942]">মোট চারার চাহিদা</p>
             <p className="font-mono tabular-nums text-xl font-extrabold text-[#142318] mt-0.5">
               {summary.totalSaplings} টি চারা
             </p>
           </div>
           <div className="p-3 bg-[#FAF8F5] border border-[#E8E1D5] rounded-xl">
-            <p className="text-[11px] font-bold text-[#785942]">ছবি শেয়ার সংখ্যা</p>
+            <p className="text-xs font-bold text-[#785942]">ছবি শেয়ার সংখ্যা</p>
             <p className="font-mono tabular-nums text-xl font-extrabold text-[#142318] mt-0.5">
               {summary.shareCount} বার
             </p>
           </div>
           <div className="p-3 bg-[#FFF8F0] border border-[#EADBCC] rounded-xl">
-            <p className="text-[11px] font-bold text-[#B34728]">আনুমানিক অর্ডার মূল্য</p>
+            <p className="text-xs font-bold text-[#B34728]">আনুমানিক অর্ডার মূল্য</p>
             <p className="font-mono tabular-nums text-xl font-extrabold text-[#B34728] mt-0.5">
               ₹{summary.totalRevenueValue}
             </p>
@@ -228,7 +228,7 @@ export function AdminOrderTrackerTab({
                 ? 'চারার নাম বা বিভাগ দিয়ে চাহিদা খুঁজুন...'
                 : 'কাস্টমারের নাম, ফোন, এলাকা বা চারার নাম দিয়ে খুঁজুন...'
             }
-            className="w-full h-10 pl-9 pr-9 bg-[#FAF8F5] border border-[#E8E1D5] focus:border-[#1B8354] rounded-xl text-xs text-[#142318] focus:outline-none"
+            className="w-full h-10 pl-9 pr-9 bg-[#FAF8F5] border border-[#E8E1D5] focus:border-[#1B8354] rounded-xl text-xs text-[#142318] focus:outline-2 focus:outline-[#1B8354] focus:outline-offset-1"
           />
           {searchQuery && (
             <button
@@ -256,7 +256,7 @@ export function AdminOrderTrackerTab({
             </div>
           ) : (
             <div className="divide-y divide-[#EFEAE0]">
-              <div className="hidden md:grid md:grid-cols-12 gap-3 px-4 py-2.5 bg-[#FAF8F5] text-[11px] font-bold text-[#526356]">
+              <div className="hidden md:grid md:grid-cols-12 gap-3 px-4 py-2.5 bg-[#FAF8F5] text-xs font-bold text-[#526356]">
                 <div className="col-span-5">র‍্যাঙ্ক · চারার নাম ও বিভাগ</div>
                 <div className="col-span-2 text-center">অর্ডার সংখ্যা</div>
                 <div className="col-span-2 text-center">শেয়ার সংখ্যা</div>
@@ -290,6 +290,8 @@ export function AdminOrderTrackerTab({
                           )}
                           alt={entry.plantNameBn}
                           className="w-full h-full object-cover"
+                          loading="lazy"
+                          decoding="async"
                         />
                       </div>
 
@@ -299,12 +301,12 @@ export function AdminOrderTrackerTab({
                             {entry.plantNameBn}
                           </h3>
                           {idx === 0 && (
-                            <span className="px-1.5 py-0.5 rounded bg-[#FEF3C7] text-[#92400E] text-[10px] font-bold">
+                            <span className="px-1.5 py-0.5 rounded bg-[#FEF3C7] text-[#92400E] text-xs font-bold">
                               ★ সর্বোচ্চ চাহিদা
                             </span>
                           )}
                         </div>
-                        <p className="text-[11px] text-[#526356] mt-0.5">
+                        <p className="text-xs text-[#526356] mt-0.5">
                           {entry.category} · সর্বশেষ চাহিদা: {entry.lastRequestedAtBn}
                         </p>
                       </div>
@@ -393,11 +395,11 @@ export function AdminOrderTrackerTab({
                   >
                     <div className="flex items-start justify-between gap-2 flex-wrap">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="px-2 py-0.5 rounded-md bg-[#142318] text-white font-mono text-[10px] font-bold">
+                        <span className="px-2 py-0.5 rounded-md bg-[#142318] text-white font-mono text-xs font-bold">
                           #{idx + 1}
                         </span>
                         <span
-                          className={`px-2 py-0.5 rounded-md text-[11px] font-bold inline-flex items-center gap-1 ${
+                          className={`px-2 py-0.5 rounded-md text-xs font-bold inline-flex items-center gap-1 ${
                             log.eventType === 'photo_share'
                               ? 'bg-[#EFF6FF] text-[#1D4ED8]'
                               : 'bg-[#EBF5EF] text-[#14532D]'
@@ -410,7 +412,7 @@ export function AdminOrderTrackerTab({
                           )}
                           <span>{getEventLabelBn(log.eventType)}</span>
                         </span>
-                        <span className="inline-flex items-center gap-1 font-mono text-[11px] text-[#526356]">
+                        <span className="inline-flex items-center gap-1 font-mono text-xs text-[#526356]">
                           <Clock className="w-3 h-3 text-[#1B8354]" />
                           <span>{log.createdAtBn}</span>
                         </span>
@@ -423,7 +425,7 @@ export function AdminOrderTrackerTab({
                           onChange={(e) =>
                             onUpdateOrderStatus(log.id, e.target.value as WhatsAppOrderStatus)
                           }
-                          className={`h-7 px-2 rounded-lg text-[11px] font-bold border cursor-pointer ${
+                          className={`h-7 px-2 rounded-lg text-xs font-bold border cursor-pointer ${
                             status === 'completed'
                               ? 'bg-[#F0FDF4] border-[#86EFAC] text-[#166534]'
                               : status === 'contacted'
@@ -459,6 +461,8 @@ export function AdminOrderTrackerTab({
                               src={resolvePlantImageUrl(item.image, PUJA_IMAGE)}
                               alt={item.plantNameBn}
                               className="w-8 h-8 rounded-lg object-cover shrink-0"
+                              loading="lazy"
+                              decoding="async"
                             />
                           )}
                           <div>
@@ -466,7 +470,7 @@ export function AdminOrderTrackerTab({
                               {item.plantNameBn}{' '}
                               <span className="font-mono text-[#1B8354]">× {item.quantity}</span>
                             </p>
-                            <p className="text-[10px] text-[#526356]">
+                            <p className="text-xs text-[#526356]">
                               {item.optionLabelBn} · ₹{item.unitPrice}
                             </p>
                           </div>

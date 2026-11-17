@@ -5,11 +5,13 @@ import type {
   WhatsAppOrderStatus,
 } from '../types/nursery';
 import { getBengaliDateTime } from './bengaliDateTime';
-import { db } from '../firebase';
-import { doc, setDoc } from 'firebase/firestore';
+import { loadFirebaseCore, loadFirestoreSdk } from '../firebaseLazy';
 import { trackFirestoreWrite } from './firestoreMonitor';
+import { checkClientSubmissionCooldown } from './customerReviewsStorage';
+import { getPublicChallengeHeaders } from './publicChallengeClient';
 
 export const STORAGE_WHATSAPP_ORDERS_KEY = 'brahmyaman_whatsapp_orders_v1';
+const CLIENT_INQUIRY_RATE_KEY = 'brahmyaman_inquiry_rate_v1';
 
 export interface PlantDemandLeaderboardRow {
   plantId: string;
@@ -135,7 +137,8 @@ export function sanitizeWhatsAppOrderForFirestore(
 
 /**
  * Records a customer WhatsApp order or photo share immediately in LocalStorage
- * and asynchronously persists it to Firestore `/whatsapp_inquiries/{id}`.
+ * and submits it through the App Check + rate-limited `/api/public/inquiries` endpoint
+ * (falling back to Firestore `/whatsapp_inquiries/{id}` only when permitted).
  */
 export function recordWhatsAppInquiryLog(params: {
   eventType: WhatsAppOrderEventType;
@@ -211,15 +214,47 @@ export function recordWhatsAppInquiryLog(params: {
   const existing = loadLocalWhatsAppOrderLogs();
   saveLocalWhatsAppOrderLogs([entry, ...existing]);
 
-  try {
+  const cooldown = checkClientSubmissionCooldown(CLIENT_INQUIRY_RATE_KEY, {
+    maxCount: 20,
+    windowMs: 5 * 60_000,
+    minIntervalMs: 2_500,
+  });
+
+  if (cooldown.allowed && typeof fetch === 'function') {
     const sanitized = sanitizeWhatsAppOrderForFirestore(entry);
-    void setDoc(doc(db, 'whatsapp_inquiries', entry.id), sanitized)
-      .then(() => {
+    const hasAppCheckSiteKey = Boolean(
+      ((import.meta as unknown as { env?: Record<string, string | undefined> }).env)
+        ?.VITE_FIREBASE_APPCHECK_SITE_KEY
+    );
+    const appCheckPromise: Promise<Record<string, string>> = hasAppCheckSiteKey
+      ? loadFirebaseCore().then((m) => m.getAppCheckHeaders()).catch(() => ({}))
+      : Promise.resolve({});
+
+    void Promise.all([appCheckPromise, getPublicChallengeHeaders()])
+      .then(([appCheckHeaders, challengeHeaders]) =>
+        fetch('/api/public/inquiries', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...appCheckHeaders,
+            ...challengeHeaders,
+          },
+          body: JSON.stringify(sanitized),
+        })
+      )
+      .then(async (res) => {
+        if (!res.ok) return;
+        const data = await res.json().catch(() => ({}));
+        if (data?.persistedBy === 'client_fallback_allowed') {
+          const [{ db }, { doc, setDoc }] = await Promise.all([
+            loadFirebaseCore(),
+            loadFirestoreSdk(),
+          ]);
+          await setDoc(doc(db, 'whatsapp_inquiries', entry.id), sanitized);
+        }
         trackFirestoreWrite(1, 'activity_logs');
       })
       .catch(() => {});
-  } catch {
-    // Ignore offline errors
   }
 
   return entry;

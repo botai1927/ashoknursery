@@ -59,7 +59,7 @@ export function AdminBackupTab({
               <h2 className="font-serif-bn text-base sm:text-lg font-bold text-[#142318]">
                 ব্যাকআপ, অফলাইন ক্যাটালগ ও রিস্টোর কেন্দ্র
               </h2>
-              <p className="text-[11px] text-[#526356]">
+              <p className="text-xs text-[#526356]">
                 সমস্ত গাছের দাম, ছবি, Cloudinary লিংক ও কাজের ইতিহাস এক ক্লিকে নিজের ফোনে সংরক্ষণ করুন
               </p>
             </div>
@@ -69,26 +69,26 @@ export function AdminBackupTab({
         {/* Summary Stats (Unboxed hairline grid, tabular numbers) */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-[#F0EAE1] text-xs">
           <div>
-            <p className="text-[11px] text-[#785942]">মোট সক্রিয় + ট্র্যাশ</p>
+            <p className="text-xs text-[#785942]">মোট সক্রিয় + ট্র্যাশ</p>
             <p className="font-mono tabular-nums text-base font-bold text-[#142318]">
               {activePlantsCount + trashedPlantsCount} টি
             </p>
           </div>
           <div>
-            <p className="text-[11px] text-[#785942]">ডাটাবেস সাইজ</p>
+            <p className="text-xs text-[#785942]">ডাটাবেস সাইজ</p>
             <p className="font-mono tabular-nums text-base font-bold text-[#142318]">
               {formatBytesReadable(totalEstimatedBytes)}
             </p>
           </div>
           <div>
-            <p className="text-[11px] text-[#785942]">Cloudinary</p>
+            <p className="text-xs text-[#785942]">Cloudinary</p>
             <p className="font-semibold text-sm text-[#1B8354] flex items-center gap-1 mt-0.5">
               <Cloud className="w-3.5 h-3.5 shrink-0" />
               <span className="truncate">{cloudinaryConfigured ? cloudinaryCloudName || 'সংযুক্ত' : 'অসংযুক্ত'}</span>
             </p>
           </div>
           <div>
-            <p className="text-[11px] text-[#785942]">Base64 অফলাইন ছবি</p>
+            <p className="text-xs text-[#785942]">Base64 অফলাইন ছবি</p>
             <p className="font-mono tabular-nums text-base font-bold text-[#142318]">
               {base64PhotoCount} টি
             </p>

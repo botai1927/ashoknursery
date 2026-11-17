@@ -1,11 +1,11 @@
-import { useState, useMemo, useEffect, useLayoutEffect, useRef, type ReactNode } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   Search,
   MessageCircle,
   Plus,
   Check,
   Sun,
-  Droplets,
+  Clock,
   Sparkles,
   X,
   Flower2,
@@ -17,18 +17,16 @@ import {
   ArrowUpDown,
   ArrowLeft,
   Share2,
-  ArrowLeftRight,
   LayoutGrid,
-  ChevronLeft,
-  ChevronRight,
+  Rows3,
 } from 'lucide-react';
 import { BrahmyamanPlant, PlantPotOption, AudienceTag } from '../types/nursery';
 import { NURSERY_CONTACT, PUJA_IMAGE, FRUIT_IMAGE, ROOFTOP_IMAGE } from '../data/brahmyamanCatalog';
 import { resolvePlantImageUrl } from '../utils/imageUrl';
-import { LiveSearchBox } from './LiveSearchBox';
 import { PlantShareModal } from './PlantShareModal';
 import { sortPlantsWithUploadsFirst } from '../utils/plantUploadSort';
 import { recordWhatsAppInquiryLog } from '../utils/whatsappOrderTracker';
+import { getPlantGrowthInfo } from '../utils/plantMetadata';
 import {
   CategoryViewKey,
   isFruitPlant,
@@ -42,122 +40,6 @@ import {
 export type { CategoryViewKey };
 
 type SortOrder = 'default' | 'price-asc' | 'price-desc';
-type CatalogScrollMode = 'horizontal' | 'vertical';
-
-const SCROLL_MODE_STORAGE_KEY = 'brahmyaman_catalog_scroll_mode';
-const railScrollLeftMap = new Map<string, number>();
-
-function HorizontalPlantRail({
-  railKey,
-  isVisible = true,
-  title,
-  subtitle,
-  count,
-  accentClass = 'text-[#122619]',
-  onViewAll,
-  lang,
-  children,
-}: {
-  railKey: string;
-  isVisible?: boolean;
-  title: string;
-  subtitle?: string;
-  count?: number;
-  accentClass?: string;
-  onViewAll?: () => void;
-  lang: 'bn' | 'en';
-  children: ReactNode;
-}) {
-  const railRef = useRef<HTMLDivElement | null>(null);
-
-  useLayoutEffect(() => {
-    const el = railRef.current;
-    if (!el || !isVisible) return;
-    const savedLeft = railScrollLeftMap.get(railKey);
-    if (typeof savedLeft === 'number' && savedLeft > 0) {
-      el.scrollLeft = savedLeft;
-    }
-  }, [railKey, isVisible]);
-
-  const handleRailScroll = () => {
-    const el = railRef.current;
-    if (el && isVisible) {
-      railScrollLeftMap.set(railKey, el.scrollLeft);
-    }
-  };
-
-  const handleStep = (direction: -1 | 1) => {
-    const el = railRef.current;
-    if (!el) return;
-    const step = Math.max(260, Math.round(el.clientWidth * 0.78));
-    el.scrollBy({ left: direction * step, behavior: 'smooth' });
-  };
-
-  return (
-    <section className="space-y-2.5">
-      <div className="flex items-center justify-between gap-2">
-        <div className="min-w-0 flex items-baseline gap-2 flex-wrap">
-          <h3 className={`font-serif-bn text-base sm:text-xl font-bold truncate ${accentClass}`}>
-            {title}
-          </h3>
-          {typeof count === 'number' && (
-            <span className="text-xs font-mono-num font-semibold text-[#785942] tabular-nums">
-              ({count})
-            </span>
-          )}
-          {subtitle && (
-            <span className="hidden md:inline text-xs text-[#4C6252] font-sans-bn truncate">
-              · {subtitle}
-            </span>
-          )}
-        </div>
-
-        <div className="flex items-center gap-1.5 shrink-0">
-          {onViewAll && (
-            <button
-              type="button"
-              onClick={onViewAll}
-              className="px-2.5 py-1 rounded-lg text-[11px] font-bold text-[#15803D] hover:bg-[#E4ECE0] active:scale-95 transition-all cursor-pointer whitespace-nowrap"
-            >
-              {lang === 'bn' ? 'সব দেখুন →' : 'See all →'}
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={() => handleStep(-1)}
-            aria-label={lang === 'bn' ? 'বামে স্ক্রল করুন' : 'Scroll left'}
-            className="w-8 h-8 rounded-full border border-[#CEDAC9] bg-white hover:bg-[#122619] text-[#122619] hover:text-white active:scale-90 flex items-center justify-center transition-all shadow-2xs cursor-pointer"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <button
-            type="button"
-            onClick={() => handleStep(1)}
-            aria-label={lang === 'bn' ? 'ডানে স্ক্রল করুন' : 'Scroll right'}
-            className="w-8 h-8 rounded-full border border-[#CEDAC9] bg-white hover:bg-[#122619] text-[#122619] hover:text-white active:scale-90 flex items-center justify-center transition-all shadow-2xs cursor-pointer"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-
-      <div className="relative">
-        <div
-          ref={railRef}
-          onScroll={handleRailScroll}
-          className="flex gap-3 sm:gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-3 thin-horizontal-scroll"
-        >
-          {children}
-        </div>
-        {/* Subtle right-edge botanical mist fade cueing additional saplings */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none hidden sm:block absolute top-0 right-0 bottom-3 w-8 bg-gradient-to-l from-[#F4F7F1]/85 to-transparent"
-        />
-      </div>
-    </section>
-  );
-}
 
 interface CatalogSectionProps {
   plants: BrahmyamanPlant[];
@@ -192,24 +74,22 @@ export function CatalogSection({
   const [onlyInStock, setOnlyInStock] = useState(false);
   const [under100Only, setUnder100Only] = useState(false);
   const [sortOrder, setSortOrder] = useState<SortOrder>('default');
-  const [scrollMode, setScrollMode] = useState<CatalogScrollMode>(() => {
+  const [viewMode, setViewMode] = useState<'grid' | 'horizontal'>(() => {
     try {
-      const saved = localStorage.getItem(SCROLL_MODE_STORAGE_KEY);
-      if (saved === 'vertical' || saved === 'horizontal') return saved;
+      const saved = sessionStorage.getItem('brahmyaman_catalog_view_mode');
+      return saved === 'horizontal' ? 'horizontal' : 'grid';
     } catch {
-      // Ignore storage access failure
+      return 'grid';
     }
-    return 'horizontal';
   });
 
-  const handleChangeScrollMode = (mode: CatalogScrollMode) => {
-    setScrollMode(mode);
+  useEffect(() => {
     try {
-      localStorage.setItem(SCROLL_MODE_STORAGE_KEY, mode);
-    } catch {
-      // Ignore storage access failure
-    }
-  };
+      sessionStorage.setItem('brahmyaman_catalog_view_mode', viewMode);
+    } catch {}
+  }, [viewMode]);
+
+  void isVisible;
 
   // Sync external activeAudience to local activeCategory
   useEffect(() => {
@@ -259,10 +139,10 @@ export function CatalogSection({
     const msg =
       plant.inStock === false
         ? encodeURIComponent(
-            `নমস্কার, আমি কালশুলির ব্রাহ্ম্যমাণ নার্সারি থেকে "${plant.nameBn}" চারাটি (বর্তমানে স্টক শেষ দেখানো হচ্ছে) কবে আবার পাওয়া যাবে তা জানতে আগ্রহী।`
+            `নমস্কার, আমি কালশুলির ভ্রাম্যমাণ নার্সারি থেকে "${plant.nameBn}" চারাটি (বর্তমানে স্টক শেষ দেখানো হচ্ছে) কবে আবার পাওয়া যাবে তা জানতে আগ্রহী।`
           )
         : encodeURIComponent(
-            `নমস্কার, আমি কালশুলির ব্রাহ্ম্যমাণ নার্সারি থেকে "${plant.nameBn}" (${defaultOpt.labelBn} - ₹${defaultOpt.price}) চারা নিতে আগ্রহী। এর প্রাপ্যতা ও বিস্তারিত জানাবেন কি?`
+            `নমস্কার, আমি কালশুলির ভ্রাম্যমাণ নার্সারি থেকে "${plant.nameBn}" (${defaultOpt.labelBn} - ₹${defaultOpt.price}) চারা নিতে আগ্রহী। এর প্রাপ্যতা ও বিস্তারিত জানাবেন কি?`
           );
     return `https://wa.me/${NURSERY_CONTACT.phoneRaw}?text=${msg}`;
   };
@@ -426,34 +306,35 @@ export function CatalogSection({
   const renderPlantCard = (
     plant: BrahmyamanPlant,
     index: number,
-    layoutVariant: 'rail' | 'grid' = 'rail'
+    isHorizontalRail = false,
+    isPrioritySection = false
   ) => {
     const baseOption = plant.options[0] || {
+      id: `${plant.id}-def`,
       price: 50,
       labelBn: 'গ্রো ব্যাগ চারা',
+      labelEn: 'Grow Bag Sapling',
       containerType: 'পলি গ্রো ব্যাগ',
     };
+    const growth = getPlantGrowthInfo(plant, baseOption);
     const isAdded = justAddedId === plant.id;
-    const isPriority = index < 6;
+    const isPriority = isPrioritySection && index < 2;
     const fallbackSrc = FALLBACK_CATEGORY_IMAGES[plant.category] || PUJA_IMAGE;
     const isOutOfStock = plant.inStock === false;
-    const isRail = layoutVariant === 'rail';
 
     return (
       <article
         key={plant.id}
-        className={`botanical-card group bg-white rounded-2xl border border-[#DCE6D7] hover:border-[#15803D]/55 overflow-hidden shadow-[0_2px_10px_-4px_rgba(18,38,25,0.07)] flex flex-col justify-between ${
-          isRail
-            ? 'w-[224px] sm:w-[254px] lg:w-[272px] shrink-0 snap-start'
-            : 'min-w-0'
+        className={`botanical-card group bg-white rounded-2xl border border-[#DCE6D7] hover:border-[#15803D]/55 overflow-hidden shadow-[0_2px_10px_-4px_rgba(18,38,25,0.08)] flex flex-col justify-between min-w-0 ${
+          isHorizontalRail
+            ? 'shrink-0 w-[68vw] sm:w-[270px] md:w-[290px] snap-start'
+            : ''
         }`}
       >
         {/* Clean Sunlit Botanical Specimen Image Frame */}
         <div
           onClick={() => onOpenPlantModal(plant)}
-          className={`relative bg-gradient-to-b from-[#EDF4EA] to-[#F7FAF5] flex items-center justify-center overflow-hidden border-b border-[#E3ECE0] cursor-pointer ${
-            isRail ? 'aspect-[4/3] p-2.5' : 'aspect-[4/3] p-2 sm:p-3'
-          }`}
+          className="relative aspect-[4/3] p-2 sm:p-3 bg-gradient-to-b from-[#EDF4EA] to-[#F7FAF5] flex items-center justify-center overflow-hidden border-b border-[#E3ECE0] cursor-pointer"
         >
           <img
             src={resolvePlantImageUrl(plant.image, fallbackSrc)}
@@ -473,16 +354,16 @@ export function CatalogSection({
             }}
           />
 
-          {/* Single Clean Status Tag (Max 1 Corner Label per Card) */}
+          {/* Single Clean Status Tag */}
           {isOutOfStock ? (
             <div className="absolute top-2 left-2 z-10 pointer-events-none">
-              <span className="px-2 py-0.5 rounded-md bg-[#B84423] text-white text-[10px] font-semibold shadow-2xs">
+              <span className="px-2 py-0.5 rounded-md bg-[#B84423] text-white text-xs sm:text-xs font-semibold shadow-2xs">
                 {lang === 'bn' ? 'স্টক শেষ' : 'Out of Stock'}
               </span>
             </div>
           ) : plant.badgeBn ? (
-            <div className="absolute top-2 left-2 z-10 pointer-events-none">
-              <span className="px-2 py-0.5 rounded-md bg-[#122619]/90 text-[#F4F7F1] text-[10px] font-semibold shadow-2xs">
+            <div className="absolute top-2 left-2 z-10 pointer-events-none max-w-[75%]">
+              <span className="inline-block truncate max-w-full px-2 py-0.5 rounded-md bg-[#122619]/90 text-[#F4F7F1] text-xs sm:text-xs font-semibold shadow-2xs">
                 {lang === 'bn' ? plant.badgeBn : plant.badgeEn}
               </span>
             </div>
@@ -514,20 +395,15 @@ export function CatalogSection({
           </button>
         </div>
 
-        {/* Card Body */}
-        <div
-          className={`flex-1 flex flex-col justify-between ${
-            isRail ? 'p-3 sm:p-4' : 'p-2.5 sm:p-4'
-          }`}
-        >
+        {/* Card Body — Bigger, Mobile-Friendly Readable Typography */}
+        <div className="flex-1 flex flex-col justify-between p-3 sm:p-4 gap-2.5">
           <div>
-            {/* Unboxed Botanical Metadata + Vitality Dot */}
-            <div className="flex items-center justify-between gap-1 text-[10px] sm:text-[11px] text-[#785942] font-sans-bn mb-0.5">
-              <span className="truncate">{plant.category}</span>
+            <div className="flex items-center justify-between gap-1 text-xs sm:text-xs text-[#785942] font-sans-bn mb-1">
+              <span className="truncate font-medium">{plant.category}</span>
               {!isOutOfStock && (
-                <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#15803D] shrink-0">
+                <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#15803D] shrink-0">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E]" aria-hidden="true" />
-                  <span className="hidden sm:inline">{lang === 'bn' ? 'সতেজ' : 'Fresh'}</span>
+                  <span>{lang === 'bn' ? 'সতেজ' : 'Fresh'}</span>
                 </span>
               )}
             </div>
@@ -537,53 +413,54 @@ export function CatalogSection({
               onClick={() => onOpenPlantModal(plant)}
               className="text-left w-full cursor-pointer"
             >
-              <h3
-                className={`font-serif-bn font-bold text-[#122619] group-hover:text-[#15803D] transition-colors leading-snug line-clamp-1 ${
-                  isRail ? 'text-base sm:text-[17px]' : 'text-sm sm:text-base'
-                }`}
-              >
+              <h3 className="font-serif-bn font-bold text-[#122619] group-hover:text-[#15803D] transition-colors leading-snug text-[15px] sm:text-[18px] line-clamp-2">
                 {lang === 'bn' ? plant.nameBn : plant.nameEn}
-                {plant.colorBn && (
-                  <span className="ml-1 text-[11px] font-sans-bn font-medium text-[#785942]">
-                    ({plant.colorBn})
-                  </span>
-                )}
               </h3>
             </button>
 
-            <p className="text-[11px] text-[#526356] font-sans-bn mt-0.5 truncate">
+            <p className="text-xs sm:text-xs text-[#526356] font-sans-bn mt-0.5 truncate">
               {lang === 'bn' ? plant.nameEn : plant.nameBn}
+              {plant.colorBn ? ` · ${plant.colorBn}` : ''}
             </p>
 
-            <p className="hidden sm:line-clamp-2 text-xs text-[#4C6252] font-sans-bn mt-1.5 leading-relaxed">
+            {/* Unique Description Visible on Mobile & Desktop */}
+            <p className="line-clamp-2 text-[12px] sm:text-[13px] text-[#3E5344] font-sans-bn mt-1.5 leading-snug">
               {lang === 'bn' ? plant.descriptionBn : plant.descriptionEn}
             </p>
 
-            {/* Unboxed Sunlight & Watering Micro-Row */}
-            <div className="mt-2 pt-2 border-t border-[#E3ECE0] grid grid-cols-2 gap-1.5 text-[10px] sm:text-[11px] font-sans-bn text-[#4C6252]">
-              <div className="flex items-center gap-1 truncate">
-                <Sun className="w-3 h-3 text-[#B45309] shrink-0" />
-                <span className="truncate">{plant.sunlightBn}</span>
+            {/* Size/Age + Days-to-Fruit/Bloom Metadata */}
+            <div className="mt-2.5 pt-2 border-t border-[#E3ECE0] space-y-1 text-xs sm:text-xs font-sans-bn">
+              <div className="flex items-center gap-1.5 text-[#142318] font-semibold">
+                <Sprout className="w-3.5 h-3.5 text-[#15803D] shrink-0" />
+                <span className="truncate">
+                  {lang === 'bn' ? growth.sizeAgeBn : growth.sizeAgeEn}
+                </span>
               </div>
-              <div className="flex items-center gap-1 truncate">
-                <Droplets className="w-3 h-3 text-[#0369A1] shrink-0" />
-                <span className="truncate">{plant.wateringBn}</span>
+              <div className="flex items-center gap-1.5 text-[#B45309] font-semibold">
+                <Clock className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">
+                  {lang === 'bn' ? growth.harvestOrBloomBn : growth.harvestOrBloomEn}
+                </span>
+              </div>
+              <div className="hidden sm:flex items-center gap-1.5 text-[#4C6252]">
+                <Sun className="w-3.5 h-3.5 text-[#B45309] shrink-0" />
+                <span className="truncate">{plant.sunlightBn}</span>
               </div>
             </div>
           </div>
 
-          {/* Pricing & Clear Action Pair */}
-          <div className="mt-2.5 sm:mt-3 pt-2.5 border-t border-[#DCE6D7] flex items-center justify-between gap-1.5">
-            <div className="min-w-0">
-              <div className="text-base sm:text-lg font-bold text-[#B84423] tabular-nums font-mono-num leading-tight">
+          {/* Pricing + Large WhatsApp Button & Cart Add Action */}
+          <div className="pt-2.5 border-t border-[#DCE6D7] space-y-2">
+            <div className="flex items-baseline justify-between gap-2 flex-wrap">
+              <div className="text-lg sm:text-xl font-bold text-[#B84423] tabular-nums font-mono-num leading-none">
                 ₹{baseOption.price}
               </div>
-              <div className="text-[10px] sm:text-[11px] text-[#785942] font-sans-bn truncate max-w-[90px] sm:max-w-[120px]">
-                {baseOption.labelBn || 'গ্রো ব্যাগ'}
+              <div className="text-xs sm:text-xs font-semibold text-[#526857] font-sans-bn truncate max-w-full">
+                {lang === 'bn' ? baseOption.labelBn : baseOption.labelEn}
               </div>
             </div>
 
-            <div className="flex items-center gap-1 shrink-0">
+            <div className="flex flex-col sm:flex-row items-stretch gap-1.5">
               <a
                 href={getSingleItemWhatsAppUrl(plant)}
                 target="_blank"
@@ -604,20 +481,22 @@ export function CatalogSection({
                     ],
                   });
                 }}
-                title={lang === 'bn' ? 'WhatsApp-এ সরাসরি অর্ডার করুন' : 'Order on WhatsApp'}
-                className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#25D366]/15 hover:bg-[#25D366] text-[#128C7E] hover:text-white active:scale-90 flex items-center justify-center transition-all cursor-pointer"
+                className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-[#15803D] hover:bg-[#166534] active:scale-[0.98] text-white text-xs sm:text-[13px] font-bold shadow-xs transition-all cursor-pointer"
                 aria-label={`Order ${plant.nameBn} on WhatsApp`}
               >
-                <MessageCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" />
+                <MessageCircle className="w-4 h-4 fill-current shrink-0" />
+                <span className="whitespace-nowrap">
+                  {lang === 'bn' ? 'WhatsApp অর্ডার' : 'WhatsApp Order'}
+                </span>
               </a>
 
               <button
                 type="button"
                 onClick={() => handleAddClick(plant)}
-                className={`inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-semibold transition-all active:scale-95 cursor-pointer whitespace-nowrap shrink-0 ${
+                className={`inline-flex items-center justify-center gap-1 px-3 py-2 rounded-xl text-xs font-bold border transition-all active:scale-95 cursor-pointer whitespace-nowrap shrink-0 ${
                   isAdded
-                    ? 'bg-[#122619] text-[#A3E635] scale-[1.03]'
-                    : 'bg-[#15803D] hover:bg-[#166534] text-white shadow-2xs'
+                    ? 'bg-[#122619] text-[#A3E635] border-[#122619]'
+                    : 'bg-[#F4F7F1] hover:bg-[#E4ECE0] text-[#122619] border-[#CEDAC9]'
                 }`}
               >
                 {isAdded ? (
@@ -628,7 +507,7 @@ export function CatalogSection({
                 ) : (
                   <>
                     <Plus className="w-3.5 h-3.5" />
-                    <span>{lang === 'bn' ? 'ব্যাগে' : 'Add'}</span>
+                    <span>{lang === 'bn' ? 'ব্যাগ' : 'Cart'}</span>
                   </>
                 )}
               </button>
@@ -658,7 +537,7 @@ export function CatalogSection({
             >
               <Layers className="w-3.5 h-3.5" />
               <span>{lang === 'bn' ? 'সকল গাছ' : 'All'}</span>
-              <span className="text-[10px] opacity-75 font-mono-num">({plants.length})</span>
+              <span className="text-xs opacity-75 font-mono-num">({plants.length})</span>
             </button>
 
             <button
@@ -674,7 +553,7 @@ export function CatalogSection({
             >
               <Apple className="w-3.5 h-3.5" />
               <span>{lang === 'bn' ? 'ফলের গাছ ও কলম' : 'Fruits & Grafts'}</span>
-              <span className="text-[10px] opacity-75 font-mono-num">({fruitList.length})</span>
+              <span className="text-xs opacity-75 font-mono-num">({fruitList.length})</span>
             </button>
 
             <button
@@ -690,7 +569,7 @@ export function CatalogSection({
             >
               <Flower2 className="w-3.5 h-3.5" />
               <span>{lang === 'bn' ? 'পূজার ফুল ও বেলপাতা' : 'Puja Plants'}</span>
-              <span className="text-[10px] opacity-75 font-mono-num">({poojaList.length})</span>
+              <span className="text-xs opacity-75 font-mono-num">({poojaList.length})</span>
             </button>
 
             <button
@@ -706,7 +585,7 @@ export function CatalogSection({
             >
               <Sparkles className="w-3.5 h-3.5" />
               <span>{lang === 'bn' ? 'ফুলগাছ' : 'Flowers'}</span>
-              <span className="text-[10px] opacity-75 font-mono-num">({flowerList.length})</span>
+              <span className="text-xs opacity-75 font-mono-num">({flowerList.length})</span>
             </button>
 
             <button
@@ -722,7 +601,7 @@ export function CatalogSection({
             >
               <TreePine className="w-3.5 h-3.5" />
               <span>{lang === 'bn' ? 'শো-প্ল্যান্ট ও পাম' : 'Foliage'}</span>
-              <span className="text-[10px] opacity-75 font-mono-num">({foliageList.length})</span>
+              <span className="text-xs opacity-75 font-mono-num">({foliageList.length})</span>
             </button>
 
             <button
@@ -738,7 +617,7 @@ export function CatalogSection({
             >
               <Sprout className="w-3.5 h-3.5" />
               <span>{lang === 'bn' ? 'মসলা ও ভেষজ' : 'Herbs'}</span>
-              <span className="text-[10px] opacity-75 font-mono-num">({herbalList.length})</span>
+              <span className="text-xs opacity-75 font-mono-num">({herbalList.length})</span>
             </button>
           </div>
         </div>
@@ -747,32 +626,8 @@ export function CatalogSection({
       {/* Anchor for smooth scroll */}
       <div id="catalog-content-anchor" className="scroll-mt-24" />
 
-      {/* Main Catalog Area */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-7">
-        {/* Catalog Inline Live Search Input + Dropdown Suggestions */}
-        <div className="mb-4">
-          <div className="max-w-2xl">
-            <label className="block text-[11px] font-bold text-[#4C6252] uppercase tracking-wider mb-1 font-sans-bn">
-              {lang === 'bn'
-                ? 'ক্যাটালগে তাৎক্ষণিক খুঁজুন (টাইপ করলেই নিচে নাম দেখাবে)'
-                : 'Quick Catalog Search (Live Suggestions)'}
-            </label>
-            <LiveSearchBox
-              variant="catalog"
-              plants={plants}
-              lang={lang}
-              value={searchQuery}
-              onChange={onSearchChange}
-              onSelectPlant={onOpenPlantModal}
-              onAddToInquiry={onAddToInquiry}
-              onSubmitSearch={() => {
-                const anchor = document.getElementById('catalog-content-anchor');
-                if (anchor) anchor.scrollIntoView({ behavior: 'smooth' });
-              }}
-              suggestionLimit={8}
-            />
-          </div>
-        </div>
+      {/* Main Catalog Area (Single Header Search kept — no duplicate inline search here) */}
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-7">
 
         {/* Search Status Banner (rendered right at the top when searching!) */}
         {searchAnalysis.isSearching ? (
@@ -804,7 +659,7 @@ export function CatalogSection({
           <div className="mb-4 pb-3.5 border-b border-[#D5DFD1]">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-2">
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#1B8354] font-sans-bn">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#1B8354] font-sans-bn">
                   {currentMeta.titleEn}
                 </p>
                 <h2 className="font-serif-bn text-xl sm:text-3xl text-[#142318] font-bold tracking-tight mt-0.5">
@@ -848,43 +703,9 @@ export function CatalogSection({
           </div>
         )}
 
-        {/* Buyer Decision Toolbar: Scroll Direction Toggle + Quick Filters + Price Sort */}
+        {/* Buyer Decision Toolbar: Quick Filters + Price Sort */}
         <div className="mb-5 flex flex-wrap items-center justify-between gap-2.5 font-sans-bn">
           <div className="flex items-center gap-2 overflow-x-auto no-scrollbar max-w-full pb-0.5">
-            {/* Scroll Direction Switcher (Horizontal Rail vs Vertical Grid) */}
-            <div
-              role="group"
-              aria-label={lang === 'bn' ? 'স্ক্রল করার ধরন' : 'Scroll direction'}
-              className="inline-flex items-center p-0.5 rounded-xl border border-[#CEDAC9] bg-white shadow-2xs shrink-0"
-            >
-              <button
-                type="button"
-                onClick={() => handleChangeScrollMode('horizontal')}
-                aria-pressed={scrollMode === 'horizontal'}
-                className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
-                  scrollMode === 'horizontal'
-                    ? 'bg-[#142318] text-white shadow-2xs'
-                    : 'text-[#526356] hover:text-[#142318]'
-                }`}
-              >
-                <ArrowLeftRight className="w-3.5 h-3.5" />
-                <span>{lang === 'bn' ? 'সাইডে স্ক্রল' : 'Horizontal'}</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleChangeScrollMode('vertical')}
-                aria-pressed={scrollMode === 'vertical'}
-                className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
-                  scrollMode === 'vertical'
-                    ? 'bg-[#142318] text-white shadow-2xs'
-                    : 'text-[#526356] hover:text-[#142318]'
-                }`}
-              >
-                <LayoutGrid className="w-3.5 h-3.5" />
-                <span>{lang === 'bn' ? 'লম্বালম্বি' : 'Vertical'}</span>
-              </button>
-            </div>
-
             <button
               type="button"
               onClick={() => setOnlyInStock((v) => !v)}
@@ -925,25 +746,61 @@ export function CatalogSection({
             )}
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
-            <ArrowUpDown className="w-3.5 h-3.5 text-[#785942]" />
-            <label htmlFor="catalog-sort" className="sr-only">
-              Sort saplings
-            </label>
-            <select
-              id="catalog-sort"
-              value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value as SortOrder)}
-              className="h-9 px-3 rounded-xl border border-[#CEDAC9] bg-white text-xs font-semibold text-[#142318] focus:outline-none focus:ring-2 focus:ring-[#1B8354] cursor-pointer"
+          <div className="flex items-center gap-2 flex-wrap shrink-0">
+            {/* View Mode Toggle: 2-Col Grid vs Horizontal Scrolling Line */}
+            <div
+              role="group"
+              aria-label={lang === 'bn' ? 'তালিকা দেখার ধরন' : 'Catalog layout'}
+              className="inline-flex items-center p-0.5 rounded-xl border border-[#CEDAC9] bg-white shadow-2xs"
             >
-              <option value="default">{lang === 'bn' ? 'জনপ্রিয় ও সঠিক ক্রম' : 'Relevance'}</option>
-              <option value="price-asc">{lang === 'bn' ? 'দাম: কম থেকে বেশি (₹↑)' : 'Price: Low to High'}</option>
-              <option value="price-desc">{lang === 'bn' ? 'দাম: বেশি থেকে কম (₹↓)' : 'Price: High to Low'}</option>
-            </select>
+              <button
+                type="button"
+                onClick={() => setViewMode('grid')}
+                aria-pressed={viewMode === 'grid'}
+                className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer whitespace-nowrap ${
+                  viewMode === 'grid'
+                    ? 'bg-[#122619] text-white'
+                    : 'text-[#526356] hover:text-[#122619]'
+                }`}
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+                <span>{lang === 'bn' ? 'গ্রিড' : 'Grid'}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('horizontal')}
+                aria-pressed={viewMode === 'horizontal'}
+                className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer whitespace-nowrap ${
+                  viewMode === 'horizontal'
+                    ? 'bg-[#15803D] text-white'
+                    : 'text-[#526356] hover:text-[#122619]'
+                }`}
+              >
+                <Rows3 className="w-3.5 h-3.5" />
+                <span>{lang === 'bn' ? 'হরিজন্টাল লাইন' : 'Horizontal'}</span>
+              </button>
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <ArrowUpDown className="w-3.5 h-3.5 text-[#785942]" />
+              <label htmlFor="catalog-sort" className="sr-only">
+                Sort saplings
+              </label>
+              <select
+                id="catalog-sort"
+                value={sortOrder}
+                onChange={(e) => setSortOrder(e.target.value as SortOrder)}
+                className="h-9 px-3 rounded-xl border border-[#CEDAC9] bg-white text-xs font-semibold text-[#142318] focus:outline-2 focus:outline-[#1B8354] focus:outline-offset-1 focus:ring-2 focus:ring-[#1B8354] cursor-pointer"
+              >
+                <option value="default">{lang === 'bn' ? 'জনপ্রিয় ও সঠিক ক্রম' : 'Relevance'}</option>
+                <option value="price-asc">{lang === 'bn' ? 'দাম: কম থেকে বেশি (₹↑)' : 'Price: Low to High'}</option>
+                <option value="price-desc">{lang === 'bn' ? 'দাম: বেশি থেকে কম (₹↓)' : 'Price: High to Low'}</option>
+              </select>
+            </div>
           </div>
         </div>
 
-        {/* Plant Catalog Display: Horizontal Side-Scroll Rails OR Compact Vertical Grid */}
+        {/* Plant Catalog Display: Responsive 2-Col Mobile / 3-4 Col Desktop Grids */}
         {displayedPlants.length === 0 ? (
           <div className="py-12 text-center bg-white rounded-2xl border border-[#D5DFD1] p-6 max-w-md mx-auto">
             <p className="font-serif-bn text-xl text-[#142318] font-bold">
@@ -993,95 +850,105 @@ export function CatalogSection({
               </button>
             </div>
           </div>
-        ) : scrollMode === 'horizontal' ? (
-          activeCategory === 'all' &&
+        ) : activeCategory === 'all' &&
           !searchAnalysis.isSearching &&
           !onlyInStock &&
           !under100Only &&
           sortOrder === 'default' ? (
-            <div className="space-y-7">
-              {[
-                {
-                  key: 'fruit' as CategoryViewKey,
-                  titleBn: 'ছাদবাগানের ফল ও কলম',
-                  titleEn: 'Fruit Grafts & Saplings',
-                  subtitleBn: 'আম, কাগজি লেবু, পেয়ারা, ডালিম',
-                  accentClass: 'text-[#B45309]',
-                  list: sortPlantsWithUploadsFirst(fruitList),
-                },
-                {
-                  key: 'puja' as CategoryViewKey,
-                  titleBn: 'নিত্য পূজার ফুল ও বেলপাতা',
-                  titleEn: 'Daily Puja Blooms & Bael',
-                  subtitleBn: 'রক্তজবা, অপরাজিতা, তুলসী ও বেলপাতা',
-                  accentClass: 'text-[#B34728]',
-                  list: sortPlantsWithUploadsFirst(poojaList),
-                },
-                {
-                  key: 'flower' as CategoryViewKey,
-                  titleBn: 'ছাদ ও বারান্দার ফুলগাছ',
-                  titleEn: 'Terrace Roses & Blooms',
-                  subtitleBn: 'গোলাপ, বাগানবিলাস, অ্যাডেনিয়াম',
-                  accentClass: 'text-[#1B8354]',
-                  list: sortPlantsWithUploadsFirst(flowerList),
-                },
-                {
-                  key: 'foliage' as CategoryViewKey,
-                  titleBn: 'গাছপালা, পাম ও শো-প্ল্যান্ট',
-                  titleEn: 'Palms & Foliage Plants',
-                  subtitleBn: 'লাকি ব্যাম্বু, র‍্যাবিশ পাম, স্নেক প্ল্যান্ট',
-                  accentClass: 'text-[#142318]',
-                  list: sortPlantsWithUploadsFirst(foliageList),
-                },
-                {
-                  key: 'herbal' as CategoryViewKey,
-                  titleBn: 'মসলা ও ভেষজ গাছ',
-                  titleEn: 'Spices & Herbal Plants',
-                  subtitleBn: 'দারুচিনি, এলাচ, তেজপাতা, কারিপাতা',
-                  accentClass: 'text-[#785942]',
-                  list: sortPlantsWithUploadsFirst(herbalList),
-                },
-              ]
-                .filter((rail) => rail.list.length > 0)
-                .map((rail) => (
-                  <HorizontalPlantRail
-                    key={rail.key}
-                    railKey={`cat-${rail.key}`}
-                    isVisible={isVisible}
-                    title={lang === 'bn' ? rail.titleBn : rail.titleEn}
-                    subtitle={lang === 'bn' ? rail.subtitleBn : undefined}
-                    count={rail.list.length}
-                    accentClass={rail.accentClass}
-                    onViewAll={() => handleCategoryTabClick(rail.key)}
-                    lang={lang}
-                  >
-                    {rail.list.map((plant, idx) => renderPlantCard(plant, idx, 'rail'))}
-                  </HorizontalPlantRail>
-                ))}
-            </div>
-          ) : (
-            <HorizontalPlantRail
-              railKey={`filtered-${activeCategory}-${searchQuery ? 'search' : 'browse'}`}
-              isVisible={isVisible}
-              title={
-                searchAnalysis.isSearching
-                  ? lang === 'bn'
-                    ? `"${searchQuery}" ফলাফল`
-                    : `Results for "${searchQuery}"`
-                  : lang === 'bn'
-                  ? currentMeta.titleBn
-                  : currentMeta.titleEn
-              }
-              subtitle={lang === 'bn' ? 'পাশে স্ক্রল করে সব চারা দেখুন' : 'Swipe or click arrows to browse'}
-              count={displayedPlants.length}
-              lang={lang}
-            >
-              {displayedPlants.map((plant, idx) => renderPlantCard(plant, idx, 'rail'))}
-            </HorizontalPlantRail>
-          )
+          <div className="space-y-8">
+            {[
+              {
+                key: 'fruit' as CategoryViewKey,
+                titleBn: 'ছাদবাগানের ফল ও কলম',
+                titleEn: 'Fruit Grafts & Saplings',
+                subtitleBn: 'আম, কাগজি লেবু, পেয়ারা, ডালিম',
+                accentClass: 'text-[#B45309]',
+                list: sortPlantsWithUploadsFirst(fruitList),
+              },
+              {
+                key: 'puja' as CategoryViewKey,
+                titleBn: 'নিত্য পূজার ফুল ও বেলপাতা',
+                titleEn: 'Daily Puja Blooms & Bael',
+                subtitleBn: 'রক্তজবা, অপরাজিতা, তুলসী ও বেলপাতা',
+                accentClass: 'text-[#B34728]',
+                list: sortPlantsWithUploadsFirst(poojaList),
+              },
+              {
+                key: 'flower' as CategoryViewKey,
+                titleBn: 'ছাদ ও বারান্দার ফুলগাছ',
+                titleEn: 'Terrace Roses & Blooms',
+                subtitleBn: 'গোলাপ, বাগানবিলাস, অ্যাডেনিয়াম',
+                accentClass: 'text-[#1B8354]',
+                list: sortPlantsWithUploadsFirst(flowerList),
+              },
+              {
+                key: 'foliage' as CategoryViewKey,
+                titleBn: 'গাছপালা, পাম ও শো-প্ল্যান্ট',
+                titleEn: 'Palms & Foliage Plants',
+                subtitleBn: 'লাকি ব্যাম্বু, র‍্যাফিস পাম, স্নেক প্ল্যান্ট',
+                accentClass: 'text-[#142318]',
+                list: sortPlantsWithUploadsFirst(foliageList),
+              },
+              {
+                key: 'herbal' as CategoryViewKey,
+                titleBn: 'মসলা ও ভেষজ গাছ',
+                titleEn: 'Spices & Herbal Plants',
+                subtitleBn: 'দারুচিনি, এলাচ, তেজপাতা, কারিপাতা',
+                accentClass: 'text-[#785942]',
+                list: sortPlantsWithUploadsFirst(herbalList),
+              },
+            ]
+              .filter((section) => section.list.length > 0)
+              .map((section, sectionIdx) => (
+                <section key={section.key} className="space-y-3">
+                  <div className="flex items-center justify-between gap-2 pb-1.5 border-b border-[#DCE6D7]">
+                    <div className="min-w-0 flex items-baseline gap-2 flex-wrap">
+                      <h3 className={`font-serif-bn text-lg sm:text-2xl font-bold ${section.accentClass}`}>
+                        {lang === 'bn' ? section.titleBn : section.titleEn}
+                      </h3>
+                      <span className="text-xs font-mono-num font-semibold text-[#785942] tabular-nums">
+                        ({section.list.length})
+                      </span>
+                      <span className="hidden md:inline text-xs text-[#4C6252] font-sans-bn">
+                        · {section.subtitleBn}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      {viewMode === 'horizontal' && (
+                        <span className="hidden sm:inline text-xs font-medium text-[#785942] font-sans-bn">
+                          {lang === 'bn' ? '← ডানে স্লাইড করুন →' : '← Slide →'}
+                        </span>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => handleCategoryTabClick(section.key)}
+                        className="px-3 py-1.5 rounded-xl bg-white border border-[#CEDAC9] hover:border-[#15803D] text-xs font-bold text-[#15803D] active:scale-95 transition-all cursor-pointer whitespace-nowrap shrink-0"
+                      >
+                        {lang === 'bn' ? 'সব দেখুন →' : 'See all →'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {viewMode === 'horizontal' ? (
+                    <div className="flex gap-3 sm:gap-5 overflow-x-auto snap-x snap-mandatory pb-3 scrollbar-thin">
+                      {section.list.map((plant, idx) => renderPlantCard(plant, idx, true, sectionIdx === 0))}
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
+                      {section.list.map((plant, idx) => renderPlantCard(plant, idx, false, sectionIdx === 0))}
+                    </div>
+                  )}
+                </section>
+              ))}
+          </div>
+        ) : viewMode === 'horizontal' ? (
+          <div className="flex gap-3 sm:gap-5 overflow-x-auto snap-x snap-mandatory pb-3 scrollbar-thin">
+            {displayedPlants.map((plant, idx) => renderPlantCard(plant, idx, true, true))}
+          </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
-            {displayedPlants.map((plant, idx) => renderPlantCard(plant, idx, 'grid'))}
+            {displayedPlants.map((plant, idx) => renderPlantCard(plant, idx, false, true))}
           </div>
         )}
 

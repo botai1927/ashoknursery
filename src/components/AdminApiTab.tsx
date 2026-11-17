@@ -105,7 +105,7 @@ export function AdminApiTab({
               <h2 className="font-serif-bn text-base sm:text-lg font-bold">
                 Google Gemini AI কনফিগারেশন ও কোটা স্ট্যাটাস
               </h2>
-              <p className="text-[11px] text-[#526356]">
+              <p className="text-xs text-[#526356]">
                 ৪-স্লট Gemini API Key রোটেশন পুল ও সার্ভার ডায়াগনস্টিকস — সব Secret সার্ভার সাইডে সুরক্ষিত
               </p>
             </div>
@@ -118,7 +118,7 @@ export function AdminApiTab({
                 onRefreshAiStatus();
                 onRefreshDiagnostics();
               }}
-              className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-[#FAF8F5] hover:bg-[#F0EAE1] border border-[#D5C9B8] rounded-xl text-[11px] font-bold text-[#142318] cursor-pointer"
+              className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-[#FAF8F5] hover:bg-[#F0EAE1] border border-[#D5C9B8] rounded-xl text-xs font-bold text-[#142318] cursor-pointer"
             >
               <RefreshCw className="w-3 h-3 text-[#1B8354]" />
               <span>রিফ্রেশ</span>
@@ -127,7 +127,7 @@ export function AdminApiTab({
             <button
               type="button"
               onClick={onOpenAiChat}
-              className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#142318] hover:bg-[#203425] text-white rounded-xl text-[11px] font-bold cursor-pointer"
+              className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#142318] hover:bg-[#203425] text-white rounded-xl text-xs font-bold cursor-pointer"
             >
               <Bot className="w-3.5 h-3.5 text-[#A3E635]" />
               <span>Gemini AI চ্যাট খুলুন</span>
@@ -144,7 +144,7 @@ export function AdminApiTab({
             <h3 className="font-serif-bn text-sm sm:text-base font-bold">
               Gemini মাল্টি-স্লট কী পুল ও কোটা মিটার
             </h3>
-            <p className="text-[11px] text-[#526356]">
+            <p className="text-xs text-[#526356]">
               একটি কী-তে কোটা পূর্ণ (429) হলে স্বয়ংক্রিয়ভাবে পরের কী-তে রোটেশন হয়
             </p>
           </div>
@@ -176,7 +176,7 @@ export function AdminApiTab({
           </div>
 
           <div className="space-y-1">
-            <div className="flex items-center justify-between text-[11px] text-[#526356]">
+            <div className="flex items-center justify-between text-xs text-[#526356]">
               <span>প্রতি মিনিটের ব্যবহারের হার:</span>
               <span className="font-mono tabular-nums font-bold text-[#142318]">
                 {isAiStatusLoading
@@ -210,7 +210,7 @@ export function AdminApiTab({
               type="button"
               disabled={isAiStatusLoading || isRotatingKeySlot || (aiStatus?.configuredCount || 0) <= 1}
               onClick={() => onRotateAiSlot('next')}
-              className="px-3 py-1.5 bg-[#142318] hover:bg-[#203425] disabled:opacity-45 text-white text-[11px] font-bold rounded-xl flex items-center gap-1.5 cursor-pointer"
+              className="px-3 py-1.5 bg-[#142318] hover:bg-[#203425] disabled:opacity-45 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 cursor-pointer"
             >
               <RefreshCw className={`w-3 h-3 text-[#A3E635] ${isRotatingKeySlot ? 'animate-spin' : ''}`} />
               <span>পরবর্তী ব্যাকআপ কী-তে রোটেট করুন</span>
@@ -219,7 +219,7 @@ export function AdminApiTab({
               type="button"
               disabled={isAiStatusLoading || isRotatingKeySlot}
               onClick={() => onRotateAiSlot('reset_cooldown')}
-              className="px-3 py-1.5 bg-white hover:bg-[#F5EFE6] border border-[#D5C9B8] text-[#142318] text-[11px] font-bold rounded-xl cursor-pointer disabled:opacity-45"
+              className="px-3 py-1.5 bg-white hover:bg-[#F5EFE6] border border-[#D5C9B8] text-[#142318] text-xs font-bold rounded-xl cursor-pointer disabled:opacity-45"
             >
               সব কোটা/কুলডাউন রিসেট
             </button>
@@ -263,7 +263,7 @@ export function AdminApiTab({
                   <div className="flex items-center justify-between gap-1">
                     <span className="font-bold text-[#142318]">{slot.labelBn}</span>
                     <span
-                      className={`text-[11px] font-bold tabular-nums ${
+                      className={`text-xs font-bold tabular-nums ${
                         !slot.configured
                           ? 'text-[#785942]'
                           : slot.status === 'cooldown' || slot.status === 'exhausted' || slot.status === 'invalid'
@@ -284,10 +284,10 @@ export function AdminApiTab({
                         : 'প্রস্তুত'}
                     </span>
                   </div>
-                  <p className="text-[10px] font-mono text-[#526356]">
+                  <p className="text-xs font-mono text-[#526356]">
                     Secret: <span className="font-bold text-[#142318]">{slot.envVarName}</span>
                   </p>
-                  <div className="flex items-center justify-between text-[10px] text-[#785942] tabular-nums">
+                  <div className="flex items-center justify-between text-xs text-[#785942] tabular-nums">
                     <span>
                       কল: {slot.requestsTotal} বার {slot.lastUsedModel ? `(${slot.lastUsedModel})` : ''}
                     </span>
@@ -296,14 +296,14 @@ export function AdminApiTab({
                         type="button"
                         disabled={isRotatingKeySlot}
                         onClick={() => onRotateAiSlot('select', slot.slotId)}
-                        className="text-[10px] font-bold text-[#1B8354] hover:underline cursor-pointer"
+                        className="text-xs font-bold text-[#1B8354] hover:underline cursor-pointer"
                       >
                         এটি সক্রিয় করুন
                       </button>
                     )}
                   </div>
                   {slot.lastErrorBn && (
-                    <p className="text-[10px] text-[#B34728] font-semibold">{slot.lastErrorBn}</p>
+                    <p className="text-xs text-[#B34728] font-semibold">{slot.lastErrorBn}</p>
                   )}
                 </div>
               ))}
@@ -337,7 +337,7 @@ export function AdminApiTab({
               >
                 <p className="text-xs font-bold">{opt.title}</p>
                 <p
-                  className={`text-[10px] mt-0.5 ${
+                  className={`text-xs mt-0.5 ${
                     modelType === opt.id ? 'text-[#A3E635]' : 'text-[#785942]'
                   }`}
                 >
@@ -346,7 +346,7 @@ export function AdminApiTab({
               </button>
             ))}
           </div>
-          <p className="text-[10px] text-[#526356] mt-2 leading-relaxed">
+          <p className="text-xs text-[#526356] mt-2 leading-relaxed">
             নোট: নিরাপত্তার জন্য ব্রাউজারে কোনো API Key ইনপুট রাখা হয়নি। অতিরিক্ত Gemini Secret যোগ করতে AI Studio-র <strong>Settings &gt; Secrets</strong> ব্যবহার করুন।
           </p>
         </div>
@@ -365,7 +365,7 @@ export function AdminApiTab({
             type="button"
             disabled={isLoadingDiagnostics}
             onClick={onRefreshDiagnostics}
-            className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#FAF8F5] hover:bg-[#F0EAE1] border border-[#D5C9B8] rounded-xl text-[11px] font-bold text-[#142318] cursor-pointer disabled:opacity-50"
+            className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#FAF8F5] hover:bg-[#F0EAE1] border border-[#D5C9B8] rounded-xl text-xs font-bold text-[#142318] cursor-pointer disabled:opacity-50"
           >
             <RefreshCw className={`w-3 h-3 text-[#1B8354] ${isLoadingDiagnostics ? 'animate-spin' : ''}`} />
             <span>পুনরায় যাচাই</span>
@@ -374,25 +374,25 @@ export function AdminApiTab({
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
           <div className="p-2.5 bg-[#FAF8F5] border border-[#E8E1D5] rounded-xl">
-            <p className="text-[10px] text-[#785942] font-bold">সার্ভার আপটাইম</p>
+            <p className="text-xs text-[#785942] font-bold">সার্ভার আপটাইম</p>
             <p className="font-mono font-bold text-[#142318]">
               {diagnosticsSnapshot ? `${diagnosticsSnapshot.server.uptimeSec}s` : 'লোড হচ্ছে...'}
             </p>
           </div>
           <div className="p-2.5 bg-[#FAF8F5] border border-[#E8E1D5] rounded-xl">
-            <p className="text-[10px] text-[#785942] font-bold">মেমোরি (RSS)</p>
+            <p className="text-xs text-[#785942] font-bold">মেমোরি (RSS)</p>
             <p className="font-mono font-bold text-[#142318]">
               {diagnosticsSnapshot ? `${diagnosticsSnapshot.server.memoryRssMb} MB` : '—'}
             </p>
           </div>
           <div className="p-2.5 bg-[#FAF8F5] border border-[#E8E1D5] rounded-xl">
-            <p className="text-[10px] text-[#785942] font-bold">রেট-লিমিট মোড</p>
+            <p className="text-xs text-[#785942] font-bold">রেট-লিমিট মোড</p>
             <p className="font-mono font-bold text-[#142318] truncate">
               {diagnosticsSnapshot?.security.rateLimitMode || '—'}
             </p>
           </div>
           <div className="p-2.5 bg-[#FAF8F5] border border-[#E8E1D5] rounded-xl">
-            <p className="text-[10px] text-[#785942] font-bold">ব্রাউজার এরর ক্যাপচার</p>
+            <p className="text-xs text-[#785942] font-bold">ব্রাউজার এরর ক্যাপচার</p>
             <p
               className={`font-mono font-bold ${
                 runtimeIssuesCount > 0 ? 'text-[#B34728]' : 'text-[#1B8354]'
@@ -403,7 +403,7 @@ export function AdminApiTab({
           </div>
         </div>
 
-        <div className="p-3 bg-[#F0FDF4] border border-[#86EFAC] rounded-2xl flex items-start gap-2 text-[11px] text-[#166534] leading-relaxed">
+        <div className="p-3 bg-[#F0FDF4] border border-[#86EFAC] rounded-2xl flex items-start gap-2 text-xs text-[#166534] leading-relaxed">
           <ShieldCheck className="w-4 h-4 text-[#1B8354] shrink-0 mt-0.5" />
           <p>
             ডায়াগনস্টিকস ও Gemini AI সরাসরি আপনার ক্যাটালগ, ছবি, কোটা এবং রানটাইম ত্রুটি পর্যবেক্ষণ করতে পারে।

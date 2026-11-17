@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useLayoutEffect, useRef, PointerEvent as ReactPointerEvent } from 'react';
+import type { User as FirebaseUser } from 'firebase/auth';
 import {
   ArrowLeft,
   MessageCircle,
@@ -17,21 +18,33 @@ import {
   MapPin,
   Camera,
   Mic,
-  Truck,
   ZoomIn,
   RotateCcw,
   Maximize2,
   X,
+  AlertCircle,
 } from 'lucide-react';
+import { loadFirebaseAuthSdk, loadFirebaseCore } from '../firebaseLazy';
+import { ReviewGoogleAuthBanner } from './ReviewGoogleAuthBanner';
 import { BrahmyamanPlant, PlantPotOption } from '../types/nursery';
 import { NURSERY_CONTACT, PUJA_IMAGE } from '../data/brahmyamanCatalog';
 import { resolvePlantImageUrl } from '../utils/imageUrl';
 import { PlantShareModal } from './PlantShareModal';
 import { recordWhatsAppInquiryLog } from '../utils/whatsappOrderTracker';
+import { getPlantGrowthInfo } from '../utils/plantMetadata';
 import {
   loadLocalCustomerReviews,
+  subscribeToApprovedCustomerReviews,
   submitCustomerReview,
 } from '../utils/customerReviewsStorage';
+import {
+  validateImageFile,
+  compressImageFileToDataUrl,
+} from '../utils/cloudinaryUpload';
+import {
+  createBengaliMathPuzzle,
+  normalizeBengaliNumberInput,
+} from '../utils/publicChallengeClient';
 import type { CustomerReviewItem } from '../types/nursery';
 
 interface PlantDetailWindowProps {
@@ -46,7 +59,6 @@ interface PlantDetailWindowProps {
 
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 3;
-const ZOOM_STEP = 0.5;
 
 export function PlantDetailWindow({
   plant,
@@ -87,25 +99,58 @@ export function PlantDetailWindow({
   const [showAllRelated, setShowAllRelated] = useState(false);
   const [justAddedRelId, setJustAddedRelId] = useState<string | null>(null);
 
-  // Customer Reviews & Garden Photos for this plant
-  const [allReviews, setAllReviews] = useState<CustomerReviewItem[]>(() =>
-    loadLocalCustomerReviews()
+  // Customer Reviews & Garden Photos for this plant (live-synced with Firestore approved reviews)
+  const [approvedReviews, setApprovedReviews] = useState<CustomerReviewItem[]>(() =>
+    loadLocalCustomerReviews().filter((r) => r.status === 'approved')
   );
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [revName, setRevName] = useState('');
   const [revLocation, setRevLocation] = useState('');
   const [revComment, setRevComment] = useState('');
   const [revPhotoUrl, setRevPhotoUrl] = useState('');
+  const [revHoneypot, setRevHoneypot] = useState('');
+  const [revMathPuzzle, setRevMathPuzzle] = useState(() => createBengaliMathPuzzle());
+  const [revMathInput, setRevMathInput] = useState('');
+  const [revSubmitting, setRevSubmitting] = useState(false);
+  const [revError, setRevError] = useState<string | null>(null);
   const [revSubmittedMsg, setRevSubmittedMsg] = useState(false);
+  const [revAuthUser, setRevAuthUser] = useState<FirebaseUser | null>(null);
 
   useEffect(() => {
-    const sync = () => setAllReviews(loadLocalCustomerReviews());
-    window.addEventListener('brahmyaman-reviews-updated', sync);
-    return () => window.removeEventListener('brahmyaman-reviews-updated', sync);
+    let disposed = false;
+    let unsubscribeAuth: (() => void) | undefined;
+    void Promise.all([loadFirebaseCore(), loadFirebaseAuthSdk()])
+      .then(([{ auth }, { onAuthStateChanged }]) => {
+        if (disposed) return;
+        setRevAuthUser(auth.currentUser);
+        unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+          if (disposed) return;
+          setRevAuthUser(user);
+          if (user?.displayName) {
+            setRevName((prev) => (prev.trim() ? prev : user.displayName || ''));
+          }
+        });
+      })
+      .catch(() => {});
+
+    const unsubscribeFirestore = subscribeToApprovedCustomerReviews((remoteApproved) => {
+      setApprovedReviews(remoteApproved);
+    });
+    const syncLocal = () =>
+      setApprovedReviews(loadLocalCustomerReviews().filter((r) => r.status === 'approved'));
+    window.addEventListener('brahmyaman-reviews-updated', syncLocal);
+    window.addEventListener('storage', syncLocal);
+    return () => {
+      disposed = true;
+      unsubscribeAuth?.();
+      unsubscribeFirestore();
+      window.removeEventListener('brahmyaman-reviews-updated', syncLocal);
+      window.removeEventListener('storage', syncLocal);
+    };
   }, []);
 
   const plantMatchingReviews = useMemo(() => {
-    const approved = allReviews.filter((r) => r.status === 'approved');
+    const approved = approvedReviews.filter((r) => r.status === 'approved');
     const exact = approved.filter(
       (r) =>
         r.plantId === plant.id ||
@@ -114,7 +159,7 @@ export function PlantDetailWindow({
     if (exact.length >= 2) return exact.slice(0, 4);
     const others = approved.filter((r) => !exact.some((e) => e.id === r.id));
     return [...exact, ...others].slice(0, 3);
-  }, [allReviews, plant.id, plant.nameBn]);
+  }, [approvedReviews, plant.id, plant.nameBn]);
 
   // Gallery of up to 3 images (preserves backward compatibility with plant.image)
   const plantImages = useMemo(() => {
@@ -309,14 +354,6 @@ export function PlantDetailWindow({
     }
   };
 
-  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    const delta = e.deltaY < 0 ? 0.25 : -0.25;
-    const next = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoomScale + delta));
-    setZoomScale(Number(next.toFixed(2)));
-    if (next <= 1) setPanOffset({ x: 0, y: 0 });
-  };
-
   const handleImageClick = () => {
     if (didDragRef.current) {
       didDragRef.current = false;
@@ -339,10 +376,10 @@ export function PlantDetailWindow({
     const msg =
       plant.inStock === false
         ? encodeURIComponent(
-            `নমস্কার ব্রাহ্ম্যমাণ নার্সারি (কালশুলি, বাঁকুড়া), আমি "${plant.nameBn}" (${selectedOption.labelBn} - ₹${selectedOption.price}) চারাটি (বর্তমানে স্টক শেষ দেখানো হচ্ছে) কবে আবার পাওয়া যাবে তা জানতে আগ্রহী।`
+            `নমস্কার ভ্রাম্যমাণ নার্সারি (কালশুলি, বাঁকুড়া), আমি "${plant.nameBn}" (${selectedOption.labelBn} - ₹${selectedOption.price}) চারাটি (বর্তমানে স্টক শেষ দেখানো হচ্ছে) কবে আবার পাওয়া যাবে তা জানতে আগ্রহী।`
           )
         : encodeURIComponent(
-            `নমস্কার ব্রাহ্ম্যমাণ নার্সারি (কালশুলি, বাঁকুড়া), আমি "${plant.nameBn}" (${selectedOption.labelBn} - ₹${selectedOption.price}) চারা নিতে আগ্রহী। এর প্রাপ্যতা ও ডেলিভারি সম্পর্কে জানাবেন কি?`
+            `নমস্কার ভ্রাম্যমাণ নার্সারি (কালশুলি, বাঁকুড়া), আমি "${plant.nameBn}" (${selectedOption.labelBn} - ₹${selectedOption.price}) চারা নিতে আগ্রহী। এর প্রাপ্যতা ও ডেলিভারি সম্পর্কে জানাবেন কি?`
           );
     return `https://wa.me/${NURSERY_CONTACT.phoneRaw}?text=${msg}`;
   }, [plant, selectedOption]);
@@ -587,7 +624,7 @@ export function PlantDetailWindow({
 
                 {/* Helper hint badge when zoomed */}
                 {zoomScale > 1 && (
-                  <div className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-lg bg-[#142318]/85 text-white text-[11px] font-sans-bn pointer-events-none">
+                  <div className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-lg bg-[#142318]/85 text-white text-xs font-sans-bn pointer-events-none">
                     আঙুল বা মাউস দিয়ে টেনে চারপাশ দেখুন
                   </div>
                 )}
@@ -658,7 +695,7 @@ export function PlantDetailWindow({
                             decoding="async"
                           />
                         </div>
-                        <span className="text-[10px] font-bold text-[#142318] font-sans-bn truncate">
+                        <span className="text-xs font-bold text-[#142318] font-sans-bn truncate">
                           {slotLabels[idx] || `ছবি ${idx + 1}`}
                         </span>
                       </button>
@@ -741,24 +778,41 @@ export function PlantDetailWindow({
                 </p>
               </div>
 
-              {/* Price Banner */}
-              <div className="p-4 rounded-2xl bg-[#F3F6F1] border border-[#D5DFD1] flex items-center justify-between gap-4">
-                <div>
-                  <span className="text-xs text-[#526857] font-semibold block">
-                    নির্ধারিত নার্সারি মূল্য:
-                  </span>
-                  <div className="text-2xl sm:text-3xl font-bold text-[#B34728] font-mono-num tabular-nums">
-                    ₹{selectedOption.price}
-                  </div>
-                </div>
+              {/* Price Banner + Size/Age & Days-to-Fruit/Bloom Info */}
+              {(() => {
+                const growthInfo = getPlantGrowthInfo(plant, selectedOption);
+                return (
+                  <div className="p-4 rounded-2xl bg-[#F3F6F1] border border-[#D5DFD1] space-y-2.5">
+                    <div className="flex items-center justify-between gap-4 flex-wrap">
+                      <div>
+                        <span className="text-xs text-[#526857] font-semibold block">
+                          {lang === 'bn' ? 'নির্ধারিত নার্সারি মূল্য ও সাইজ:' : 'Nursery Price & Size:'}
+                        </span>
+                        <div className="flex items-baseline gap-2.5 flex-wrap">
+                          <span className="text-2xl sm:text-3xl font-bold text-[#B34728] font-mono-num tabular-nums">
+                            ₹{selectedOption.price}
+                          </span>
+                          <span className="text-xs sm:text-sm font-bold text-[#142318] font-sans-bn">
+                            ({lang === 'bn' ? growthInfo.sizeAgeBn : growthInfo.sizeAgeEn})
+                          </span>
+                        </div>
+                      </div>
 
-                <div className="text-right font-sans-bn">
-                  <span className="inline-block px-2.5 py-1 rounded-md bg-[#1B8354]/12 text-[#1B8354] text-xs font-bold">
-                    {selectedOption.labelBn}
-                  </span>
-                  <p className="text-[11px] text-[#526356] mt-0.5">ন্যায্য নার্সারি দর</p>
-                </div>
-              </div>
+                      <div className="text-left sm:text-right font-sans-bn">
+                        <span className="inline-block px-2.5 py-1 rounded-md bg-[#1B8354]/12 text-[#1B8354] text-xs font-bold">
+                          {selectedOption.labelBn}
+                        </span>
+                        <p className="text-xs text-[#526356] mt-0.5">ন্যায্য নার্সারি দর</p>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-[#DCE6D7] flex items-center gap-2 text-xs sm:text-sm font-bold text-[#B45309] font-sans-bn">
+                      <Clock className="w-4 h-4 shrink-0" />
+                      <span>{lang === 'bn' ? growthInfo.harvestOrBloomBn : growthInfo.harvestOrBloomEn}</span>
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Description */}
               <div className="space-y-2">
@@ -795,7 +849,7 @@ export function PlantDetailWindow({
                           <p className="text-xs sm:text-sm font-bold text-[#142318] font-sans-bn">
                             {lang === 'bn' ? opt.labelBn : opt.labelEn}
                           </p>
-                          <p className="text-[11px] text-[#526857] font-sans-bn mt-0.5">
+                          <p className="text-xs text-[#526857] font-sans-bn mt-0.5">
                             {opt.containerType}
                           </p>
                         </div>
@@ -970,7 +1024,10 @@ export function PlantDetailWindow({
 
             <button
               type="button"
-              onClick={() => setShowReviewForm((prev) => !prev)}
+              onClick={() => {
+                setRevError(null);
+                setShowReviewForm((prev) => !prev);
+              }}
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#1B8354] hover:bg-[#146c44] text-white text-xs font-bold cursor-pointer self-start sm:self-auto"
             >
               <Camera className="w-3.5 h-3.5" />
@@ -989,123 +1046,222 @@ export function PlantDetailWindow({
           )}
 
           {showReviewForm && (
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault();
-                if (!revName.trim() || !revComment.trim()) return;
-                await submitCustomerReview({
-                  plantId: plant.id,
-                  plantNameBn: plant.nameBn,
-                  customerName: revName.trim(),
-                  locationBn: revLocation.trim() || 'বাঁকুড়া',
-                  rating: 5,
-                  commentBn: revComment.trim(),
-                  photoUrl: revPhotoUrl || undefined,
-                  status: 'pending',
-                });
-                setRevName('');
-                setRevLocation('');
-                setRevComment('');
-                setRevPhotoUrl('');
-                setShowReviewForm(false);
-                setRevSubmittedMsg(true);
-                setTimeout(() => setRevSubmittedMsg(false), 6000);
-              }}
-              className="bg-white border border-[#D5DFD1] rounded-2xl p-4 sm:p-5 space-y-3 shadow-2xs"
-            >
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <input
-                  type="text"
-                  required
-                  value={revName}
-                  onChange={(e) => setRevName(e.target.value)}
-                  placeholder="আপনার নাম *"
-                  className="h-10 px-3 bg-[#F3F6F1] border border-[#CEDAC9] rounded-xl text-xs text-[#142318]"
-                />
-                <input
-                  type="text"
-                  value={revLocation}
-                  onChange={(e) => setRevLocation(e.target.value)}
-                  placeholder="আপনার গ্রাম বা শহর (যেমন: বিষ্ণুপুর, খাতড়া)"
-                  className="h-10 px-3 bg-[#F3F6F1] border border-[#CEDAC9] rounded-xl text-xs text-[#142318]"
-                />
-              </div>
-
-              <textarea
-                rows={2}
-                required
-                value={revComment}
-                onChange={(e) => setRevComment(e.target.value)}
-                placeholder={`${plant.nameBn} চারাটি আপনার বাগানে কেমন বাড়ছে তা লিখুন *`}
-                className="w-full p-3 bg-[#F3F6F1] border border-[#CEDAC9] rounded-xl text-xs text-[#142318]"
+            <div className="bg-white border border-[#D5DFD1] rounded-2xl p-4 sm:p-5 space-y-3 shadow-2xs">
+              <ReviewGoogleAuthBanner
+                user={revAuthUser}
+                compact
+                onUserSignedIn={(signedIn) => {
+                  setRevAuthUser(signedIn);
+                  setRevError(null);
+                  if (signedIn.displayName) {
+                    setRevName((prev) => (prev.trim() ? prev : signedIn.displayName || ''));
+                  }
+                }}
               />
 
-              <div className="flex items-center justify-between gap-2 flex-wrap">
-                <label className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#F3F6F1] hover:bg-[#E4ECE0] border border-[#CEDAC9] rounded-xl text-xs font-bold text-[#142318] cursor-pointer">
-                  <Camera className="w-3.5 h-3.5 text-[#1B8354]" />
-                  <span>{revPhotoUrl ? 'বাগানের ছবি যুক্ত হয়েছে ✓' : 'বাগানের ছবি আপলোড করুন'}</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const f = e.target.files?.[0];
-                      if (!f) return;
-                      const reader = new FileReader();
-                      reader.onload = () => {
-                        if (typeof reader.result === 'string') setRevPhotoUrl(reader.result);
-                      };
-                      reader.readAsDataURL(f);
-                    }}
-                    className="hidden"
-                  />
-                </label>
-
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-[#142318] hover:bg-[#1B8354] text-white rounded-xl text-xs font-bold cursor-pointer"
+              {revAuthUser && (
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    if (!revAuthUser) {
+                      setRevError('রিভিউ জমা দিতে আগে Google অ্যাকাউন্ট দিয়ে সাইন-ইন করুন।');
+                      return;
+                    }
+                    if (!revName.trim() || !revComment.trim() || revSubmitting) return;
+                    const parsedAnswer = normalizeBengaliNumberInput(revMathInput);
+                    if (parsedAnswer === null || parsedAnswer !== revMathPuzzle.answer) {
+                      setRevError('সহজ যোগফলের উত্তরটি সঠিক হয়নি। অনুগ্রহ করে আবার লিখুন।');
+                      setRevMathPuzzle(createBengaliMathPuzzle());
+                      setRevMathInput('');
+                      return;
+                    }
+                    setRevError(null);
+                    setRevSubmitting(true);
+                    try {
+                      await submitCustomerReview({
+                        plantId: plant.id,
+                        plantNameBn: plant.nameBn,
+                        customerName: revName.trim(),
+                        locationBn: revLocation.trim() || 'বাঁকুড়া',
+                        rating: 5,
+                        commentBn: revComment.trim(),
+                        photoUrl: revPhotoUrl || undefined,
+                        status: 'pending',
+                        honeypot: revHoneypot,
+                      });
+                      setRevName('');
+                      setRevLocation('');
+                      setRevComment('');
+                      setRevPhotoUrl('');
+                      setRevHoneypot('');
+                      setRevMathInput('');
+                      setRevMathPuzzle(createBengaliMathPuzzle());
+                      setShowReviewForm(false);
+                      setRevSubmittedMsg(true);
+                      setTimeout(() => setRevSubmittedMsg(false), 6000);
+                    } catch (err: any) {
+                      setRevError(err?.message || 'রিভিউ জমা দেওয়া যায়নি। কিছুক্ষণ পর আবার চেষ্টা করুন।');
+                    } finally {
+                      setRevSubmitting(false);
+                    }
+                  }}
+                  className="space-y-3"
                 >
-                  রিভিউ পাঠান
-                </button>
-              </div>
-            </form>
-          )}
+                  {/* Anti-bot honeypot field */}
+                  <div className="sr-only" aria-hidden="true">
+                    <label htmlFor="plant-review-website-hp">Website</label>
+                    <input
+                      id="plant-review-website-hp"
+                      type="text"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={revHoneypot}
+                      onChange={(e) => setRevHoneypot(e.target.value)}
+                    />
+                  </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {plantMatchingReviews.map((rev) => (
-              <div
-                key={rev.id}
-                className="bg-white border border-[#D5DFD1] rounded-2xl p-4 flex flex-col justify-between gap-3"
-              >
-                <div className="space-y-2">
-                  {rev.photoUrl && (
-                    <div className="aspect-[16/10] rounded-xl overflow-hidden bg-[#EBF1E8] border border-[#D5DFD1]">
-                      <img
-                        src={resolvePlantImageUrl(rev.photoUrl, PUJA_IMAGE)}
-                        alt={rev.plantNameBn || rev.customerName}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
+                  {revError && (
+                    <div className="p-2.5 rounded-xl bg-[#FEF2F2] border border-[#FECACA] text-xs font-bold text-[#B34728] flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 shrink-0" />
+                      <span>{revError}</span>
                     </div>
                   )}
-                  <p className="font-serif-bn text-xs sm:text-sm text-[#142318] italic leading-relaxed">
-                    "{rev.commentBn}"
-                  </p>
-                </div>
 
-                <div className="pt-2 border-t border-[#EBF1E8] flex items-center justify-between text-[11px]">
-                  <div>
-                    <p className="font-bold text-[#142318]">{rev.customerName}</p>
-                    <p className="text-[#526857]">{rev.locationBn}</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <input
+                      type="text"
+                      required
+                      maxLength={120}
+                      value={revName}
+                      onChange={(e) => setRevName(e.target.value)}
+                      placeholder="আপনার নাম *"
+                      className="h-10 px-3 bg-[#F3F6F1] border border-[#CEDAC9] rounded-xl text-xs text-[#142318]"
+                    />
+                    <input
+                      type="text"
+                      maxLength={160}
+                      value={revLocation}
+                      onChange={(e) => setRevLocation(e.target.value)}
+                      placeholder="আপনার গ্রাম বা শহর (যেমন: বিষ্ণুপুর, খাতড়া)"
+                      className="h-10 px-3 bg-[#F3F6F1] border border-[#CEDAC9] rounded-xl text-xs text-[#142318]"
+                    />
                   </div>
-                  {rev.plantNameBn && (
-                    <span className="px-2 py-0.5 rounded-full bg-[#1B8354]/10 text-[#1B8354] text-[10px] font-bold">
-                      ✓ {rev.plantNameBn}
-                    </span>
-                  )}
+
+                  <textarea
+                    rows={2}
+                    required
+                    maxLength={1500}
+                    value={revComment}
+                    onChange={(e) => setRevComment(e.target.value)}
+                    placeholder={`${plant.nameBn} চারাটি আপনার বাগানে কেমন বাড়ছে তা লিখুন *`}
+                    className="w-full p-3 bg-[#F3F6F1] border border-[#CEDAC9] rounded-xl text-xs text-[#142318]"
+                  />
+
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <label className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#F3F6F1] hover:bg-[#E4ECE0] border border-[#CEDAC9] rounded-xl text-xs font-bold text-[#142318] cursor-pointer">
+                      <Camera className="w-3.5 h-3.5 text-[#1B8354]" />
+                      <span>{revPhotoUrl ? 'বাগানের ছবি যুক্ত হয়েছে ✓' : 'বাগানের ছবি আপলোড করুন'}</span>
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/gif,image/avif,image/heic,image/heif"
+                        onChange={async (e) => {
+                          const f = e.target.files?.[0];
+                          if (!f) return;
+                          setRevError(null);
+                          const check = validateImageFile(f);
+                          if (!check.ok) {
+                            setRevError(check.errorBn || 'শুধুমাত্র বৈধ ছবি (JPG, PNG, WebP) আপলোড করা যাবে।');
+                            e.target.value = '';
+                            return;
+                          }
+                          try {
+                            const compressed = await compressImageFileToDataUrl(f, {
+                              maxWidth: 900,
+                              maxHeight: 900,
+                              quality: 0.78,
+                            });
+                            setRevPhotoUrl(compressed);
+                          } catch (err: any) {
+                            setRevError(err?.message || 'ছবি প্রসেস করা যায়নি।');
+                            e.target.value = '';
+                          }
+                        }}
+                        className="hidden"
+                      />
+                    </label>
+
+                    <label className="inline-flex items-center gap-1.5 bg-[#F3F6F1] border border-[#CEDAC9] rounded-xl px-2.5 h-9 text-xs font-bold text-[#142318]">
+                      <span>যাচাই: {revMathPuzzle.questionBn}</span>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        required
+                        maxLength={4}
+                        value={revMathInput}
+                        onChange={(e) => setRevMathInput(e.target.value)}
+                        placeholder="উত্তর"
+                        className="w-12 h-7 px-1.5 bg-white border border-[#CEDAC9] rounded-lg text-center text-xs font-bold text-[#142318]"
+                      />
+                    </label>
+
+                    <button
+                      type="submit"
+                      disabled={revSubmitting}
+                      className="px-4 py-2 bg-[#142318] hover:bg-[#1B8354] disabled:opacity-60 text-white rounded-xl text-xs font-bold cursor-pointer"
+                    >
+                      {revSubmitting ? 'পাঠানো হচ্ছে...' : 'রিভিউ পাঠান'}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          )}
+
+          {plantMatchingReviews.length === 0 ? (
+            <div className="bg-white border border-[#D5DFD1] rounded-2xl p-5 text-center text-xs sm:text-sm text-[#526857]">
+              {lang === 'bn'
+                ? 'এই চারার জন্য এখনও কোনো ক্রেতা রিভিউ প্রকাশিত হয়নি। আপনি আপনার বাগানের ছবি ও অভিজ্ঞতা প্রথম শেয়ার করতে পারেন।'
+                : 'No customer photos or reviews published for this plant yet. Be the first to share yours.'}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {plantMatchingReviews.map((rev) => (
+                <div
+                  key={rev.id}
+                  className="bg-white border border-[#D5DFD1] rounded-2xl p-4 flex flex-col justify-between gap-3"
+                >
+                  <div className="space-y-2">
+                    {rev.photoUrl && (
+                      <div className="aspect-[16/10] rounded-xl overflow-hidden bg-[#EBF1E8] border border-[#D5DFD1]">
+                        <img
+                          src={resolvePlantImageUrl(rev.photoUrl, PUJA_IMAGE)}
+                          alt={rev.plantNameBn || rev.customerName}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </div>
+                    )}
+                    <p className="font-serif-bn text-xs sm:text-sm text-[#142318] italic leading-relaxed">
+                      "{rev.commentBn}"
+                    </p>
+                  </div>
+
+                  <div className="pt-2 border-t border-[#EBF1E8] flex items-center justify-between text-xs">
+                    <div>
+                      <p className="font-bold text-[#142318]">{rev.customerName}</p>
+                      <p className="text-[#526857]">{rev.locationBn}</p>
+                    </div>
+                    {rev.plantNameBn && (
+                      <span className="px-2 py-0.5 rounded-full bg-[#1B8354]/10 text-[#1B8354] text-xs font-bold">
+                        ✓ {rev.plantNameBn}
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* ========================================================= */}
@@ -1168,7 +1324,7 @@ export function PlantDetailWindow({
                         />
                       </div>
 
-                      <p className="text-[11px] text-[#526857] font-sans-bn truncate mb-0.5">
+                      <p className="text-xs text-[#526857] font-sans-bn truncate mb-0.5">
                         {sameCategory ? rel.category : `অনুরূপ পছন্দ · ${rel.category}`}
                       </p>
 
@@ -1192,7 +1348,7 @@ export function PlantDetailWindow({
                             setJustAddedRelId((curr) => (curr === rel.id ? null : curr));
                           }, 1200);
                         }}
-                        className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold inline-flex items-center gap-1 transition-colors cursor-pointer ${
+                        className={`px-2.5 py-1.5 rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-colors cursor-pointer ${
                           isRelAdded
                             ? 'bg-[#142318] text-white'
                             : 'bg-[#EBF1E8] hover:bg-[#1B8354] text-[#142318] hover:text-white'
@@ -1250,7 +1406,7 @@ export function PlantDetailWindow({
           </button>
 
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] text-[#526857] font-sans-bn truncate">{selectedOption.labelBn}</p>
+            <p className="text-xs text-[#526857] font-sans-bn truncate">{selectedOption.labelBn}</p>
             <p className="text-lg font-bold text-[#B34728] font-mono-num tabular-nums leading-none">
               ₹{selectedOption.price}
             </p>
@@ -1339,6 +1495,7 @@ export function PlantDetailWindow({
               src={activePhotoSrc}
               alt={plant.nameBn}
               draggable={false}
+              decoding="async"
               style={{
                 transform: `translate(${panOffset.x}px, ${panOffset.y}px) scale(${zoomScale})`,
                 transition: isPanning ? 'none' : 'transform 220ms cubic-bezier(0.16, 1, 0.3, 1)',

@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useRef } from 'react';
 import { MapPin, Phone, MessageCircle } from 'lucide-react';
 import { NURSERY_CONTACT } from '../data/brahmyamanCatalog';
 import { AudienceTag } from '../types/nursery';
@@ -45,7 +45,7 @@ export function Footer({ lang, onSelectAudience, onOpenAdmin, onNavigateWindow }
           {/* Brand Col */}
           <div className="md:col-span-5 space-y-3">
             <p className="font-serif-bn text-2xl font-bold text-white tracking-wide">
-              ভ্রম্যমাণ নার্সারি
+              ভ্রাম্যমাণ নার্সারি
             </p>
             <p className="text-xs text-[#A3E635] font-sans-bn font-medium">
               Brahmyaman Nursery · Kalsuli, Bankura
@@ -64,7 +64,7 @@ export function Footer({ lang, onSelectAudience, onOpenAdmin, onNavigateWindow }
                   {NURSERY_CONTACT.phone}
                 </a>
               </p>
-              <p className="text-[11px] text-[#A8BDB0]">
+              <p className="text-xs text-[#A8BDB0]">
                 {NURSERY_CONTACT.visitingHoursBn} · ১৫ মিনিটে উত্তর
               </p>
             </div>
@@ -165,7 +165,7 @@ export function Footer({ lang, onSelectAudience, onOpenAdmin, onNavigateWindow }
             >
               ©
             </span>{' '}
-            {new Date().getFullYear()} ভ্রম্যমাণ নার্সারি (Brahmyaman Nursery), কালশুলি, বাঁকুড়া। সর্বস্বত্ব সংরক্ষিত।
+            {new Date().getFullYear()} ভ্রাম্যমাণ নার্সারি (Brahmyaman Nursery), কালশুলি, বাঁকুড়া। সর্বস্বত্ব সংরক্ষিত।
           </p>
           
           <div className="flex items-center gap-2">

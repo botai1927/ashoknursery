@@ -4,7 +4,17 @@ import { alignPlantImageSlots } from './cloudinaryCleanup';
 export const MAX_RAW_IMAGE_FILE_BYTES = 65 * 1024 * 1024; // 65 MB raw camera file cap
 export const SIGNED_DIRECT_PREFER_THRESHOLD_BYTES = 9 * 1024 * 1024; // Avoid backend JSON body limits for huge payloads
 
-const ALLOWED_IMAGE_EXTENSIONS = /\.(jpe?g|png|webp|gif|avif|heic|heif|bmp)$/i;
+const ALLOWED_IMAGE_EXTENSIONS = /\.(jpe?g|png|webp|gif|avif|heic|heif)$/i;
+const ALLOWED_CLIENT_MIME_TYPES = new Set([
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'image/avif',
+  'image/heic',
+  'image/heif',
+]);
 
 export type GetAuthHeadersFn = (isJson?: boolean) => Promise<HeadersInit>;
 
@@ -28,14 +38,14 @@ export function validateImageFile(
 
   const mime = (file.type || '').trim().toLowerCase();
   const fileName = (file.name || '').trim();
-  const hasImageMime = mime.startsWith('image/');
+  const hasAllowedMime = mime ? ALLOWED_CLIENT_MIME_TYPES.has(mime) : false;
   // Some Android gallery pickers omit MIME type and provide only filename
-  const hasImageExtension = !mime && ALLOWED_IMAGE_EXTENSIONS.test(fileName);
+  const hasAllowedExtension = !mime && ALLOWED_IMAGE_EXTENSIONS.test(fileName);
 
-  if (!hasImageMime && !hasImageExtension) {
+  if (!hasAllowedMime && !hasAllowedExtension) {
     return {
       ok: false,
-      errorBn: 'শুধুমাত্র ছবির ফাইল (JPG, PNG, WebP, HEIC) আপলোড করা যাবে।',
+      errorBn: 'শুধুমাত্র বৈধ ছবির ফাইল (JPG, PNG, WebP, GIF, AVIF, HEIC) আপলোড করা যাবে।',
     };
   }
 

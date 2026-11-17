@@ -1,5 +1,4 @@
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '../firebase';
+import { loadFirebaseCore, loadFirestoreSdk } from '../firebaseLazy';
 
 export interface RuntimeIssueRecord {
   id: string;
@@ -114,6 +113,10 @@ export function subscribeRuntimeIssues(cb: () => void): () => void {
  */
 export async function fetchRunningQuotaFromUsageStats(): Promise<RunningQuotaState | null> {
   try {
+    const [{ db }, { doc, getDoc }] = await Promise.all([
+      loadFirebaseCore(),
+      loadFirestoreSdk(),
+    ]);
     const snap = await getDoc(doc(db, 'usage_stats', 'running_quota'));
     if (snap.exists()) {
       const data = snap.data() as RunningQuotaState;
@@ -138,6 +141,10 @@ export async function fetchRunningQuotaFromUsageStats(): Promise<RunningQuotaSta
 
 export async function persistRunningQuotaToUsageStats(state: RunningQuotaState): Promise<boolean> {
   try {
+    const [{ db }, { doc, setDoc }] = await Promise.all([
+      loadFirebaseCore(),
+      loadFirestoreSdk(),
+    ]);
     await setDoc(doc(db, 'usage_stats', 'running_quota'), {
       ...state,
       updatedAtIso: new Date().toISOString(),
