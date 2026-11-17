@@ -188,7 +188,14 @@ export function CatalogSection({
     photoSrc: string;
   } | null>(null);
   const [selectedColorFilter, setSelectedColorFilter] = useState<string>('all');
-  const [activeCategory, setActiveCategory] = useState<CategoryViewKey>('all');
+  const [activeCategory, setActiveCategory] = useState<CategoryViewKey>(() => {
+    if (typeof window === 'undefined') return 'all';
+    const value = new URLSearchParams(window.location.search).get('category');
+    if (value === 'fruit' || value === 'puja' || value === 'flower' || value === 'foliage' || value === 'herbal') {
+      return value;
+    }
+    return 'all';
+  });
   const [onlyInStock, setOnlyInStock] = useState(false);
   const [under100Only, setUnder100Only] = useState(false);
   const [sortOrder, setSortOrder] = useState<SortOrder>('default');
@@ -211,6 +218,13 @@ export function CatalogSection({
     }
   };
 
+  const keepUrlCategory = useRef(
+    typeof window !== 'undefined' &&
+      ['fruit', 'puja', 'flower', 'foliage', 'herbal'].includes(
+        new URLSearchParams(window.location.search).get('category') || ''
+      )
+  );
+
   // Sync external activeAudience to local activeCategory
   useEffect(() => {
     if (activeAudience === 'puja') {
@@ -224,12 +238,26 @@ export function CatalogSection({
     } else if (activeAudience === 'herbal') {
       setActiveCategory('herbal');
     } else if (activeAudience === 'all') {
+      if (keepUrlCategory.current) {
+        keepUrlCategory.current = false;
+        return;
+      }
       setActiveCategory('all');
     }
   }, [activeAudience]);
 
   const handleCategoryTabClick = (cat: CategoryViewKey) => {
     setActiveCategory(cat);
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      params.delete('plant');
+      params.delete('view');
+      if (cat === 'all') params.delete('category');
+      else params.set('category', cat);
+      const next = params.toString();
+      window.history.pushState(null, '', next ? `/?${next}` : '/');
+      window.dispatchEvent(new Event('brahmyaman-route'));
+    }
     onSelectAudience(cat as AudienceTag);
     if (searchQuery.trim()) {
       onSearchChange('');
@@ -259,10 +287,10 @@ export function CatalogSection({
     const msg =
       plant.inStock === false
         ? encodeURIComponent(
-            `নমস্কার, আমি কালশুলির ব্রাহ্ম্যমাণ নার্সারি থেকে "${plant.nameBn}" চারাটি (বর্তমানে স্টক শেষ দেখানো হচ্ছে) কবে আবার পাওয়া যাবে তা জানতে আগ্রহী।`
+            `নমস্কার, আমি কালশুলির ভ্রম্যমাণ নার্সারি থেকে "${plant.nameBn}" চারাটি (বর্তমানে স্টক শেষ দেখানো হচ্ছে) কবে আবার পাওয়া যাবে তা জানতে আগ্রহী।`
           )
         : encodeURIComponent(
-            `নমস্কার, আমি কালশুলির ব্রাহ্ম্যমাণ নার্সারি থেকে "${plant.nameBn}" (${defaultOpt.labelBn} - ₹${defaultOpt.price}) চারা নিতে আগ্রহী। এর প্রাপ্যতা ও বিস্তারিত জানাবেন কি?`
+            `নমস্কার, আমি কালশুলির ভ্রম্যমাণ নার্সারি থেকে "${plant.nameBn}" (${defaultOpt.labelBn} - ₹${defaultOpt.price}) চারা নিতে আগ্রহী। এর প্রাপ্যতা ও বিস্তারিত জানাবেন কি?`
           );
     return `https://wa.me/${NURSERY_CONTACT.phoneRaw}?text=${msg}`;
   };
@@ -397,7 +425,7 @@ export function CatalogSection({
     foliage: {
       titleBn: 'গাছপালা, পাম ও শো-প্ল্যান্ট',
       titleEn: 'Palms, Crotons & Low-Maintenance Foliage',
-      descBn: 'লাকি ব্যাম্বু, র‍্যাবিশ পাম, বাহারি ক্রোটন, স্নেক প্ল্যান্ট ও ঝাউ গাছ—ঘরের বাতাস রাখে সতেজ।',
+      descBn: 'লাকি ব্যাম্বু, র‍্যাপিস পাম, বাহারি ক্রোটন, স্নেক প্ল্যান্ট ও ঝাউ গাছ—ঘরের বাতাস রাখে সতেজ।',
       descEn: 'Natural air purifiers and hardy foliage with minimal maintenance.',
       icon: TreePine,
       count: foliageList.length,
@@ -451,17 +479,14 @@ export function CatalogSection({
         {/* Clean Sunlit Botanical Specimen Image Frame */}
         <div
           onClick={() => onOpenPlantModal(plant)}
-          className={`relative bg-gradient-to-b from-[#EDF4EA] to-[#F7FAF5] flex items-center justify-center overflow-hidden border-b border-[#E3ECE0] cursor-pointer ${
-            isRail ? 'aspect-[4/3] p-2.5' : 'aspect-[4/3] p-2 sm:p-3'
-          }`}
+          className="relative aspect-[4/3] bg-[#F4EFE4] overflow-hidden border-b border-[#E3ECE0] cursor-pointer"
         >
           <img
             src={resolvePlantImageUrl(plant.image, fallbackSrc)}
             alt={plant.nameBn}
-            loading={isPriority ? 'eager' : 'lazy'}
-            fetchPriority={isPriority ? 'high' : 'auto'}
+            loading="lazy"
             decoding="async"
-            className={`max-h-full max-w-full object-contain mx-auto transition-transform duration-500 ease-out group-hover:scale-[1.06] drop-shadow-2xs ${
+            className={`h-full w-full object-cover object-center ${
               isOutOfStock ? 'opacity-70 grayscale-[20%]' : ''
             }`}
             referrerPolicy="no-referrer"
@@ -476,13 +501,13 @@ export function CatalogSection({
           {/* Single Clean Status Tag (Max 1 Corner Label per Card) */}
           {isOutOfStock ? (
             <div className="absolute top-2 left-2 z-10 pointer-events-none">
-              <span className="px-2 py-0.5 rounded-md bg-[#B84423] text-white text-[10px] font-semibold shadow-2xs">
+              <span className="px-2 py-0.5 rounded-md bg-[#B84423] text-white text-[13px] font-semibold shadow-2xs">
                 {lang === 'bn' ? 'স্টক শেষ' : 'Out of Stock'}
               </span>
             </div>
           ) : plant.badgeBn ? (
             <div className="absolute top-2 left-2 z-10 pointer-events-none">
-              <span className="px-2 py-0.5 rounded-md bg-[#122619]/90 text-[#F4F7F1] text-[10px] font-semibold shadow-2xs">
+              <span className="px-2 py-0.5 rounded-md bg-[#122619]/90 text-[#F4F7F1] text-[13px] font-semibold shadow-2xs">
                 {lang === 'bn' ? plant.badgeBn : plant.badgeEn}
               </span>
             </div>
@@ -522,10 +547,10 @@ export function CatalogSection({
         >
           <div>
             {/* Unboxed Botanical Metadata + Vitality Dot */}
-            <div className="flex items-center justify-between gap-1 text-[10px] sm:text-[11px] text-[#785942] font-sans-bn mb-0.5">
+            <div className="flex items-center justify-between gap-1 text-[13px] text-[#785942] font-sans-bn mb-1">
               <span className="truncate">{plant.category}</span>
               {!isOutOfStock && (
-                <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#15803D] shrink-0">
+                <span className="inline-flex items-center gap-1 text-[13px] font-semibold text-[#15803D] shrink-0">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E]" aria-hidden="true" />
                   <span className="hidden sm:inline">{lang === 'bn' ? 'সতেজ' : 'Fresh'}</span>
                 </span>
@@ -538,20 +563,18 @@ export function CatalogSection({
               className="text-left w-full cursor-pointer"
             >
               <h3
-                className={`font-serif-bn font-bold text-[#122619] group-hover:text-[#15803D] transition-colors leading-snug line-clamp-1 ${
-                  isRail ? 'text-base sm:text-[17px]' : 'text-sm sm:text-base'
-                }`}
+                className="font-serif-bn font-bold text-[#122619] group-hover:text-[#15803D] transition-colors leading-snug line-clamp-2 text-[15px] sm:text-base"
               >
                 {lang === 'bn' ? plant.nameBn : plant.nameEn}
                 {plant.colorBn && (
-                  <span className="ml-1 text-[11px] font-sans-bn font-medium text-[#785942]">
+                  <span className="ml-1 text-[13px] font-sans-bn font-medium text-[#785942]">
                     ({plant.colorBn})
                   </span>
                 )}
               </h3>
             </button>
 
-            <p className="text-[11px] text-[#526356] font-sans-bn mt-0.5 truncate">
+            <p className="text-[13px] text-[#526356] font-sans-bn mt-0.5 truncate">
               {lang === 'bn' ? plant.nameEn : plant.nameBn}
             </p>
 
@@ -560,7 +583,7 @@ export function CatalogSection({
             </p>
 
             {/* Unboxed Sunlight & Watering Micro-Row */}
-            <div className="mt-2 pt-2 border-t border-[#E3ECE0] grid grid-cols-2 gap-1.5 text-[10px] sm:text-[11px] font-sans-bn text-[#4C6252]">
+            <div className="mt-2 pt-2 border-t border-[#E3ECE0] grid grid-cols-2 gap-1.5 text-[13px] font-sans-bn text-[#4C6252]">
               <div className="flex items-center gap-1 truncate">
                 <Sun className="w-3 h-3 text-[#B45309] shrink-0" />
                 <span className="truncate">{plant.sunlightBn}</span>
@@ -578,7 +601,7 @@ export function CatalogSection({
               <div className="text-base sm:text-lg font-bold text-[#B84423] tabular-nums font-mono-num leading-tight">
                 ₹{baseOption.price}
               </div>
-              <div className="text-[10px] sm:text-[11px] text-[#785942] font-sans-bn truncate max-w-[90px] sm:max-w-[120px]">
+              <div className="text-[13px] text-[#785942] font-sans-bn truncate max-w-[110px] sm:max-w-[140px]">
                 {baseOption.labelBn || 'গ্রো ব্যাগ'}
               </div>
             </div>
@@ -614,7 +637,7 @@ export function CatalogSection({
               <button
                 type="button"
                 onClick={() => handleAddClick(plant)}
-                className={`inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-semibold transition-all active:scale-95 cursor-pointer whitespace-nowrap shrink-0 ${
+                className={`inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-[13px] font-semibold transition-all active:scale-95 cursor-pointer whitespace-nowrap shrink-0 ${
                   isAdded
                     ? 'bg-[#122619] text-[#A3E635] scale-[1.03]'
                     : 'bg-[#15803D] hover:bg-[#166534] text-white shadow-2xs'
@@ -749,32 +772,7 @@ export function CatalogSection({
 
       {/* Main Catalog Area */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-7">
-        {/* Catalog Inline Live Search Input + Dropdown Suggestions */}
-        <div className="mb-4">
-          <div className="max-w-2xl">
-            <label className="block text-[11px] font-bold text-[#4C6252] uppercase tracking-wider mb-1 font-sans-bn">
-              {lang === 'bn'
-                ? 'ক্যাটালগে তাৎক্ষণিক খুঁজুন (টাইপ করলেই নিচে নাম দেখাবে)'
-                : 'Quick Catalog Search (Live Suggestions)'}
-            </label>
-            <LiveSearchBox
-              variant="catalog"
-              plants={plants}
-              lang={lang}
-              value={searchQuery}
-              onChange={onSearchChange}
-              onSelectPlant={onOpenPlantModal}
-              onAddToInquiry={onAddToInquiry}
-              onSubmitSearch={() => {
-                const anchor = document.getElementById('catalog-content-anchor');
-                if (anchor) anchor.scrollIntoView({ behavior: 'smooth' });
-              }}
-              suggestionLimit={8}
-            />
-          </div>
-        </div>
-
-        {/* Search Status Banner (rendered right at the top when searching!) */}
+        {/* Search Status Banner (search lives in the header only) */}
         {searchAnalysis.isSearching ? (
           <div className="mb-4 p-4 sm:p-5 bg-[#E4ECE0] rounded-2xl border border-[#D5DFD1] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
@@ -851,40 +849,6 @@ export function CatalogSection({
         {/* Buyer Decision Toolbar: Scroll Direction Toggle + Quick Filters + Price Sort */}
         <div className="mb-5 flex flex-wrap items-center justify-between gap-2.5 font-sans-bn">
           <div className="flex items-center gap-2 overflow-x-auto no-scrollbar max-w-full pb-0.5">
-            {/* Scroll Direction Switcher (Horizontal Rail vs Vertical Grid) */}
-            <div
-              role="group"
-              aria-label={lang === 'bn' ? 'স্ক্রল করার ধরন' : 'Scroll direction'}
-              className="inline-flex items-center p-0.5 rounded-xl border border-[#CEDAC9] bg-white shadow-2xs shrink-0"
-            >
-              <button
-                type="button"
-                onClick={() => handleChangeScrollMode('horizontal')}
-                aria-pressed={scrollMode === 'horizontal'}
-                className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
-                  scrollMode === 'horizontal'
-                    ? 'bg-[#142318] text-white shadow-2xs'
-                    : 'text-[#526356] hover:text-[#142318]'
-                }`}
-              >
-                <ArrowLeftRight className="w-3.5 h-3.5" />
-                <span>{lang === 'bn' ? 'সাইডে স্ক্রল' : 'Horizontal'}</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleChangeScrollMode('vertical')}
-                aria-pressed={scrollMode === 'vertical'}
-                className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
-                  scrollMode === 'vertical'
-                    ? 'bg-[#142318] text-white shadow-2xs'
-                    : 'text-[#526356] hover:text-[#142318]'
-                }`}
-              >
-                <LayoutGrid className="w-3.5 h-3.5" />
-                <span>{lang === 'bn' ? 'লম্বালম্বি' : 'Vertical'}</span>
-              </button>
-            </div>
-
             <button
               type="button"
               onClick={() => setOnlyInStock((v) => !v)}
@@ -993,13 +957,12 @@ export function CatalogSection({
               </button>
             </div>
           </div>
-        ) : scrollMode === 'horizontal' ? (
-          activeCategory === 'all' &&
+        ) : activeCategory === 'all' &&
           !searchAnalysis.isSearching &&
           !onlyInStock &&
           !under100Only &&
           sortOrder === 'default' ? (
-            <div className="space-y-7">
+            <div className="space-y-8">
               {[
                 {
                   key: 'fruit' as CategoryViewKey,
@@ -1029,7 +992,7 @@ export function CatalogSection({
                   key: 'foliage' as CategoryViewKey,
                   titleBn: 'গাছপালা, পাম ও শো-প্ল্যান্ট',
                   titleEn: 'Palms & Foliage Plants',
-                  subtitleBn: 'লাকি ব্যাম্বু, র‍্যাবিশ পাম, স্নেক প্ল্যান্ট',
+                  subtitleBn: 'লাকি ব্যাম্বু, র‍্যাপিস পাম, স্নেক প্ল্যান্ট',
                   accentClass: 'text-[#142318]',
                   list: sortPlantsWithUploadsFirst(foliageList),
                 },
@@ -1042,45 +1005,34 @@ export function CatalogSection({
                   list: sortPlantsWithUploadsFirst(herbalList),
                 },
               ]
-                .filter((rail) => rail.list.length > 0)
-                .map((rail) => (
-                  <HorizontalPlantRail
-                    key={rail.key}
-                    railKey={`cat-${rail.key}`}
-                    isVisible={isVisible}
-                    title={lang === 'bn' ? rail.titleBn : rail.titleEn}
-                    subtitle={lang === 'bn' ? rail.subtitleBn : undefined}
-                    count={rail.list.length}
-                    accentClass={rail.accentClass}
-                    onViewAll={() => handleCategoryTabClick(rail.key)}
-                    lang={lang}
-                  >
-                    {rail.list.map((plant, idx) => renderPlantCard(plant, idx, 'rail'))}
-                  </HorizontalPlantRail>
+                .filter((group) => group.list.length > 0)
+                .map((group) => (
+                  <section key={group.key} className="space-y-3">
+                    <div className="flex items-end justify-between gap-3">
+                      <div>
+                        <h3 className={`font-serif-bn text-lg sm:text-xl font-bold ${group.accentClass}`}>
+                          {lang === 'bn' ? group.titleBn : group.titleEn}
+                        </h3>
+                        <p className="text-[13px] text-[#526356] font-sans-bn">
+                          {lang === 'bn' ? group.subtitleBn : group.titleEn}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleCategoryTabClick(group.key)}
+                        className="text-[13px] font-semibold text-[#15803D] shrink-0"
+                      >
+                        {lang === 'bn' ? 'সব দেখুন' : 'See all'}
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+                      {group.list.map((plant, idx) => renderPlantCard(plant, idx, 'grid'))}
+                    </div>
+                  </section>
                 ))}
             </div>
           ) : (
-            <HorizontalPlantRail
-              railKey={`filtered-${activeCategory}-${searchQuery ? 'search' : 'browse'}`}
-              isVisible={isVisible}
-              title={
-                searchAnalysis.isSearching
-                  ? lang === 'bn'
-                    ? `"${searchQuery}" ফলাফল`
-                    : `Results for "${searchQuery}"`
-                  : lang === 'bn'
-                  ? currentMeta.titleBn
-                  : currentMeta.titleEn
-              }
-              subtitle={lang === 'bn' ? 'পাশে স্ক্রল করে সব চারা দেখুন' : 'Swipe or click arrows to browse'}
-              count={displayedPlants.length}
-              lang={lang}
-            >
-              {displayedPlants.map((plant, idx) => renderPlantCard(plant, idx, 'rail'))}
-            </HorizontalPlantRail>
-          )
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
             {displayedPlants.map((plant, idx) => renderPlantCard(plant, idx, 'grid'))}
           </div>
         )}

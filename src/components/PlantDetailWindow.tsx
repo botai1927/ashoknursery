@@ -29,7 +29,7 @@ import { resolvePlantImageUrl } from '../utils/imageUrl';
 import { PlantShareModal } from './PlantShareModal';
 import { recordWhatsAppInquiryLog } from '../utils/whatsappOrderTracker';
 import {
-  loadLocalCustomerReviews,
+  subscribeApprovedCustomerReviews,
   submitCustomerReview,
 } from '../utils/customerReviewsStorage';
 import type { CustomerReviewItem } from '../types/nursery';
@@ -88,9 +88,7 @@ export function PlantDetailWindow({
   const [justAddedRelId, setJustAddedRelId] = useState<string | null>(null);
 
   // Customer Reviews & Garden Photos for this plant
-  const [allReviews, setAllReviews] = useState<CustomerReviewItem[]>(() =>
-    loadLocalCustomerReviews()
-  );
+  const [allReviews, setAllReviews] = useState<CustomerReviewItem[]>([]);
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [revName, setRevName] = useState('');
   const [revLocation, setRevLocation] = useState('');
@@ -99,21 +97,18 @@ export function PlantDetailWindow({
   const [revSubmittedMsg, setRevSubmittedMsg] = useState(false);
 
   useEffect(() => {
-    const sync = () => setAllReviews(loadLocalCustomerReviews());
-    window.addEventListener('brahmyaman-reviews-updated', sync);
-    return () => window.removeEventListener('brahmyaman-reviews-updated', sync);
+    return subscribeApprovedCustomerReviews(setAllReviews);
   }, []);
 
   const plantMatchingReviews = useMemo(() => {
-    const approved = allReviews.filter((r) => r.status === 'approved');
-    const exact = approved.filter(
-      (r) =>
-        r.plantId === plant.id ||
-        (r.plantNameBn && r.plantNameBn.includes(plant.nameBn))
-    );
-    if (exact.length >= 2) return exact.slice(0, 4);
-    const others = approved.filter((r) => !exact.some((e) => e.id === r.id));
-    return [...exact, ...others].slice(0, 3);
+    return allReviews
+      .filter((r) => r.status === 'approved')
+      .filter(
+        (r) =>
+          r.plantId === plant.id ||
+          (r.plantNameBn && (r.plantNameBn === plant.nameBn || plant.nameBn.includes(r.plantNameBn)))
+      )
+      .slice(0, 6);
   }, [allReviews, plant.id, plant.nameBn]);
 
   // Gallery of up to 3 images (preserves backward compatibility with plant.image)
@@ -339,10 +334,10 @@ export function PlantDetailWindow({
     const msg =
       plant.inStock === false
         ? encodeURIComponent(
-            `নমস্কার ব্রাহ্ম্যমাণ নার্সারি (কালশুলি, বাঁকুড়া), আমি "${plant.nameBn}" (${selectedOption.labelBn} - ₹${selectedOption.price}) চারাটি (বর্তমানে স্টক শেষ দেখানো হচ্ছে) কবে আবার পাওয়া যাবে তা জানতে আগ্রহী।`
+            `নমস্কার ভ্রম্যমাণ নার্সারি (কালশুলি, বাঁকুড়া), আমি "${plant.nameBn}" (${selectedOption.labelBn} - ₹${selectedOption.price}) চারাটি (বর্তমানে স্টক শেষ দেখানো হচ্ছে) কবে আবার পাওয়া যাবে তা জানতে আগ্রহী।`
           )
         : encodeURIComponent(
-            `নমস্কার ব্রাহ্ম্যমাণ নার্সারি (কালশুলি, বাঁকুড়া), আমি "${plant.nameBn}" (${selectedOption.labelBn} - ₹${selectedOption.price}) চারা নিতে আগ্রহী। এর প্রাপ্যতা ও ডেলিভারি সম্পর্কে জানাবেন কি?`
+            `নমস্কার ভ্রম্যমাণ নার্সারি (কালশুলি, বাঁকুড়া), আমি "${plant.nameBn}" (${selectedOption.labelBn} - ₹${selectedOption.price}) চারা নিতে আগ্রহী। এর প্রাপ্যতা ও ডেলিভারি সম্পর্কে জানাবেন কি?`
           );
     return `https://wa.me/${NURSERY_CONTACT.phoneRaw}?text=${msg}`;
   }, [plant, selectedOption]);
@@ -503,7 +498,7 @@ export function PlantDetailWindow({
                 onTouchEnd={handleTouchEnd}
                 onTouchCancel={handleTouchEnd}
                 onClick={handleImageClick}
-                className={`w-full aspect-[4/3] sm:aspect-square max-h-[460px] bg-[#EBF1E8] rounded-2xl flex items-center justify-center p-3 sm:p-5 relative border border-[#D5DFD1] overflow-hidden select-none touch-none ${
+                className={`w-full aspect-[4/3] max-h-[460px] bg-[#F4EFE4] rounded-2xl relative border border-[#D5DFD1] overflow-hidden select-none touch-none ${
                   zoomScale > 1
                     ? isPanning
                       ? 'cursor-grabbing'
@@ -524,7 +519,7 @@ export function PlantDetailWindow({
                     transform: `translate(${panOffset.x}px, ${panOffset.y}px) scale(${zoomScale})`,
                     transition: isPanning ? 'none' : 'transform 220ms cubic-bezier(0.16, 1, 0.3, 1)',
                   }}
-                  className="max-h-full max-w-full object-contain mx-auto drop-shadow-md pointer-events-none"
+                  className="h-full w-full object-cover pointer-events-none"
                   referrerPolicy="no-referrer"
                   loading={selectedGalleryIdx === 0 ? 'eager' : 'lazy'}
                   fetchPriority={selectedGalleryIdx === 0 ? 'high' : 'auto'}
@@ -900,7 +895,7 @@ export function PlantDetailWindow({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
                   <a
                     href={`https://wa.me/${NURSERY_CONTACT.phoneRaw}?text=${encodeURIComponent(
-                      `নমস্কার অশোকদা, আমি কালশুলির নার্সারি থেকে "${plant.nameBn}" এর বর্তমান চারাটির একটি টাটকা ছবি WhatsApp-এ দেখে নিতে চাই।`
+                      `নমস্কার, ভ্রম্যমাণ নার্সারি। আমি "${plant.nameBn}" চারাটির একটি টাটকা ছবি WhatsApp-এ দেখে নিতে চাই।`
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -912,7 +907,7 @@ export function PlantDetailWindow({
 
                   <a
                     href={`https://wa.me/${NURSERY_CONTACT.phoneRaw}?text=${encodeURIComponent(
-                      `নমস্কার অশোকদা, আমি "${plant.nameBn}" চারাটি মুখে বলে (Voice Note) বুক করতে চাই।`
+                      `নমস্কার, ভ্রম্যমাণ নার্সারি। আমি "${plant.nameBn}" চারাটি মুখে বলে বুক করতে চাই।`
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -1070,6 +1065,14 @@ export function PlantDetailWindow({
             </form>
           )}
 
+          {plantMatchingReviews.length === 0 && (
+            <p className="text-[13px] text-[#526356] font-sans-bn bg-white border border-[#D5DFD1] rounded-2xl p-4">
+              {lang === 'bn'
+                ? 'এই চারার কোনো অনুমোদিত রিভিউ এখনও নেই। WhatsApp-এ অভিজ্ঞতা পাঠালে নার্সারি দেখে এখানে যোগ করবে।'
+                : 'This sapling has no approved review yet. Send your experience on WhatsApp and the nursery can publish it here.'}
+            </p>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {plantMatchingReviews.map((rev) => (
               <div
@@ -1151,11 +1154,11 @@ export function PlantDetailWindow({
                     className="group bg-white rounded-2xl border border-[#D5DFD1] hover:border-[#1B8354] p-3 shadow-2xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between"
                   >
                     <div>
-                      <div className="aspect-[4/3] bg-[#EBF1E8] rounded-xl flex items-center justify-center p-2 mb-2.5 overflow-hidden">
+                      <div className="aspect-[4/3] bg-[#F4EFE4] rounded-xl mb-2.5 overflow-hidden">
                         <img
                           src={resolvePlantImageUrl(rel.image, PUJA_IMAGE)}
                           alt={rel.nameBn}
-                          className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform"
+                          className="h-full w-full object-cover"
                           referrerPolicy="no-referrer"
                           loading="lazy"
                           decoding="async"

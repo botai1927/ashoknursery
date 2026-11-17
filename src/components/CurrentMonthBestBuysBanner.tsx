@@ -35,7 +35,7 @@ export function CurrentMonthBestBuysBanner({ lang, plants, onSelectPlant }: Curr
   const getWhatsAppUrl = (plant: BrahmyamanPlant) => {
     const opt = plant.options?.[0] || { labelBn: 'গ্রো ব্যাগ চারা', price: 50 };
     const msg = encodeURIComponent(
-      `নমস্কার, আমি কালশুলির ব্রাহ্ম্যমাণ নার্সারি থেকে চলতি মাসের সেরা চারা "${plant.nameBn}" (${opt.labelBn} - ₹${opt.price}) নিতে আগ্রহী। বিস্তারিত জানাবেন কি?`
+      `নমস্কার, আমি কালশুলির ভ্রম্যমাণ নার্সারি থেকে চলতি মাসের সেরা চারা "${plant.nameBn}" (${opt.labelBn} - ₹${opt.price}) নিতে আগ্রহী। বিস্তারিত জানাবেন কি?`
     );
     return `https://wa.me/${NURSERY_CONTACT.phoneRaw}?text=${msg}`;
   };

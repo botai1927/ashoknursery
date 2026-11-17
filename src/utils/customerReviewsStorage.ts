@@ -1,103 +1,120 @@
-import { collection, doc, setDoc, deleteDoc } from 'firebase/firestore';
+import { collection, doc, onSnapshot, query, setDoc, deleteDoc, where } from 'firebase/firestore';
 import { db } from '../firebase';
 import type { CustomerReviewItem } from '../types/nursery';
 import { getBengaliDateTime } from './bengaliDateTime';
-import {
-  PUJA_IMAGE,
-  lemonImg,
-  adeniumImg,
-} from '../data/brahmyamanCatalog';
 
 export const CUSTOMER_REVIEWS_STORAGE_KEY = 'brahmyaman_customer_reviews_v1';
 
+const REMOVED_FAKE_REVIEW_IDS = new Set([
+  'rev-seed-1',
+  'rev-seed-2',
+  'rev-seed-3',
+  'rev-seed-4',
+]);
+
+const REMOVED_FAKE_REVIEW_NAMES = new Set([
+  'ডাঃ অনির্বাণ মণ্ডল',
+  'অনির্বাণ মণ্ডল',
+  'অর্পিতা মুখার্জী',
+  'অলোক কুমার মণ্ডল',
+]);
+
 export function isRemovedFakeReview(item: Partial<CustomerReviewItem> | null | undefined): boolean {
   if (!item) return false;
-  if (item.id === 'rev-seed-1') return true;
+  if (item.id && REMOVED_FAKE_REVIEW_IDS.has(item.id)) return true;
   const combinedName = `${item.customerName || ''} ${item.customerNameBn || ''}`
-    .toLowerCase()
+    .replace(/\s+/g, ' ')
     .trim();
-  if (!combinedName) return false;
+  const lowered = combinedName.toLowerCase();
+  if (REMOVED_FAKE_REVIEW_NAMES.has(combinedName)) return true;
   const hasSouvik =
-    combinedName.includes('souvik') ||
+    lowered.includes('souvik') ||
     combinedName.includes('শৌভিক') ||
     combinedName.includes('সৌভিক');
   const hasBanerjee =
-    combinedName.includes('banerjee') ||
+    lowered.includes('banerjee') ||
     combinedName.includes('ব্যানার্জি') ||
     combinedName.includes('ব্যানার্জী');
   return hasSouvik && hasBanerjee;
 }
 
-export const DEFAULT_CUSTOMER_REVIEWS: CustomerReviewItem[] = [
-  {
-    id: 'rev-seed-2',
-    plantNameBn: 'রক্তজবা ও কৃষ্ণ তুলসী',
-    customerName: 'অর্পিতা মুখার্জী',
-    customerNameBn: 'অর্পিতা মুখার্জী',
-    locationBn: 'পারসোলা, বাঁকুড়া',
-    rating: 5,
-    commentBn:
-      'প্রতিদিনের পুজোর জন্য রক্তজবা ও কৃষ্ণ তুলসীর চারা নিয়েছি। নার্সারির অশোকদা নিজে দাঁড়িয়ে থেকে ভালো চারা বেছে দিয়েছেন। বাড়ির উঠোনে খুব সুন্দর ফুল ফুটছে।',
-    photoUrl: PUJA_IMAGE,
-    status: 'approved',
-    createdAt: '2026-01-12T11:30:00.000Z',
-    createdAtBn: '১২ জানু ২০২৬ · সকাল ১১:৩০',
-  },
-  {
-    id: 'rev-seed-3',
-    plantNameBn: 'মরু গোলাপ ও বাগানবিলাস',
-    customerName: 'ডাঃ অনির্বাণ মণ্ডল',
-    customerNameBn: 'ডাঃ অনির্বাণ মণ্ডল',
-    locationBn: 'খাতড়া, বাঁকুড়া',
-    rating: 5,
-    commentBn:
-      'অ্যাডেনিয়াম ও বিভিন্ন রঙের বাগানবিলাস নিয়েছিলাম। খাতড়ার কড়া রোদ সহ্য করেও এত সুন্দর ফুল ফুটছে যে বারান্দা পুরো ভরে উঠেছে। নার্সারির সঠিক যত্ন নেওয়ার পরামর্শ খুব কাজে লেগেছে।',
-    photoUrl: adeniumImg,
-    status: 'approved',
-    createdAt: '2026-01-15T16:15:00.000Z',
-    createdAtBn: '১৫ জানু ২০২৬ · বিকাল ৪:১৫',
-  },
-  {
-    id: 'rev-seed-4',
-    plantNameBn: 'কাগজি পাতিলেবু ও এলাচ চারা',
-    customerName: 'অলোক কুমার মণ্ডল',
-    customerNameBn: 'অলোক কুমার মণ্ডল',
-    locationBn: 'সিমলাপাল, বাঁকুড়া',
-    rating: 5,
-    commentBn:
-      'বারোমাসি কাগজি পাতিলেবুর চারা ও এলাচ গাছ এনে লাগিয়েছিলাম। মাত্র ছয় মাসের মাথায় থোকায় থোকায় রসালো কাগজি লেবু ধরেছে। সিমলাপাল অঞ্চলে সঠিক সময়ে চারা পেয়েছি।',
-    photoUrl: lemonImg,
-    status: 'approved',
-    createdAt: '2026-01-18T09:45:00.000Z',
-    createdAtBn: '১৮ জানু ২০২৬ · সকাল ৯:৪৫',
-  },
-];
+/** Public pages never invent reviews. Approved text comes from Firestore. */
+export const DEFAULT_CUSTOMER_REVIEWS: CustomerReviewItem[] = [];
 
 export function loadLocalCustomerReviews(): CustomerReviewItem[] {
-  if (typeof window === 'undefined') return DEFAULT_CUSTOMER_REVIEWS;
+  if (typeof window === 'undefined') return [];
   try {
     const raw = window.localStorage.getItem(CUSTOMER_REVIEWS_STORAGE_KEY);
-    if (!raw) return DEFAULT_CUSTOMER_REVIEWS;
+    if (!raw) return [];
     const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed) || parsed.length === 0) return DEFAULT_CUSTOMER_REVIEWS;
+    if (!Array.isArray(parsed)) return [];
     const cleaned = (parsed as CustomerReviewItem[]).filter(
       (item) => !isRemovedFakeReview(item)
     );
     if (cleaned.length !== parsed.length) {
-      const next = cleaned.length > 0 ? cleaned : DEFAULT_CUSTOMER_REVIEWS;
       try {
         window.localStorage.setItem(
           CUSTOMER_REVIEWS_STORAGE_KEY,
-          JSON.stringify(next.slice(0, 200))
+          JSON.stringify(cleaned.slice(0, 200))
         );
       } catch {
         // Ignore storage quota errors
       }
-      return next;
     }
     return cleaned;
   } catch {
-    return DEFAULT_CUSTOMER_REVIEWS;
+    return [];
+  }
+}
+
+export function mapFirestoreCustomerReview(
+  id: string,
+  data: Record<string, unknown>
+): CustomerReviewItem {
+  const name = String(data.customerNameBn || data.customerName || 'গ্রাহক');
+  const photo = typeof data.gardenImage === 'string' ? data.gardenImage : undefined;
+  return {
+    id: String(data.id || id),
+    plantId: typeof data.plantId === 'string' ? data.plantId : undefined,
+    plantNameBn: typeof data.plantNameBn === 'string' ? data.plantNameBn : undefined,
+    customerName: name,
+    customerNameBn: name,
+    locationBn: String(data.locationBn || ''),
+    rating: Math.min(5, Math.max(1, Number(data.rating) || 5)),
+    commentBn: String(data.commentBn || ''),
+    photoUrl: photo,
+    status: data.status === 'approved' ? 'approved' : 'pending',
+    createdAt: String(data.createdAt || ''),
+    createdAtBn: String(data.createdAtBn || ''),
+  };
+}
+
+/** Live list of reviews an admin has marked approved. Empty when Firestore is unavailable. */
+export function subscribeApprovedCustomerReviews(
+  onReviews: (reviews: CustomerReviewItem[]) => void
+): () => void {
+  try {
+    const approvedQuery = query(
+      collection(db, 'customer_reviews'),
+      where('status', '==', 'approved')
+    );
+    return onSnapshot(
+      approvedQuery,
+      (snap) => {
+        const reviews = snap.docs
+          .map((entry) =>
+            mapFirestoreCustomerReview(entry.id, entry.data() as Record<string, unknown>)
+          )
+          .filter((item) => item.status === 'approved' && !isRemovedFakeReview(item));
+        onReviews(reviews);
+      },
+      () => {
+        onReviews([]);
+      }
+    );
+  } catch {
+    onReviews([]);
+    return () => {};
   }
 }
 

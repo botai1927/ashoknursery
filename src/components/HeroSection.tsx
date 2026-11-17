@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { MessageCircle, Phone, MapPin, ArrowDown, ShieldCheck, Camera, Sprout } from 'lucide-react';
 import { HERO_IMAGE, NURSERY_CONTACT } from '../data/brahmyamanCatalog';
 import { FallingLeaves } from './FallingLeaves';
@@ -16,8 +17,41 @@ export function HeroSection({
   onExploreCatalog,
   onOpenLocation,
 }: HeroSectionProps) {
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [heroVideoReady, setHeroVideoReady] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const apply = () => setReducedMotion(media.matches);
+    apply();
+    media.addEventListener('change', apply);
+    return () => media.removeEventListener('change', apply);
+  }, []);
+
+  useEffect(() => {
+    if (reducedMotion) {
+      setHeroVideoReady(false);
+      return;
+    }
+    let cancelled = false;
+    fetch('/hero-reel.mp4', { method: 'HEAD' })
+      .then((response) => {
+        const type = (response.headers.get('content-type') || '').toLowerCase();
+        const looksLikeVideo = type.startsWith('video/') || type === 'application/mp4';
+        if (!cancelled && response.ok && looksLikeVideo) {
+          setHeroVideoReady(true);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setHeroVideoReady(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [reducedMotion]);
+
   const whatsappMessage = encodeURIComponent(
-    'নমস্কার, আমি কালশুলির ব্রাহ্ম্যমাণ নার্সারি থেকে সতেজ চারাগাছ ও ফলের কলম সম্পর্কে জানতে ও অর্ডার করতে চাই।'
+    'নমস্কার, আমি কালশুলির ভ্রম্যমাণ নার্সারি থেকে সতেজ চারাগাছ ও ফলের কলম সম্পর্কে জানতে ও অর্ডার করতে চাই।'
   );
   const whatsappUrl = `https://wa.me/${NURSERY_CONTACT.phoneRaw}?text=${whatsappMessage}`;
 
@@ -32,15 +66,32 @@ export function HeroSection({
     <section className="relative w-full min-h-[270px] sm:min-h-[325px] lg:min-h-[370px] flex items-center justify-center overflow-hidden bg-[#122619] text-white">
       {/* Background Image Container with Subtle Ambient Motion */}
       <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
-        <img
-          src={HERO_IMAGE}
-          alt="Brahmyaman Nursery in Kalsuli village, Bankura with potted plants and red laterite soil"
-          className="w-full h-full object-cover object-center animate-kenburns scale-105"
-          referrerPolicy="no-referrer"
-          loading="eager"
-          fetchPriority="high"
-          decoding="async"
-        />
+        {heroVideoReady && !reducedMotion ? (
+          <video
+            className="w-full h-full object-cover object-center"
+            poster={HERO_IMAGE}
+            muted
+            loop
+            playsInline
+            autoPlay
+            preload="metadata"
+            onError={() => setHeroVideoReady(false)}
+          >
+            <source src="/hero-reel.mp4" type="video/mp4" />
+          </video>
+        ) : (
+          <img
+            src={HERO_IMAGE}
+            alt="ভ্রম্যমাণ নার্সারি, কালশুলি, বাঁকুড়া"
+            className={`w-full h-full object-cover object-center scale-105 ${
+              reducedMotion ? '' : 'animate-kenburns'
+            }`}
+            referrerPolicy="no-referrer"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-[#0D1C12] via-[#122619]/78 to-[#163120]/52" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(163,230,53,0.12),transparent_60%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_28%,rgba(10,20,14,0.72)_100%)]" />

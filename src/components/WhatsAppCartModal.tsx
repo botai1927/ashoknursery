@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { X, MessageCircle, Trash2, Plus, Minus, ArrowRight, ShoppingBag, Mic, ShieldCheck, AlertCircle, Copy, Check, Clock, Truck } from 'lucide-react';
 import { WhatsAppInquiryItem, BrahmyamanPlant } from '../types/nursery';
 import { NURSERY_CONTACT, PUJA_IMAGE } from '../data/brahmyamanCatalog';
@@ -75,7 +76,7 @@ export function WhatsAppCartModal({
       )
       .join('\n');
 
-    return `নমস্কার ব্রাহ্ম্যমাণ নার্সারি (কালশুলি, বাঁকুড়া),
+    return `নমস্কার ভ্রম্যমাণ নার্সারি (কালশুলি, বাঁকুড়া),
 আমি আপনার নার্সারি থেকে নিম্নলিখিত চারাগাছ ও কলম অর্ডার/জিজ্ঞাসা করতে চাই:
 
 ${orderLines}
@@ -100,10 +101,19 @@ ${orderLines}
 
   const voiceOrderUrl = useMemo(() => {
     const msg = encodeURIComponent(
-      `নমস্কার অশোকদা (ব্রাহ্ম্যমাণ নার্সারি, কালশুলি), আমি টাইপ না করে মুখে বলে (Voice Note) চারাগাছ অর্ডার করতে চাই। অনুগ্রহ করে এই চ্যাটে একটু শুনবেন।`
+      `নমস্কার, ভ্রম্যমাণ নার্সারি (কালশুলি)। আমি মুখে বলে চারাগাছ অর্ডার করতে চাই। অনুগ্রহ করে এই চ্যাটে একটু শুনবেন।`
     );
     return `https://wa.me/${NURSERY_CONTACT.phoneRaw}?text=${msg}`;
   }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -131,12 +141,12 @@ ${orderLines}
     }
   };
 
-  return (
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
       aria-labelledby="cart-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-[#121914]/60 backdrop-blur-sm"
+      className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center p-0 sm:p-6 bg-[#121914]/60 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
@@ -567,6 +577,7 @@ ${orderLines}
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

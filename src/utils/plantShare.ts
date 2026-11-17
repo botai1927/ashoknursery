@@ -1,7 +1,7 @@
 import { BrahmyamanPlant, PlantPotOption } from '../types/nursery';
 
 const DEFAULT_NURSERY_SHARE_INFO = {
-  nameBn: 'ব্রাহ্ম্যমাণ নার্সারি',
+  nameBn: 'ভ্রম্যমাণ নার্সারি',
   nameEn: 'Brahmyaman Nursery',
   addressBn: 'কালশুলি, বাঁকুড়া, ৭২২১৬০',
   addressEn: 'Kalsuli, Bankura, 722160',

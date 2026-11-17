@@ -393,8 +393,8 @@ export interface CloudinaryUploadResult {
 
 function isValidUploadPayload(image: string): boolean {
   const trimmed = image.trim();
-  if (trimmed.startsWith('data:image/')) {
-    return trimmed.includes(';base64,');
+  if (trimmed.startsWith('data:')) {
+    return /^data:image\/(jpeg|jpg|png|webp);base64,[a-z0-9+/=\r\n]+$/i.test(trimmed);
   }
   try {
     const parsed = new URL(trimmed);
@@ -428,7 +428,7 @@ export async function uploadImageToCloudinary(
     const uploadResponse: UploadApiResponse = await cloudinary.uploader.upload(input.image, {
       folder,
       resource_type: 'image',
-      allowed_formats: ['jpg', 'png', 'webp', 'jpeg', 'avif', 'heic'],
+      allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
       tags: ['brahmyaman_nursery', safeTag, `slot_${slotNum}`],
       transformation: [
         {

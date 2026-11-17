@@ -11,6 +11,9 @@ import { LocationSection } from './components/LocationSection';
 import { Footer } from './components/Footer';
 import { PlantDetailWindow } from './components/PlantDetailWindow';
 import { WhatsAppCartModal } from './components/WhatsAppCartModal';
+import { SeoHead } from './components/SeoHead';
+import { NotFoundPage } from './components/NotFoundPage';
+import { MobileActionBar } from './components/MobileActionBar';
 import { CurrentMonthBestBuysBanner } from './components/CurrentMonthBestBuysBanner';
 import { BRAHMYAMAN_PLANTS } from './data/brahmyamanCatalog';
 import {
@@ -686,8 +689,10 @@ function AppContent() {
     if (typeof window !== 'undefined') {
       if (route === 'admin') {
         window.history.pushState(null, '', '/admin');
+        setShopPath('/admin');
       } else {
         window.history.pushState(null, '', '/');
+        setShopPath('/');
       }
       window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
     }
@@ -700,6 +705,8 @@ function AppContent() {
     if (typeof window !== 'undefined') {
       const url = windowKey === 'catalog' ? '/' : `/?view=${windowKey}`;
       window.history.pushState(null, '', url);
+      setShopPath('/');
+      window.dispatchEvent(new Event('brahmyaman-route'));
       window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
     }
   };
@@ -712,6 +719,8 @@ function AppContent() {
     setSelectedPlantId(plant.id);
     if (typeof window !== 'undefined') {
       window.history.pushState(null, '', `?plant=${plant.id}`);
+      setShopPath('/');
+      window.dispatchEvent(new Event('brahmyaman-route'));
       window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
     }
   };
@@ -721,6 +730,8 @@ function AppContent() {
     if (typeof window !== 'undefined') {
       const url = activeWindow === 'catalog' ? '/' : `/?view=${activeWindow}`;
       window.history.pushState(null, '', url);
+      setShopPath('/');
+      window.dispatchEvent(new Event('brahmyaman-route'));
     }
   };
 
@@ -737,6 +748,7 @@ function AppContent() {
   useEffect(() => {
     const handleLocationChange = () => {
       const path = window.location.pathname;
+      setShopPath(path);
       const hash = window.location.hash;
       const search = window.location.search;
       const params = new URLSearchParams(search);
@@ -780,8 +792,10 @@ function AppContent() {
           const next = prev === 'admin' ? 'shop' : 'admin';
           if (next === 'admin') {
             window.history.pushState(null, '', '/admin');
+            setShopPath('/admin');
           } else {
             window.history.pushState(null, '', '/');
+            setShopPath('/');
           }
           return next;
         });
@@ -816,6 +830,22 @@ function AppContent() {
   const handleToggleLang = () => {
     setLang((prev) => (prev === 'bn' ? 'en' : 'bn'));
   };
+
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
+
+  useEffect(() => {
+    const onScroll = () => setPastHero(window.scrollY > 480);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const [shopPath, setShopPath] = useState(() =>
+    typeof window === 'undefined' ? '/' : window.location.pathname
+  );
+  const [pastHero, setPastHero] = useState(false);
 
   const handleSelectAudience = (audience: AudienceTag) => {
     setActiveAudience(audience);
@@ -1524,9 +1554,14 @@ function AppContent() {
       null
     : null;
 
+  const unknownShopPath =
+    currentRoute !== 'admin' && shopPath !== '/' && !shopPath.startsWith('/admin');
+
   // If user is on the dedicated admin page route (/admin or #admin)
   if (currentRoute === 'admin') {
     return (
+      <>
+      <SeoHead lang={lang} route="admin" view={activeWindow} plant={null} unknownPath={false} />
       <Suspense
         fallback={
           <div className="min-h-screen bg-[#EBF1E8] flex items-center justify-center p-6 font-sans-bn">
@@ -1554,6 +1589,7 @@ function AppContent() {
           onRetryStartupRecovery={handleStartupCatalogRecovery}
         />
       </Suspense>
+      </>
     );
   }
 
@@ -1562,8 +1598,15 @@ function AppContent() {
   // -------------------------------------------------------------
   return (
     <>
-      {selectedPlant && (
-        <div className="min-h-screen flex flex-col bg-[#F4F7F1] text-[#122619]">
+      <SeoHead
+        lang={lang}
+        route="shop"
+        view={activeWindow}
+        plant={selectedPlant}
+        unknownPath={unknownShopPath}
+      />
+      {selectedPlant && !unknownShopPath && (
+        <div className="min-h-screen flex flex-col bg-[#F4F7F1] text-[#122619] pb-20 md:pb-0">
           <Header
             lang={lang}
             plants={activePlants}
@@ -1611,9 +1654,9 @@ function AppContent() {
 
       {/* PRIMARY DEDICATED SECTIONS / WINDOWS (Preserved mounted for zero-animation exact scroll restoration) */}
       <div
-        className={`min-h-screen flex flex-col bg-[#F4F7F1] text-[#122619] ${
-          totalItemCount > 0 ? 'pb-16 sm:pb-0' : ''
-        } ${selectedPlant ? 'hidden' : ''}`}
+        className={`min-h-screen flex flex-col bg-[#F4F7F1] text-[#122619] pb-20 md:pb-0 ${
+          selectedPlant && !unknownShopPath ? 'hidden' : ''
+        }`}
       >
         <Header
           lang={lang}
@@ -1631,8 +1674,20 @@ function AppContent() {
         />
 
         <main className="flex-1">
+          {unknownShopPath ? (
+            <NotFoundPage
+              lang={lang}
+              onHome={() => {
+                window.history.pushState(null, '', '/');
+                setShopPath('/');
+                setCurrentRoute('shop');
+                setSelectedPlantId(null);
+                setActiveWindow('catalog');
+              }}
+            />
+          ) : null}
           {/* WINDOW 1: PLANT CATALOG & CATEGORIES */}
-          {activeWindow === 'catalog' && (
+          {!unknownShopPath && activeWindow === 'catalog' && (
             <div>
               <HeroSection
                 lang={lang}
@@ -1659,7 +1714,7 @@ function AppContent() {
           )}
 
         {/* WINDOW 2: SEASONAL OFFERS & DEALS */}
-        {activeWindow === 'offers' && (
+        {!unknownShopPath && activeWindow === 'offers' && (
           <div className="bg-[#EBF1E8] py-6 sm:py-10">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
               <div className="bg-white rounded-3xl border border-[#D5DFD1] p-6 sm:p-8 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -1705,7 +1760,7 @@ function AppContent() {
         )}
 
         {/* WINDOW 3: CARE GUIDE & SOIL ADVICE */}
-        {activeWindow === 'care' && (
+        {!unknownShopPath && activeWindow === 'care' && (
           <div className="bg-[#EBF1E8] py-6 sm:py-10">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
               <div className="bg-white rounded-3xl border border-[#D5DFD1] p-6 sm:p-8 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -1735,7 +1790,7 @@ function AppContent() {
         )}
 
         {/* WINDOW 4: REVIEWS & TESTIMONIALS */}
-        {activeWindow === 'reviews' && (
+        {!unknownShopPath && activeWindow === 'reviews' && (
           <div className="bg-[#EBF1E8] py-6 sm:py-10">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
               <div className="bg-white rounded-3xl border border-[#D5DFD1] p-6 sm:p-8 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -1765,7 +1820,7 @@ function AppContent() {
         )}
 
         {/* WINDOW 5: LOCATION & VISITING HOURS */}
-        {activeWindow === 'location' && (
+        {!unknownShopPath && activeWindow === 'location' && (
           <div className="bg-[#EBF1E8] py-6 sm:py-10">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
               <div className="bg-white rounded-3xl border border-[#D5DFD1] p-6 sm:p-8 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -1806,17 +1861,17 @@ function AppContent() {
       />
 
       {/* Sticky Floating Order Bag Summary Bar (Active when items are selected) */}
-      {totalItemCount > 0 && !isCartModalOpen && !selectedPlant && (
-        <div className="fixed bottom-3 left-3 right-3 sm:left-auto sm:right-6 sm:bottom-6 z-30 pointer-events-none">
+      {pastHero && totalItemCount > 0 && !isCartModalOpen && !selectedPlant && !unknownShopPath && (
+        <div className="hidden md:block fixed bottom-6 right-6 z-30 pointer-events-none">
           <div className="max-w-md ml-auto bg-[#122619] text-white rounded-2xl shadow-2xl border border-[#2C4733] px-4 py-3 flex items-center justify-between gap-4 pointer-events-auto font-sans-bn animate-bag-pop">
             <div className="min-w-0">
-              <p className="text-xs font-bold text-white flex items-center gap-1.5">
+              <p className="text-[13px] font-bold text-white flex items-center gap-1.5">
                 <span className="font-mono-num tabular-nums text-[#A3E635]">{totalItemCount}টি</span>
                 <span>{lang === 'bn' ? 'চারা নির্বাচিত' : 'saplings selected'}</span>
                 <span aria-hidden="true">·</span>
                 <span className="font-mono-num tabular-nums text-[#FFD8C2]">₹{totalEstimatePrice}</span>
               </p>
-              <p className="text-[10px] text-[#A8BDB0] truncate mt-0.5">
+              <p className="text-[13px] text-[#A8BDB0] truncate mt-0.5">
                 {totalEstimatePrice >= 250
                   ? 'খাতড়া/সিমলাপাল রুট ডেলিভারির জন্য যোগ্য ✓'
                   : `আর ₹${250 - totalEstimatePrice} হলে দূরবর্তী রুট ডেলিভারি উপযোগী`}
@@ -1835,7 +1890,12 @@ function AppContent() {
         </div>
       )}
 
-      {/* WhatsApp Order Inquiry Builder Modal */}
+      </div>
+      <MobileActionBar
+        lang={lang}
+        cartCount={totalItemCount}
+        onOpenCart={() => setIsCartModalOpen(true)}
+      />
       <WhatsAppCartModal
         isOpen={isCartModalOpen}
         items={inquiryItems}
@@ -1846,7 +1906,6 @@ function AppContent() {
         onRemoveItem={handleRemoveItem}
         onClearAll={handleClearAll}
       />
-      </div>
     </>
   );
 }

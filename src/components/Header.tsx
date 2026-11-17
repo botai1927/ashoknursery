@@ -91,12 +91,12 @@ export function Header({
   return (
     <header className="sticky top-0 z-40 bg-[#F4F7F1]/95 backdrop-blur-md border-b border-[#D5DFD1]">
       {/* Desktop Top Customer Trust Strip (hidden on narrow mobile to keep sticky bar slim) */}
-      <div className="hidden sm:flex bg-[#122619] text-[#E8EDE9] px-4 sm:px-8 py-1.5 text-[11px] font-sans-bn items-center justify-between">
-        <div className="flex items-center gap-2 truncate">
-          <span className="truncate">{NURSERY_CONTACT.sublineBn}</span>
+      <div className="flex bg-[#122619] text-[#E8EDE9] px-4 sm:px-8 py-2 text-[13px] leading-snug font-sans-bn items-center justify-between gap-x-4 gap-y-1 flex-wrap">
+        <div className="flex items-center gap-2 min-w-0">
+          <span>{NURSERY_CONTACT.sublineBn}</span>
         </div>
 
-        <div className="flex items-center gap-4 text-[#A8BDB0] shrink-0">
+        <div className="flex items-center gap-x-4 gap-y-1 text-[#A8BDB0] flex-wrap">
           <span>সকাল ৬:৩০ – সন্ধ্যা ৬:৩০</span>
           <span aria-hidden="true">·</span>
           <span>কালশুলি, পারসোলা, খাতড়া, সিমলাপাল</span>
@@ -120,12 +120,12 @@ export function Header({
               onSearchChange('');
               handleNavClick('catalog', 'all');
             }}
-            className="group flex flex-col text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15803D] rounded cursor-pointer"
+            className="group flex flex-col text-left rounded cursor-pointer"
           >
             <span className="font-serif-bn text-lg sm:text-2xl font-bold tracking-tight text-[#122619] group-hover:text-[#15803D] transition-colors whitespace-nowrap leading-none">
               ভ্রম্যমাণ নার্সারি
             </span>
-            <span className="text-[10px] sm:text-[11px] font-sans-bn text-[#785942] mt-0.5 flex items-center gap-1 font-medium">
+            <span className="text-[13px] font-sans-bn text-[#785942] mt-0.5 flex items-center gap-1 font-medium">
               <MapPin className="w-2.5 h-2.5 text-[#B84423]" />
               <span>কালশুলি · বাঁকুড়া</span>
             </span>
@@ -366,7 +366,7 @@ export function Header({
                   </a>
                   <a
                     href={`https://wa.me/${NURSERY_CONTACT.phoneRaw}?text=${encodeURIComponent(
-                      'নমস্কার অশোকদা, আমি কালশুলির নার্সারি থেকে মুখে বলে (Voice Note) চারাগাছ অর্ডার করতে চাই।'
+                      'নমস্কার, ভ্রম্যমাণ নার্সারি। আমি মুখে বলে চারাগাছ অর্ডার করতে চাই।'
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"

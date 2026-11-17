@@ -13,18 +13,17 @@ import { PUJA_IMAGE } from '../data/brahmyamanCatalog';
 import { resolvePlantImageUrl } from '../utils/imageUrl';
 import type { CustomerReviewItem } from '../types/nursery';
 import {
-  loadLocalCustomerReviews,
   submitCustomerReview,
+  subscribeApprovedCustomerReviews,
 } from '../utils/customerReviewsStorage';
+import { NURSERY_CONTACT } from '../data/brahmyamanCatalog';
 
 interface TestimonialsSectionProps {
   lang: 'bn' | 'en';
 }
 
 export function TestimonialsSection({ lang }: TestimonialsSectionProps) {
-  const [allReviews, setAllReviews] = useState<CustomerReviewItem[]>(() =>
-    loadLocalCustomerReviews()
-  );
+  const [allReviews, setAllReviews] = useState<CustomerReviewItem[]>([]);
   const [showSubmitForm, setShowSubmitForm] = useState(false);
   const [customerName, setCustomerName] = useState('');
   const [locationBn, setLocationBn] = useState('');
@@ -36,13 +35,8 @@ export function TestimonialsSection({ lang }: TestimonialsSectionProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    const sync = () => setAllReviews(loadLocalCustomerReviews());
-    window.addEventListener('brahmyaman-reviews-updated', sync);
-    window.addEventListener('storage', sync);
-    return () => {
-      window.removeEventListener('brahmyaman-reviews-updated', sync);
-      window.removeEventListener('storage', sync);
-    };
+    const unsubscribe = subscribeApprovedCustomerReviews(setAllReviews);
+    return unsubscribe;
   }, []);
 
   const approvedReviews = allReviews.filter((r) => r.status === 'approved');
@@ -97,10 +91,10 @@ export function TestimonialsSection({ lang }: TestimonialsSectionProps) {
               ? 'কালশুলি, পারসোলা, খাতড়া ও সিমলাপালের উদ্যানপ্রেমীদের মতামত'
               : 'Feedback from Gardeners in Kalsuli, Parsola, Khatra & Simlapal'}
           </h2>
-          <p className="text-xs sm:text-sm text-[#526356] mt-2 font-sans-bn">
+          <p className="text-[13px] sm:text-[15px] text-[#526356] mt-2 font-sans-bn">
             {lang === 'bn'
-              ? 'আমাদের নার্সারির সতেজ চারা ও কলমের গাছ নিয়ে ছাদবাগান ও পুজো সাজিয়েছেন যারা, তাদের বাস্তব ছবি ও অভিজ্ঞতা।'
-              : 'Real photos and feedback from local gardeners who trust our family nursery.'}
+              ? 'নার্সারি অনুমোদন করলে গ্রাহকের মতামত এখানে দেখা যায়। নতুন কথা WhatsApp-এ পাঠান।'
+              : 'Notes appear here after the nursery approves them. Send a new one on WhatsApp.'}
           </p>
 
           <div className="mt-5 flex justify-center">
@@ -231,6 +225,29 @@ export function TestimonialsSection({ lang }: TestimonialsSectionProps) {
           </form>
         )}
 
+        {approvedReviews.length === 0 && (
+          <div className="max-w-xl mx-auto bg-white border border-[#D5DFD1] rounded-2xl p-6 sm:p-8 text-center shadow-xs">
+            <p className="font-serif-bn text-xl text-[#142318]">
+              {lang === 'bn' ? 'এখনও কোনো অনুমোদিত রিভিউ নেই' : 'No approved reviews yet'}
+            </p>
+            <p className="mt-2 text-[13px] leading-relaxed text-[#526356] font-sans-bn">
+              {lang === 'bn'
+                ? 'চারা নিয়ে বাগানে লাগানোর পর আপনার অভিজ্ঞতা WhatsApp-এ লিখে পাঠান। নার্সারি দেখে অনুমোদন করলে সেটি এখানে দেখা যাবে।'
+                : 'After you plant your sapling, send your experience on WhatsApp. It appears here once the nursery approves it.'}
+            </p>
+            <a
+              href={`https://wa.me/${NURSERY_CONTACT.phoneRaw}?text=${encodeURIComponent(
+                'নমস্কার, ভ্রম্যমাণ নার্সারি। আমি চারার অভিজ্ঞতা জানাতে চাই।'
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-5 inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-[#15803D] text-white text-[13px] font-semibold"
+            >
+              {lang === 'bn' ? 'WhatsApp-এ রিভিউ পাঠান' : 'Send a review on WhatsApp'}
+            </a>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
           {approvedReviews.map((rev) => (
             <div
@@ -266,7 +283,7 @@ export function TestimonialsSection({ lang }: TestimonialsSectionProps) {
                     <h3 className="font-serif-bn font-bold text-sm text-[#142318]">
                       {rev.customerName}
                     </h3>
-                    <p className="text-[11px] text-[#785942] flex items-center gap-1 font-sans-bn">
+                    <p className="text-[13px] text-[#785942] flex items-center gap-1 font-sans-bn">
                       <MapPin className="w-3 h-3 text-[#B34728]" />
                       <span>{rev.locationBn}</span>
                     </p>
@@ -274,7 +291,7 @@ export function TestimonialsSection({ lang }: TestimonialsSectionProps) {
 
                   {rev.plantNameBn && (
                     <div className="text-right">
-                      <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#1B8354] bg-[#1B8354]/10 px-2.5 py-1 rounded-full">
+                      <span className="inline-flex items-center gap-1 text-[13px] font-semibold text-[#1B8354] bg-[#1B8354]/10 px-2.5 py-1 rounded-full">
                         <CheckCircle2 className="w-3 h-3" />
                         <span>{rev.plantNameBn}</span>
                       </span>

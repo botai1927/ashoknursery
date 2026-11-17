@@ -260,9 +260,12 @@ service cloud.firestore {
     }
 
     // Customer Reviews & Garden Photo Gallery: Public read of approved reviews, Public create as pending (or Admin approved), Admin approve/update, Owner delete
+    // Split allows so an unauthenticated query where status == 'approved' is provably allowed.
     match /customer_reviews/{reviewId} {
-      allow list: if isAuthorizedAdmin() || existing().status == 'approved';
-      allow get: if isValidId(reviewId) && (isAuthorizedAdmin() || existing().status == 'approved');
+      allow list: if isAuthorizedAdmin();
+      allow list: if resource.data.status == 'approved';
+      allow get: if isValidId(reviewId) && isAuthorizedAdmin();
+      allow get: if isValidId(reviewId) && resource.data.status == 'approved';
       allow create: if isValidId(reviewId) &&
         isValidCustomerReview(incoming()) &&
         incoming().id == reviewId &&

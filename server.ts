@@ -191,26 +191,40 @@ const cloudinaryUploadRateLimiter = createRateLimitMiddleware({
   errorMessage: 'অনেকগুলো ছবি একসাথে আপলোড করা হচ্ছে। অনুগ্রহ করে ১ মিনিট পর আবার চেষ্টা করুন।',
 });
 
-// Server-side Firebase ID token verification (signature + expiry + strict fail-closed live revocation)
+// Explicit local-only opt-in. Default off. NODE_ENV must be exactly "development".
+// Cloud Run (including K_SERVICE=ais-dev-*) and any non-development environment never bypass.
+function isExplicitDevAdminBypassEnabled(): boolean {
+  return (
+    process.env.NODE_ENV === 'development' &&
+    process.env.ALLOW_DEV_ADMIN_BYPASS === 'true'
+  );
+}
+
+function attachDevAdminBypass(req: express.Request): void {
+  console.warn(
+    'ALLOW_DEV_ADMIN_BYPASS=true with NODE_ENV=development: skipping Firebase admin checks for this request.'
+  );
+  (req as any).adminUser = {
+    uid: 'dev-admin-bypass',
+    email: AUTHORIZED_ADMIN_EMAILS[0] || 'admin@brahmyaman.local',
+    revocationCheckActive: false,
+    revocationMethod: 'explicit-dev-bypass',
+  };
+}
+
+// Server-side Firebase ID token verification (signature + expiry + strict fail-closed live revocation).
+// Every /api/admin/* route and /api/grok-chat uses this. A missing, invalid, unverified,
+// or non-allowlisted token is rejected in every environment unless the explicit dev opt-in is set.
 async function requireFirebaseAdmin(
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
 ) {
-  const isDevEnvironment =
-    process.env.NODE_ENV === 'development' ||
-    Boolean(process.env.K_SERVICE && process.env.K_SERVICE.startsWith('ais-dev-')) ||
-    process.env.NODE_ENV !== 'production';
   const authHeader = req.headers.authorization || '';
 
   if (!authHeader.startsWith('Bearer ')) {
-    if (isDevEnvironment) {
-      (req as any).adminUser = {
-        uid: 'dev-admin-preview',
-        email: AUTHORIZED_ADMIN_EMAILS[0] || 'admin@brahmyaman.local',
-        revocationCheckActive: false,
-        revocationMethod: 'dev-environment-bypass',
-      };
+    if (isExplicitDevAdminBypassEnabled()) {
+      attachDevAdminBypass(req);
       return next();
     }
     return res.status(401).json({
@@ -221,13 +235,8 @@ async function requireFirebaseAdmin(
 
   const idToken = authHeader.slice('Bearer '.length).trim();
   if (!idToken) {
-    if (isDevEnvironment) {
-      (req as any).adminUser = {
-        uid: 'dev-admin-preview',
-        email: AUTHORIZED_ADMIN_EMAILS[0] || 'admin@brahmyaman.local',
-        revocationCheckActive: false,
-        revocationMethod: 'dev-environment-bypass',
-      };
+    if (isExplicitDevAdminBypassEnabled()) {
+      attachDevAdminBypass(req);
       return next();
     }
     return res.status(401).json({
@@ -244,14 +253,9 @@ async function requireFirebaseAdmin(
   });
 
   if (verification.ok === false) {
-    if (isDevEnvironment) {
-      console.warn('Dev preview: Firebase token check soft-fallback:', verification.error);
-      (req as any).adminUser = {
-        uid: 'dev-admin-preview',
-        email: AUTHORIZED_ADMIN_EMAILS[0] || 'admin@brahmyaman.local',
-        revocationCheckActive: false,
-        revocationMethod: 'dev-environment-bypass',
-      };
+    if (isExplicitDevAdminBypassEnabled()) {
+      console.warn('Explicit dev admin bypass after token check failed:', verification.error);
+      attachDevAdminBypass(req);
       return next();
     }
     return res.status(verification.status).json({
@@ -263,13 +267,8 @@ async function requireFirebaseAdmin(
   }
 
   if (verification.emailVerified !== true) {
-    if (isDevEnvironment) {
-      (req as any).adminUser = {
-        uid: verification.uid,
-        email: verification.email || AUTHORIZED_ADMIN_EMAILS[0],
-        revocationCheckActive: false,
-        revocationMethod: 'dev-environment-bypass',
-      };
+    if (isExplicitDevAdminBypassEnabled()) {
+      attachDevAdminBypass(req);
       return next();
     }
     return res.status(403).json({
@@ -279,13 +278,8 @@ async function requireFirebaseAdmin(
   }
 
   if (!verification.email || !AUTHORIZED_ADMIN_EMAILS.includes(verification.email)) {
-    if (isDevEnvironment) {
-      (req as any).adminUser = {
-        uid: verification.uid,
-        email: verification.email,
-        revocationCheckActive: false,
-        revocationMethod: 'dev-environment-bypass',
-      };
+    if (isExplicitDevAdminBypassEnabled()) {
+      attachDevAdminBypass(req);
       return next();
     }
     return res.status(403).json({
@@ -301,6 +295,29 @@ async function requireFirebaseAdmin(
     revocationMethod: verification.revocationMethod,
   };
   next();
+}
+
+const ALLOWED_UPLOAD_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+
+function decodeAllowedImageDataUrl(
+  image: string
+): { buffer: Buffer; ext: 'jpg' | 'png' | 'webp'; mime: string } | null {
+  const trimmed = image.trim();
+  const match = /^data:(image\/(?:jpeg|jpg|png|webp));base64,([a-z0-9+/=\r\n]+)$/i.exec(trimmed);
+  if (!match) return null;
+  const mime = match[1].toLowerCase() === 'image/jpg' ? 'image/jpeg' : match[1].toLowerCase();
+  if (!ALLOWED_UPLOAD_IMAGE_TYPES.has(mime)) return null;
+  const buffer = Buffer.from(match[2].replace(/\s/g, ''), 'base64');
+  if (buffer.length < 32 || buffer.length > 12 * 1024 * 1024) return null;
+  const isJpeg = buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
+  const isPng =
+    buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4e && buffer[3] === 0x47;
+  const isWebp = buffer.toString('ascii', 0, 4) === 'RIFF' && buffer.toString('ascii', 8, 12) === 'WEBP';
+  if (mime === 'image/jpeg' && !isJpeg) return null;
+  if (mime === 'image/png' && !isPng) return null;
+  if (mime === 'image/webp' && !isWebp) return null;
+  const ext = mime === 'image/png' ? 'png' : mime === 'image/webp' ? 'webp' : 'jpg';
+  return { buffer, ext, mime };
 }
 
 async function startServer() {
@@ -1197,28 +1214,33 @@ Respond in a friendly, knowledgeable, and respectful tone. Answer in Bengali whe
       ALLOWED_NURSERY_CATEGORIES.find((c) => c === rawCat || c.includes(rawCat) || rawCat.includes(c)) ||
       fallback.category;
 
+    const textFromModel = (value: unknown, fallbackText: string): string => {
+      if (typeof value === 'string') return value.trim();
+      return typeof fallbackText === 'string' ? fallbackText.trim() : '';
+    };
+
     const rawPrice = Number(raw?.suggestedPrice);
+    const existingPrice = Number(existingPlant?.currentPrice);
     const cleanPrice =
       Number.isFinite(rawPrice) && rawPrice >= 20 && rawPrice <= 5000
         ? Math.round(rawPrice / 5) * 5
-        : fallback.suggestedPrice;
-
-    const rawDescBn = typeof raw?.descriptionBn === 'string' ? raw.descriptionBn.trim() : '';
-    const rawDescEn = typeof raw?.descriptionEn === 'string' ? raw.descriptionEn.trim() : '';
+        : Number.isFinite(existingPrice) && existingPrice > 0
+          ? Math.round(existingPrice)
+          : null;
 
     return {
-      nameBn: isDescOnly && existingPlant?.nameBn ? existingPlant.nameBn : (raw?.nameBn || fallback.nameBn).trim(),
-      nameEn: isDescOnly && existingPlant?.nameEn ? existingPlant.nameEn : (raw?.nameEn || fallback.nameEn).trim(),
-      colorBn: isDescOnly && existingPlant?.colorBn ? existingPlant.colorBn : (raw?.colorBn || fallback.colorBn).trim(),
-      badgeBn: (raw?.badgeBn || fallback.badgeBn).trim().slice(0, 48),
+      nameBn: isDescOnly && existingPlant?.nameBn ? existingPlant.nameBn : textFromModel(raw?.nameBn, fallback.nameBn),
+      nameEn: isDescOnly && existingPlant?.nameEn ? existingPlant.nameEn : textFromModel(raw?.nameEn, fallback.nameEn),
+      colorBn: isDescOnly && existingPlant?.colorBn ? existingPlant.colorBn : textFromModel(raw?.colorBn, ''),
+      badgeBn: textFromModel(raw?.badgeBn, '').slice(0, 48),
       category: isDescOnly && existingPlant?.category ? existingPlant.category : matchedCat,
-      botanicalName: (raw?.botanicalName || fallback.botanicalName).trim(),
+      botanicalName: textFromModel(raw?.botanicalName, ''),
       suggestedPrice: cleanPrice,
-      sunlightBn: (raw?.sunlightBn || fallback.sunlightBn).trim(),
-      wateringBn: (raw?.wateringBn || fallback.wateringBn).trim(),
-      soilTipBn: (raw?.soilTipBn || fallback.soilTipBn).trim(),
-      descriptionBn: rawDescBn.length >= 80 ? rawDescBn : fallback.descriptionBn,
-      descriptionEn: rawDescEn.length >= 35 ? rawDescEn : fallback.descriptionEn,
+      sunlightBn: textFromModel(raw?.sunlightBn, ''),
+      wateringBn: textFromModel(raw?.wateringBn, ''),
+      soilTipBn: textFromModel(raw?.soilTipBn, ''),
+      descriptionBn: textFromModel(raw?.descriptionBn, ''),
+      descriptionEn: textFromModel(raw?.descriptionEn, ''),
     };
   }
 
@@ -1687,14 +1709,14 @@ Respond in a friendly, knowledgeable, and respectful tone. Answer in Bengali whe
       dynamicWateringBn = 'মাটি হালকা আর্দ্র রাখুন; শিকড়ে যাতে জল জমে না থাকে';
       dynamicSoilTipBn = '৫০% দোআঁশ মাটি, ৩০% গোবর সার বা কম্পোস্ট ও ২০% বালি-নিমখোল';
       dynamicPrice = 70;
-      dynamicDescBn = `${displayName} রান্নায় তাজা সুবাস ও ঘরোয়া আয়ুর্বেদিক প্রয়োজনে ব্যবহারের জন্য খাঁটি জাতের মশলা চারা। বাড়িতে নিজের হাতে ফলানো এই ভেষজ চারা থেকে খাঁটি স্বাস্থ্যকর উপাদান পাওয়া যায়।\n\nগাছটির জন্য সকালের রোদ ও আলো-বাতাসযুক্ত জায়গা অত্যন্ত অনুকূল। নিয়মিত ডগা ছাঁটাই করলে গাছটি লম্বালম্বি না বেড়ে চারদিকে প্রচুর শাখা-প্রশাখা ছড়ায়। রাসায়নিক সারের পরিবর্তে জৈব সার দিলে পাতার প্রাকৃতিক ঔষধি গুণ ও সুবাস অক্ষুণ্ণ থাকে।\n\n১০ থেকে ১২ ইঞ্চির টবে দোআঁশ মাটি ও ভার্মিকম্পোস্ট মিশিয়ে গাছ প্রতিপালন করুন।${customSuffix}`;
+      dynamicDescBn = `${displayName} রান্নায় তাজা সুবাসের জন্য নার্সারির মসলা চারা। বাঁকুড়ার লাল মাটিতে সকালের রোদ পেলে গাছটি সতেজ থাকে।\n\nনিয়মিত ডগা ছাঁটাই করলে গাছটি লম্বালম্বি না বেড়ে শাখা ছড়ায়। ১০ থেকে ১২ ইঞ্চির টবে দোআঁশ মাটি ও ভার্মিকম্পোস্ট মিশিয়ে রাখুন।${customSuffix}`;
     } else {
       dynamicBadgeBn = 'ঘরোয়া ঔষধি গুণ';
       dynamicSunlightBn = 'উজ্জ্বল পরোক্ষ আলো বা সকালের রোদ';
       dynamicWateringBn = 'মাটি শুকিয়ে গেলে পরিমিত জল দিন; কম জলে ভালো থাকে';
       dynamicSoilTipBn = '৪০% দোআঁশ মাটি, ৪০% মোটা বালি ও ২০% ভার্মিকম্পোস্ট';
       dynamicPrice = 60;
-      dynamicDescBn = `${displayName} ঘরোয়া প্রাথমিক চিকিৎসা, রোগ প্রতিরোধ ও বাতাস বিশুদ্ধকরণের অসাধারণ ক্ষমতাসম্পন্ন প্রাকৃতিক ঔষধি চারা। প্রাচীন আয়ুর্বেদিক গুণে সমৃদ্ধ এই গাছ বাড়িতে থাকা অত্যন্ত কল্যাণকর।\n\nখুবই কম যত্ন ও অল্প পরিচর্যাতেই গাছটি বেঁচে থাকে। অতিরিক্ত জল দেওয়া থেকে বিরত থাকুন এবং টবের মাটি শুকিয়ে এলে তবেই জল দিন।\n\n৮ থেকে ১০ ইঞ্চির টবে বালি প্রধান মাটিতে গাছ রোপণ করুন। কোনো রাসায়নিক সার ছাড়াই গাছটি দীর্ঘকাল সতেজ থাকে।${customSuffix}`;
+      dynamicDescBn = `${displayName} বাঁকুড়ার গরম ও বর্ষার জন্য নার্সারির গ্রো-ব্যাগ চারা। গ্রীষ্মে মাটি শুকিয়ে এলে জল দিন, বর্ষায় টবে জল জমতে দেবেন না।\n\n৮ থেকে ১০ ইঞ্চির টবে বালি-মেশানো মাটিতে রাখলে শিকড় সহজে বাড়ে। কোনো রোগ সারানোর দাবি এই বিবরণে নেই — এটি শুধু চারা বাড়ানোর সাধারণ যত্ন।${customSuffix}`;
     }
 
     return {
@@ -1753,51 +1775,47 @@ Respond in a friendly, knowledgeable, and respectful tone. Answer in Bengali whe
           ? `\nEXISTING PLANT CONTEXT: ${JSON.stringify(existingPlant).slice(0, 1200)}`
           : '';
 
-      const prompt = `You are a Senior Master Horticultural Botanist and Retail Plant Strategist for "Brahmyaman Nursery" (ভ্রম্যমাণ নার্সারি) in Kalsuli, Bankura, West Bengal.
-Given the plant name or query: "${query}" (Bengali or English).
-Generation mode: ${isDescriptionOnly ? 'UNIQUE_DESCRIPTION_AND_FEATURES_ONLY' : 'FULL_PLANT_PROFILE'}.${extraNote}${existingNote}
+      const prompt = `You fill a plant form for ভ্রম্যমাণ নার্সারি (Brahmyaman Nursery), Kalsuli, Bankura, West Bengal, India.
+Query: "${query}".
+Mode: ${isDescriptionOnly ? 'DESCRIPTION_AND_CARE_ONLY' : 'FULL_PROFILE'}.${extraNote}${existingNote}
 
-CRITICAL HORTICULTURAL MANDATE — READ CAREFULLY:
-The nursery owner has strictly instructed: DO NOT GENERATE SHORT, GENERIC, OR BOILERPLATE CONTENT. Every single plant must have an in-depth, authentic, species-specific horticultural profile with deep botanical precision for Bankura and Bengal gardeners.
+Write ONLY Bengali (Bangla script) and English. Never use Hindi, Devanagari, or Hindi plant names.
 
-1. CATEGORY: MUST be EXACTLY one of these 6 live-plant nursery categories:
-   - "ছাদবাগানের ফল ও কলম" (for mango/amrapali/katimon, lemon/kagzi, guava, pomelo, pomegranate/dalim, sapota, banana, etc.)
-   - "পূজার ফুল ও পবিত্র গাছ" (for hibiscus, lotus, tulsi, aparajita, bel, shiuli, tagar, stholopaddmo, gandharaj, etc.)
-   - "ছাদ ও বারান্দার ফুল" (for rose, adenium, bougainvillea, marigold/ganda, chrysanthemum, ixora/rangan, jasmine/beli, etc.)
-   - "গাছপালা ও শো-প্ল্যান্ট" (for palms, croton, rubber plant, lucky bamboo, money plant, foliage, show plants, etc.)
-   - "মসলা ও ভেষজ গাছ" (for cardamom, cinnamon, bay leaf, curry leaf, black pepper, etc.)
-   - "গৃহস্থ ও ঔষধি গাছ" (for snake plant, aloe vera, neem, indoor medicinal/air-purifying plants, etc.)
+Climate the sapling must suit: Bankura red laterite soil, a hot dry summer (often 38–42°C), and a heavy monsoon. Say how a nursery sapling is watered in that summer and how the pot is drained in the monsoon. Do not describe a mature orchard tree as if it were the product.
 
-2. DETAILED BENGALI DESCRIPTION ("descriptionBn") — MANDATORY LENGTH: 150-250 BENGALI WORDS (minimum 400-800 characters) across 3-4 structured, rich paragraphs:
-   - Paragraph 1 (চারার জাত, গঠন ও উদ্ভিজ্জ বৈশিষ্ট্য): Describe the specific cultivar/variety, leaf pattern, branching structure, grafting technique (জোড় কলম/গুটি কলম) or root system, bud formation, and blooming/fruiting timeline.
-   - Paragraph 2 (বাঁকুড়া ও দক্ষিণবঙ্গের আবহাওয়ায় ঋতুভিত্তিক পরিচর্যা): Address local seasonal realities (বাঁকুড়ার চরম গ্রীষ্মের ৩৮-৪২° সে. খরায় জল ও ছায়ার ব্যবস্থা, বর্ষায় ড্রেনেজ ও সাফ/ট্রাইকোডার্মা বা নিমতেল ছত্রাকনাশক স্প্রে, এবং কার্তিক-শীতকালে সঠিক প্রুনিং বা ডাল ছাঁটাই ও সরিষার খোল পচা তরল জৈব সার প্রয়োগের নিয়ম)।
-   - Paragraph 3 (টব নির্বাচন ও পুষ্টিকর মাটির মিশ্রণ অনুপাত): Mention recommended container size (যেমন: ১০-১৪ ইঞ্চি মাটির টব বা হাফ-ড্রাম) and the exact potting recipe (দোআঁশ মাটি, ভার্মিকম্পোস্ট বা পচা গোবর সার, হাড়গুঁড়ো, নিমখোল ও মোটা বালির নিখুঁত অনুপাত)।
-   - Paragraph 4 (ব্যবহারিক উপকারিতা ও রোগবালাই প্রতিরোধ): Specific religious worship (পূজা), edible nutrition, herbal health, air purification benefits, along with aphid/mealybug prevention tips.
+Grafted vs seedling: if the query or existing context says কলম / graft / grafted, call it a grafted sapling and do not call it a seedling. If it says বীজ / seedling / seed-grown, call it a seedling and do not invent a graft union. If the query does not say which, leave that distinction out. Do not invent a cultivar name, a graft method, a yield, or a fruiting age.
 
-3. ENGLISH DESCRIPTION ("descriptionEn"): 3-4 comprehensive, informative sentences detailing botanical taxonomy, cultivation, soil mix, container recommendation, and seasonal care.
+Size: this is a nursery sapling, usually a poly grow-bag plant roughly 6–18 inches tall, or a slightly larger bag if the query says so. Do not describe a fruit-laden patio tree, a bonsai specimen, or a flowering show plant unless the query itself says the nursery is selling that exact form.
 
-4. SPECIFIC CARE TIPS:
-   - "sunlightBn": Plant-specific sunlight requirement with seasonal summer vs winter placement in Bankura.
-   - "wateringBn": Specific watering schedule (summer vs monsoon vs winter) and soil-moisture check technique.
-   - "soilTipBn": Detailed potting mix ratios with percentages and organic amendments (bone meal, neem cake, vermicompost, red loam soil).
-   - "badgeBn": Short 2-4 word distinctive highlight badge in Bengali (e.g., "বারোমাসি সুস্বাদু ফলন", "রোদসহনশীল থোকা ফুল", "২৪ ঘণ্টা বাতাস বিশুদ্ধকারী").
-   - "suggestedPrice": Realistic sapling retail price in INR (between 30 and 250 for regular/grafted plants).
+Unknown fields: leave them as an empty string. For suggestedPrice, use 0 unless the owner note or existing context already gives a price in INR. Never invent a price, a review, an award, a year in business, or a person's name.
 
-Output a strictly valid JSON object ONLY (no markdown fences, no surrounding text):
+No medical claims. Do not say a plant cures, treats, prevents disease, or purifies air as a health product. Puja use and ordinary kitchen use are fine when they are actually true for that plant. If you are not sure, leave the benefit sentence out.
+
+Category must be exactly one of:
+- "ছাদবাগানের ফল ও কলম"
+- "পূজার ফুল ও পবিত্র গাছ"
+- "ছাদ ও বারান্দার ফুল"
+- "গাছপালা ও শো-প্ল্যান্ট"
+- "মসলা ও ভেষজ গাছ"
+- "গৃহস্থ ও ঔষধি গাছ"
+If the category is unclear, still pick the closest of these six and keep the description cautious.
+
+Return one JSON object and nothing else. Keys must be exactly:
 {
-  "nameBn": "Clean Bengali plant name",
-  "nameEn": "Clean English plant name",
-  "colorBn": "Color or variety in Bengali (e.g. রক্ত লাল, বারোমাসি কলম, থাই মিষ্টি জাত)",
-  "badgeBn": "Short 2-4 word unique feature highlight badge in Bengali",
-  "category": "Exact match to one of the 6 categories listed above",
-  "botanicalName": "Binomial Latin scientific name (e.g. Hibiscus rosa-sinensis)",
-  "suggestedPrice": 60,
-  "sunlightBn": "Detailed sunlight instruction in Bengali",
-  "wateringBn": "Detailed watering instruction in Bengali",
-  "soilTipBn": "Detailed potting soil mix with percentages in Bengali",
-  "descriptionBn": "150-250 Bengali words covering all 4 paragraphs with deep botanical details",
-  "descriptionEn": "3-4 detailed English sentences covering traits, pot size, soil, and care"
-}`;
+  "nameBn": "",
+  "nameEn": "",
+  "colorBn": "",
+  "badgeBn": "",
+  "category": "",
+  "botanicalName": "",
+  "suggestedPrice": 0,
+  "sunlightBn": "",
+  "wateringBn": "",
+  "soilTipBn": "",
+  "descriptionBn": "",
+  "descriptionEn": ""
+}
+nameBn is Bengali. nameEn and botanicalName are English/Latin. descriptionBn, badgeBn, colorBn, sunlightBn, wateringBn, and soilTipBn are Bengali. descriptionEn is English. Keep descriptionBn to 2 short paragraphs a gardener can use, only with facts you are confident about.`;
 
       const tryGeminiAutofill = async () => {
         const geminiModelChoice = modelChoice === 'grok-4' ? 'auto' : modelChoice;
@@ -1867,7 +1885,11 @@ Output a strictly valid JSON object ONLY (no markdown fences, no surrounding tex
         const grokRes = await runGrokChatWithFallback({
           preferredModel: preferredGrokModel,
           messages: [
-            { role: 'system', content: 'Return ONLY a valid JSON object matching the requested plant schema.' },
+            {
+              role: 'system',
+              content:
+                'Return ONLY a valid JSON object with the requested keys. Bengali and English only, never Hindi. Leave unknown strings empty and set suggestedPrice to 0 unless a price was supplied. No medical claims.',
+            },
             { role: 'user', content: prompt },
           ],
           jsonMode: true,
@@ -1931,21 +1953,9 @@ Output a strictly valid JSON object ONLY (no markdown fences, no surrounding tex
     }
   });
 
-  // Health check endpoint (strictly non-sensitive status booleans only)
+  // Public health probe. Config flags live on the admin-only /api/admin/system-diagnostics route.
   app.get('/api/health', (_req, res) => {
-    res.json({
-      status: 'ok',
-      nursery: 'Brahmyaman Nursery',
-      location: 'Kalsuli, Bankura',
-      rateLimitMode: adminRateLimitStore.getMode(),
-      rateLimitReason: adminRateLimitStore.getFallbackReason(),
-      hasExplicitServiceAccount,
-      authRevocationMode: hasExplicitServiceAccount ? 'firebase-admin-sdk' : 'identity-toolkit-lookup',
-      cloudinaryConfigured: isCloudinaryConfigured(),
-      geminiConfigured: getConfiguredClients().length > 0,
-      grokConfigured: isGrokConfigured(),
-      uptimeSec: Math.round(process.uptime()),
-    });
+    res.json({ status: 'ok' });
   });
 
   // In-memory LRU image cache for /api/image-proxy (prevents Wikimedia hotlink blocks & accelerates 3G/4G)
@@ -2517,11 +2527,25 @@ Output a strictly valid JSON object ONLY (no markdown fences, no surrounding tex
         });
       }
 
+      const trimmedImage = image.trim();
+      const decodedDataUrl = trimmedImage.startsWith('data:')
+        ? decodeAllowedImageDataUrl(trimmedImage)
+        : null;
+      if (trimmedImage.startsWith('data:') && !decodedDataUrl) {
+        return res.status(415).json({
+          success: false,
+          code: 'UNSUPPORTED_IMAGE_TYPE',
+          error: 'শুধু JPEG, PNG বা WebP ছবি আপলোড করা যাবে।',
+        });
+      }
+
       // If Cloudinary is configured, attempt upload to Cloudinary CDN
       if (isCloudinaryConfigured()) {
         try {
           const uploaded = await uploadImageToCloudinary({
-            image,
+            image: decodedDataUrl
+              ? `data:${decodedDataUrl.mime};base64,${decodedDataUrl.buffer.toString('base64')}`
+              : trimmedImage,
             plantName,
             slot,
             folder,
@@ -2543,28 +2567,27 @@ Output a strictly valid JSON object ONLY (no markdown fences, no surrounding tex
           fs.mkdirSync(publicUploadsDir, { recursive: true });
         }
 
-        let buffer: Buffer;
-        let ext = 'jpg';
-        if (image.startsWith('data:image/')) {
-          const mimeMatch = image.match(/^data:image\/([a-zA-Z0-9+.-]+);base64,/);
-          if (mimeMatch) {
-            ext = mimeMatch[1] === 'jpeg' ? 'jpg' : mimeMatch[1];
-          }
-          const base64Data = image.replace(/^data:image\/[a-zA-Z0-9+.-]+;base64,/, '');
-          buffer = Buffer.from(base64Data, 'base64');
-        } else if (image.startsWith('http://') || image.startsWith('https://')) {
+        if (trimmedImage.startsWith('http://') || trimmedImage.startsWith('https://')) {
           return res.json({
             success: true,
-            url: image,
+            url: trimmedImage,
             public_id: `external_${Date.now()}`,
             format: 'jpg',
-            bytes: image.length,
+            bytes: trimmedImage.length,
             method: 'external_url',
           });
-        } else {
-          buffer = Buffer.from(image, 'base64');
         }
 
+        if (!decodedDataUrl) {
+          return res.status(415).json({
+            success: false,
+            code: 'UNSUPPORTED_IMAGE_TYPE',
+            error: 'শুধু JPEG, PNG বা WebP ছবি সেভ করা যাবে।',
+          });
+        }
+
+        const buffer = decodedDataUrl.buffer;
+        const ext = decodedDataUrl.ext;
         const safePrefix = (plantName || 'plant').replace(/[^a-zA-Z0-9_]/g, '_').slice(0, 30);
         const fileName = `${safePrefix}_${Date.now()}_slot${slot || 1}.${ext}`;
         const filePath = path.join(publicUploadsDir, fileName);
@@ -2750,9 +2773,24 @@ Output a strictly valid JSON object ONLY (no markdown fences, no surrounding tex
     if (!fs.existsSync(distIndexPath)) {
       console.warn('Warning: dist/index.html not found in production mode. Run "npm run build" before starting.');
     }
-    app.use(express.static(distDir));
+    app.use(express.static(distDir, { index: false, fallthrough: true }));
     app.get('*', (req, res) => {
-      res.sendFile(distIndexPath);
+      if (!fs.existsSync(distIndexPath)) {
+        return res.status(503).type('text/plain').send('Site build is missing.');
+      }
+      const requestPath = req.path || '/';
+      const extension = path.extname(requestPath);
+      if (extension) {
+        return res.status(404).type('text/plain').send('Not found');
+      }
+      const knownSpaPath =
+        requestPath === '/' ||
+        requestPath === '/admin' ||
+        requestPath.startsWith('/admin/');
+      if (!knownSpaPath) {
+        return res.status(404).sendFile(distIndexPath);
+      }
+      return res.sendFile(distIndexPath);
     });
   }
 

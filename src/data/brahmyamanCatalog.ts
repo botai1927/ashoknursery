@@ -1,30 +1,30 @@
 import { BrahmyamanPlant, PlantCareTip } from "../types/nursery";
 import { getAshokePhotoUrl } from "./ashokePhotos";
 
-import heroImg from "../assets/images/hero_brahmyaman_nursery_1794627514151.jpg";
-import pujaOrigImg from "../assets/images/puja_plants_hibiscus_1794627514451.jpg";
-import fruitOrigImg from "../assets/images/fruit_grafts_saplings_1794627514463.jpg";
-import rooftopOrigImg from "../assets/images/rooftop_bougainvillea_rose_1794627515749.jpg";
-import potsOrigImg from "../assets/images/terracotta_pots_compost_1794627515802.jpg";
+import heroImg from "../assets/images/hero_brahmyaman_nursery_1794627514151.webp";
+import pujaOrigImg from "../assets/images/puja_plants_hibiscus_1794627514451.webp";
+import fruitOrigImg from "../assets/images/fruit_grafts_saplings_1794627514463.webp";
+import rooftopOrigImg from "../assets/images/rooftop_bougainvillea_rose_1794627515749.webp";
+import potsOrigImg from "../assets/images/terracotta_pots_compost_1794627515802.webp";
 
-import mangoOrigImg from "../assets/images/plant_mango_amrapali_1794628168576.jpg";
-import dalimOrigImg from "../assets/images/plant_pomegranate_dalim_1794628170246.jpg";
-import belOrigImg from "../assets/images/plant_bel_bilwapatra_1794628166466.jpg";
-import shiuliOrigImg from "../assets/images/plant_shiuli_parijat_1794628167184.jpg";
-import aparajitaOrigImg from "../assets/images/plant_neel_aparajita_1794628167282.jpg";
-import tulsiOrigImg from "../assets/images/plant_krishna_tulsi_1794628165686.jpg";
-import lemonOrigImg from "../assets/images/plant_kagzi_lemon_1794628168792.jpg";
-import guavaOrigImg from "../assets/images/plant_guava_lucknow_1794628171221.jpg";
-import kashmiriRoseOrigImg from "../assets/images/plant_kashmiri_rose_1794628170606.jpg";
-import adeniumOrigImg from "../assets/images/plant_adenium_desert_rose_1794628171551.jpg";
-import lotusOrigImg from "../assets/images/plant_lotus_padma_1794633597303.jpg";
-import bananaOrigImg from "../assets/images/plant_banana_g9_1794633596588.jpg";
-import marigoldOrigImg from "../assets/images/plant_marigold_ganda_1794633615666.jpg";
-import stholopaddmoOrigImg from "../assets/images/plant_stholopaddmo_rose_1794633615030.jpg";
-import luckyBambooOrigImg from "../assets/images/plant_lucky_bamboo_1794633632995.jpg";
-import chandramallikaOrigImg from "../assets/images/plant_chandramallika_mum_1794633634519.jpg";
-import rubberOrigImg from "../assets/images/plant_rubber_burgundy_1794625408145.jpg";
-import snakeOrigImg from "../assets/images/plant_snake_laurentii_1794625409134.jpg";
+import mangoOrigImg from "../assets/images/plant_mango_amrapali_1794628168576.webp";
+import dalimOrigImg from "../assets/images/plant_pomegranate_dalim_1794628170246.webp";
+import belOrigImg from "../assets/images/plant_bel_bilwapatra_1794628166466.webp";
+import shiuliOrigImg from "../assets/images/plant_shiuli_parijat_1794628167184.webp";
+import aparajitaOrigImg from "../assets/images/plant_neel_aparajita_1794628167282.webp";
+import tulsiOrigImg from "../assets/images/plant_krishna_tulsi_1794628165686.webp";
+import lemonOrigImg from "../assets/images/plant_kagzi_lemon_1794628168792.webp";
+import guavaOrigImg from "../assets/images/plant_guava_lucknow_1794628171221.webp";
+import kashmiriRoseOrigImg from "../assets/images/plant_kashmiri_rose_1794628170606.webp";
+import adeniumOrigImg from "../assets/images/plant_adenium_desert_rose_1794628171551.webp";
+import lotusOrigImg from "../assets/images/plant_lotus_padma_1794633597303.webp";
+import bananaOrigImg from "../assets/images/plant_banana_g9_1794633596588.webp";
+import marigoldOrigImg from "../assets/images/plant_marigold_ganda_1794633615666.webp";
+import stholopaddmoOrigImg from "../assets/images/plant_stholopaddmo_rose_1794633615030.webp";
+import luckyBambooOrigImg from "../assets/images/plant_lucky_bamboo_1794633632995.webp";
+import chandramallikaOrigImg from "../assets/images/plant_chandramallika_mum_1794633634519.webp";
+import rubberOrigImg from "../assets/images/plant_rubber_burgundy_1794625408145.webp";
+import snakeOrigImg from "../assets/images/plant_snake_laurentii_1794625409134.webp";
 
 export const HERO_IMAGE = heroImg;
 export const POTS_IMAGE = potsOrigImg;
@@ -55,15 +55,15 @@ export { getAshokePhotoUrl };
 
 export const NURSERY_CONTACT = {
   phone: "+918609417672",
-  phoneRaw: "+918609417672",
+  phoneRaw: "918609417672",
   phoneDisplay: "+91 86094 17672",
   whatsappNumber: "918609417672",
   mapUrl: "https://maps.app.goo.gl/zLQBxPHZKqK9ofLJ8",
   addressBn: "কালশুলি, বাঁকুড়া, ৭২২১৬০",
   addressEn: "Kalsuli, Bankura, 722160",
-  taglineBn: "পারিবারিক নার্সারি, কালশুলি · বাঁকুড়া, ৭২২১৬০,WhatsApp-এ সরাসরি অর্ডার, ন্যায্য দাম",
+  taglineBn: "পারিবারিক নার্সারি, কালশুলি · বাঁকুড়া, ৭২২১৬০ · WhatsApp-এ সরাসরি অর্ডার, ন্যায্য দাম",
   taglineEn: "Family Nursery, Kalsuli · Bankura, 722160 · Direct WhatsApp Order · Fair Price",
-  sublineBn: "পারিবারিক নার্সারি, কালশুলি · বাঁকুড়া, ৭২২১৬০,WhatsApp-এ সরাসরি অর্ডার, ন্যায্য দাম",
+  sublineBn: "পারিবারিক নার্সারি, কালশুলি · বাঁকুড়া, ৭২২১৬০ · WhatsApp-এ সরাসরি অর্ডার, ন্যায্য দাম",
   sublineEn: "Family Nursery, Kalsuli · Bankura, 722160 · Direct WhatsApp Order · Fair Price",
   visitingHoursBn: "প্রতিদিন সকাল ৬:৩০ – সন্ধ্যা ৬:৩০",
   visitingHoursEn: "Daily 6:30 AM – 6:30 PM",
@@ -94,7 +94,7 @@ export const SEASONAL_HIGHLIGHTS: SeasonalHighlight[] = [
     tagEn: "Bearing Lemons Now",
     priceNoteBn: "₹৯০ (ন্যায্য দাম)",
     priceNoteEn: "₹90 nursery rate",
-    image: lemonOrigImg,
+    image: getAshokePhotoUrl(25),
   },
   {
     id: "season-rose",
@@ -105,18 +105,18 @@ export const SEASONAL_HIGHLIGHTS: SeasonalHighlight[] = [
     tagEn: "Peak Blooming Season",
     priceNoteBn: "₹৬০ ও ₹৮০",
     priceNoteEn: "From ₹60",
-    image: kashmiriRoseOrigImg,
+    image: getAshokePhotoUrl(42),
   },
   {
     id: "season-lotus",
-    plantId: "ashoke-17",
+    plantId: "ashoke-28",
     titleBn: "পবিত্র গোলাপি পদ্ম কন্দ ও চারা",
     titleEn: "Sacred Water Lotus Sapling",
     tagBn: "জলজ পবিত্র ফুল",
     tagEn: "Sacred Aquatic Lotus",
     priceNoteBn: "₹৩৫০ (পরিপুষ্ট কন্দ চারা)",
     priceNoteEn: "₹350 ready tuber",
-    image: lotusOrigImg,
+    image: getAshokePhotoUrl(38),
   },
   {
     id: "season-banana",
@@ -553,9 +553,9 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-69",
-    nameBn: "কেজি টেন জাম",
-    nameEn: "KG-10 Hybrid Black Plum (Jam)",
-    botanicalName: "Syzygium cumini (KG-10)",
+    nameBn: "কালা জাম",
+    nameEn: "Black Plum (Jamun)",
+    botanicalName: "Syzygium cumini",
     category: "ছাদবাগানের ফল ও কলম",
     audience: ["rooftop","family"],
     badgeBn: "মিষ্টি ও বড় জাত",
@@ -566,8 +566,8 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
     soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "বাঁকুড়ার মাটি ও আবহাওয়ায় দ্রুত ফলনশীল সুপুষ্ট কেজি টেন জাম কলমের চারা।",
-    descriptionEn: "Fast-fruiting grafted KG-10 Hybrid Black Plum (Jam) sapling acclimated to Bankura.",
+    descriptionBn: "বাঁকুড়ার মাটি ও আবহাওয়ায় দ্রুত ফলনশীল সুপুষ্ট কালা জামের কলমের চারা।",
+    descriptionEn: "Fast-fruiting grafted black plum (jamun) sapling acclimated to Bankura.",
     image: getAshokePhotoUrl(82),
     options: [
       {
@@ -855,34 +855,6 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
         labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
         labelEn: "Grow Bag / Nursery Sapling",
         price: 70,
-        containerType: "পলি গ্রো ব্যাগ"
-      }
-    ]
-  },
-  {
-    id: "ashoke-55",
-    nameBn: "কেমেলিয়ান ফুল",
-    nameEn: "Camellia Flower Bush",
-    botanicalName: "Camellia japonica",
-    category: "ছাদ ও বারান্দার ফুল",
-    audience: ["rooftop","family"],
-    badgeBn: "শীতকালীন অভিজাত ফুল",
-    colorBn: "গোলাপি",
-    sunlightBn: "পূর্ণ রোদ ও পর্যাপ্ত আলো",
-    sunlightEn: "Full Sun & Good Light",
-    wateringBn: "মাটি শুকোলে পরিমিত জল দিন",
-    wateringEn: "Water moderately when topsoil dries",
-    soilTipBn: "বাঁকুড়ার লাল দোআঁশ মাটি ও ভার্মিকম্পোস্ট",
-    soilTipEn: "Bankura red loam & vermicompost blend",
-    descriptionBn: "কালশুলির নিজস্ব নার্সারিতে যত্নে তৈরি প্রচুর কুঁড়ি ও শিকড়যুক্ত সতেজ কেমেলিয়ান ফুল চারা।",
-    descriptionEn: "Fresh, well-rooted Camellia Flower Bush sapling grown at Kalsuli nursery.",
-    image: getAshokePhotoUrl(66),
-    options: [
-      {
-        id: "opt-55-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
-        price: 80,
         containerType: "পলি গ্রো ব্যাগ"
       }
     ]
@@ -1756,90 +1728,6 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     ]
   },
   {
-    id: "ashoke-26",
-    nameBn: "পদ্ম ফুল",
-    nameEn: "Sacred White Water Lotus",
-    botanicalName: "Nelumbo nucifera (Alba)",
-    category: "পূজার ফুল ও পবিত্র গাছ",
-    audience: ["puja","family"],
-    badgeBn: "মা সরস্বতীর শ্বেতপদ্ম",
-    colorBn: "স্নিগ্ধ সাদা",
-    sunlightBn: "দিনে ৫-৬ ঘণ্টা পূর্ণ রোদ",
-    sunlightEn: "5-6 Hours Full Sunlight",
-    wateringBn: "পাত্রে সবসময় ৩-৪ ইঞ্চি পরিষ্কার জল রাখুন",
-    wateringEn: "Maintain 3-4 inches standing clean water",
-    soilTipBn: "পুকুরের এঁটেল মাটি ও সামান্য গোবর সার",
-    soilTipEn: "Heavy clay/pond mud with aged cow manure",
-    descriptionBn: "বাঁকুড়ার রোদে জলের পাত্র বা গামলায় প্রচুর ফুল ফোটা পদ্ম ফুল।",
-    descriptionEn: "Healthy aquatic Sacred White Water Lotus ready to bloom abundantly in sunny water tubs.",
-    image: getAshokePhotoUrl(36),
-    options: [
-      {
-        id: "opt-26-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
-        price: 350,
-        containerType: "পলি গ্রো ব্যাগ"
-      }
-    ]
-  },
-  {
-    id: "ashoke-29",
-    nameBn: "পদ্ম ফুল",
-    nameEn: "Royal Pink Lotus",
-    botanicalName: "Nelumbo nucifera (Rosea)",
-    category: "পূজার ফুল ও পবিত্র গাছ",
-    audience: ["puja","family"],
-    badgeBn: "বড় জাতের পদ্ম",
-    colorBn: "হালকা গোলাপি-সাদা",
-    sunlightBn: "দিনে ৫-৬ ঘণ্টা পূর্ণ রোদ",
-    sunlightEn: "5-6 Hours Full Sunlight",
-    wateringBn: "পাত্রে সবসময় ৩-৪ ইঞ্চি পরিষ্কার জল রাখুন",
-    wateringEn: "Maintain 3-4 inches standing clean water",
-    soilTipBn: "পুকুরের এঁটেল মাটি ও সামান্য গোবর সার",
-    soilTipEn: "Heavy clay/pond mud with aged cow manure",
-    descriptionBn: "বাঁকুড়ার রোদে জলের পাত্র বা গামলায় প্রচুর ফুল ফোটা পদ্ম ফুল।",
-    descriptionEn: "Healthy aquatic Royal Pink Lotus ready to bloom abundantly in sunny water tubs.",
-    image: getAshokePhotoUrl(39),
-    options: [
-      {
-        id: "opt-29-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
-        price: 350,
-        containerType: "পলি গ্রো ব্যাগ"
-      }
-    ]
-  },
-  {
-    id: "ashoke-17",
-    nameBn: "পবিত্র গোলাপি পদ্ম কন্দ ও চারা",
-    nameEn: "Pink Sacred Lotus Tuber Sapling",
-    botanicalName: "Nelumbo nucifera",
-    category: "পূজার ফুল ও পবিত্র গাছ",
-    audience: ["puja","family"],
-    badgeBn: "জলজ পবিত্র পদ্মের চারা",
-    colorBn: "গোলাপি",
-    sunlightBn: "দিনে ৫-৬ ঘণ্টা পূর্ণ রোদ",
-    sunlightEn: "5-6 Hours Full Sunlight",
-    wateringBn: "পাত্রে সবসময় ৩-৪ ইঞ্চি পরিষ্কার জল রাখুন",
-    wateringEn: "Maintain 3-4 inches standing clean water",
-    soilTipBn: "পুকুরের এঁটেল মাটি ও সামান্য গোবর সার",
-    soilTipEn: "Heavy clay/pond mud with aged cow manure",
-    descriptionBn: "শিকড়সহ সতেজ পদ্ম কন্দ ও পাতা—বাড়িতে নিয়ে জলে সরাসরি রোদে রাখলেই ফুল ফুটবে।",
-    descriptionEn: "Established pink sacred lotus tuber sapling with intact roots, ready to bloom in standing water under sunlight.",
-    image: lotusOrigImg,
-    options: [
-      {
-        id: "opt-17-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
-        price: 350,
-        containerType: "পলি গ্রো ব্যাগ"
-      }
-    ]
-  },
-  {
     id: "ashoke-21",
     nameBn: "পুনা জবা",
     nameEn: "Pune Hybrid Hibiscus",
@@ -2176,34 +2064,6 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     ]
   },
   {
-    id: "ashoke-34",
-    nameBn: "লাল পদ্ম ফুল",
-    nameEn: "Sacred Red Lotus",
-    botanicalName: "Nelumbo nucifera (Rubra)",
-    category: "পূজার ফুল ও পবিত্র গাছ",
-    audience: ["puja","family"],
-    badgeBn: "পুজোয় শ্রেষ্ঠ লাল পদ্ম",
-    colorBn: "রক্ত লাল",
-    sunlightBn: "দিনে ৫-৬ ঘণ্টা পূর্ণ রোদ",
-    sunlightEn: "5-6 Hours Full Sunlight",
-    wateringBn: "পাত্রে সবসময় ৩-৪ ইঞ্চি পরিষ্কার জল রাখুন",
-    wateringEn: "Maintain 3-4 inches standing clean water",
-    soilTipBn: "পুকুরের এঁটেল মাটি ও সামান্য গোবর সার",
-    soilTipEn: "Heavy clay/pond mud with aged cow manure",
-    descriptionBn: "বাঁকুড়ার রোদে জলের পাত্র বা গামলায় প্রচুর ফুল ফোটা লাল পদ্ম ফুল।",
-    descriptionEn: "Healthy aquatic Sacred Red Lotus ready to bloom abundantly in sunny water tubs.",
-    image: getAshokePhotoUrl(44),
-    options: [
-      {
-        id: "opt-34-1",
-        labelBn: "গ্রো ব্যাগ / নার্সারি সাইজ",
-        labelEn: "Grow Bag / Nursery Sapling",
-        price: 350,
-        containerType: "পলি গ্রো ব্যাগ"
-      }
-    ]
-  },
-  {
     id: "ashoke-25",
     nameBn: "শিব জটা",
     nameEn: "Shiba Jata / Cockscomb Cristata",
@@ -2276,7 +2136,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     soilTipEn: "Bankura red loam & vermicompost blend",
     descriptionBn: "সকালে সাদা থেকে দুপুরে গোলাপি রঙ বদলানো পবিত্র ডাবল স্থলপদ্ম চারা।",
     descriptionEn: "Double-petal Confederate Rose blooming white in morning and turning pink by afternoon.",
-    image: stholopaddmoOrigImg,
+    image: getAshokePhotoUrl(83),
     options: [
       {
         id: "opt-41-1",
@@ -2317,7 +2177,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-66",
-    nameBn: "Rabish পাম",
+    nameBn: "র‍্যাপিস পাম",
     nameEn: "Rhapis Palm / Broadleaf Lady Palm",
     botanicalName: "Rhapis excelsa",
     category: "গৃহস্থ ও ঔষধি গাছ",
@@ -2429,7 +2289,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-67",
-    nameBn: "ব্রাজিলিয়ান লাকি বেম্বো",
+    nameBn: "ব্রাজিলিয়ান লাকি ব্যাম্বু",
     nameEn: "Brazilian Lucky Bamboo",
     botanicalName: "Dracaena sanderiana (Brazilian)",
     category: "গৃহস্থ ও ঔষধি গাছ",
@@ -2442,7 +2302,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Water moderately when topsoil dries",
     soilTipBn: "হালকা কোকোপিট, বালি ও ভার্মিকম্পোস্ট মিশ্রণ",
     soilTipEn: "Well-draining cocopeat, sand & vermicompost mix",
-    descriptionBn: "ঘরের ভেতর বা বারান্দার হালকা ছায়ায় সহজে বেড়ে ওঠা সতেজ ব্রাজিলিয়ান লাকি বেম্বো চারা।",
+    descriptionBn: "ঘরের ভেতর বা বারান্দার হালকা ছায়ায় সহজে বেড়ে ওঠা সতেজ ব্রাজিলিয়ান লাকি ব্যাম্বু চারা।",
     descriptionEn: "Healthy, low-maintenance indoor/balcony Brazilian Lucky Bamboo sapling.",
     image: getAshokePhotoUrl(79),
     options: [
@@ -2513,7 +2373,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
   },
   {
     id: "ashoke-65",
-    nameBn: "লাকিবেম্বো",
+    nameBn: "লাকি ব্যাম্বু",
     nameEn: "Lucky Bamboo 3-Tier",
     botanicalName: "Dracaena braunii",
     category: "গৃহস্থ ও ঔষধি গাছ",
@@ -2526,7 +2386,7 @@ export const BRAHMYAMAN_PLANTS: BrahmyamanPlant[] = [
     wateringEn: "Keep roots submerged in clean fresh water",
     soilTipBn: "হালকা কোকোপিট, বালি ও ভার্মিকম্পোস্ট মিশ্রণ",
     soilTipEn: "Well-draining cocopeat, sand & vermicompost mix",
-    descriptionBn: "ঘরের ভেতর বা বারান্দার হালকা ছায়ায় সহজে বেড়ে ওঠা সতেজ লাকিবেম্বো চারা।",
+    descriptionBn: "ঘরের ভেতর বা বারান্দার হালকা ছায়ায় সহজে বেড়ে ওঠা সতেজ লাকি ব্যাম্বু চারা।",
     descriptionEn: "Healthy, low-maintenance indoor/balcony Lucky Bamboo 3-Tier sapling.",
     image: getAshokePhotoUrl(77),
     options: [
